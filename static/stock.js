@@ -1,11 +1,10 @@
-// this script is for the testing and demostration of the api.
+// this script is for the testing and demonstration of the api.
 // test get, put, delete requests for the stocks
 
-
 // define api constants for the stocks:
-const api_url_get='http://127.0.0.1:5000/v1/stock/';
-const api_url_get_all='http://127.0.0.1:5000/v1/stocks/0';// "0" for all stocks
-const api_url_post_put='http://127.0.0.1:5000/v1/regstock';
+const api_url_get= server_url +'v1/stock/';
+const api_url_get_all= server_url +'v1/stocks/0';// "0" for all stocks
+const api_url_post_put= server_url +'v1/regstock';
 
 // form data to be collected in these variables:
 var formJSON;
