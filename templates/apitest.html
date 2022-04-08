@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RESTful API TEST PAGE</title>
+    <meta charset="UTF-8">
+    <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css">    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  
+    <script type="text/javascript" >
+        $(document).ready(function(){
+
+            // for the tabs:
+            $(".tabs-list li a").click(function(e){
+                e.preventDefault();
+            });
+
+            $(".tabs-list li").click(function(){
+                var tabid = $(this).find("a").attr("href");
+                $(".tabs-list li,.tabs div.tab").removeClass("active");
+                $(".tab").hide();
+                $(tabid).show();
+                $(this).addClass("active");
+
+            });
+
+            // end
+
+            // thanks to: https://jsfiddle.net/KarmaProd/hw8j34f2/4/
+            // Restricts input for each element in the set of matched elements to the given inputFilter.
+            (function($) {
+            $.fn.inputFilter = function(callback, errMsg) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function(e) {
+                if (callback(this.value)) {
+                    // Accepted value
+                    if (["keydown","mousedown","focusout"].indexOf(e.type) >= 0){
+                    $(this).removeClass("input-error");
+                    this.setCustomValidity("");
+                    }
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                } else if (this.hasOwnProperty("oldValue")) {
+                    // Rejected value - restore the previous one
+                    $(this).addClass("input-error");
+                    this.setCustomValidity(errMsg);
+                    this.reportValidity();
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                } else {
+                    // Rejected value - nothing to restore
+                    this.value = "";
+                }
+                });
+            };
+            }(jQuery));
+
+            // Install input filters.
+            // not used:
+            $("#intTextBox").inputFilter(function(value) {
+            return /^-?\d*$/.test(value); }, "Must be an integer");
+            
+            // used:
+            $('input.integer').inputFilter(function(value) {
+            return /^\d*$/.test(value); }, "Must be an unsigned integer");
+            
+            // not used:
+            $("#intLimitTextBox").inputFilter(function(value) {
+            return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1000); }, "Must be between 0 and 1000");
+            $('input.float').inputFilter(function(value) {
+            return /^-?\d*[.]?\d*$/.test(value); }, "Must be a floating (real) number");
+            
+            // used. if you need ',' as a separator use below:
+            //return /^-?\d*[.,]?\d*$/.test(value); }, "Must be a floating (real) number");
+            $("#currencyTextBox").inputFilter(function(value) {
+            return /^-?\d*[.,]?\d{0,2}$/.test(value); }, "Must be a currency value");
+            
+            // not used. currently using html input pattern:
+            $("#latinTextBox").inputFilter(function(value) {
+            return /^[a-z]*$/i.test(value); }, "Must use alphabetic latin characters");
+            // not used
+            $("#hexTextBox").inputFilter(function(value) {
+            return /^[0-9a-f]*$/i.test(value); }, "Must use hexadecimal characters");
+
+            // // not used: this can also be used for float only text inputs as "class=float"
+            // $('input.float').on('input', function() {
+            //     this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+            // });
+
+            // end
+
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+    <div class="tabs">
+        <ul class="tabs-list">
+            <li id="signalstab" class="active"><a href="#tab1">Signals</a></li>
+            <li id="pairstab"><a href="#tab2">Pairs</a></li>
+            <li id="stockstab"><a href="#tab3">Stocks<a/></li>
+        </ul>
+
+        <div id="tab1" class="tab active">
+            <div class="container">
+                <div class="column">
+                <h3> Webhook Simulator </h3>
+                <section class="webhook-form">
+                    <form>                                                  
+                        <div id="tradetype">
+                            <input type="radio" id="tradepair" name="tradetype" value="pair" checked><span>trade pair</span>
+                            <input type="radio" id="tradestock" name="tradetype" value="stock"><span>trade stock</span>
+                        </div>
+                        <br>
+                        <div>
+                            <div style="border-bottom:1px solid darkgrey;">
+                                <p>
+                                    <label for="ticker_webhook" id="ticker_webhook_label">Select Pair(*):</label>
+                                    <select onchange="changeStatusColor(this); "name="ticker_webhook" id="ticker_webhook">                    
+                                    <option disabled selected value></option>
+                                    </select>
+                                    <span title= "ticker status" id="show_status" class="round" style="vertical-align:middle";></span>                               
+                                </p>                          
+                            </div>
+                            <br>
+                            <p>
+                                <label for="order_action">Order Action(*):&nbsp;</label>
+                                <select name="order_action" id="order_action">
+                                    <option disabled selected value></option>
+                                    <option value="buy">buy</option>
+                                    <option value="sell">sell</option>
+                                </select>          
+                            </p>
+                            <p>
+                                <label for="order_contracts"># of Contracts(*):&nbsp;</label>
+                                <input type="text" name="order_contracts" id="order_contracts" class="integer"> 
+                            </p>
+                            <p>
+                                <label for="order_price">Order Price:&nbsp;</label>
+                                <input type="text" name="order_price" id="order_price" class="float"> 
+                            </p>
+                            <p>
+                                <label for="mar_pos">Market Position:&nbsp;</label>
+                                <select name="mar_pos" id="mar_pos">
+                                    <option></option>
+                                    <option value="flat">flat</option>
+                                    <option value="short">short</option>
+                                    <option value="long">long</option>
+                                </select>        
+                            </p>
+                            <p>
+                                <label for="mar_pos_size">Mar. Pos. Size:&nbsp;</label>
+                                <input type="text" name="mar_pos_size" id="mar_pos_size" class="integer"> 
+                            </p>
+                            <p>
+                                <label for="pre_mar_pos">Previous Mar. Pos.:&nbsp;</label>
+                                <select name="pre_mar_pos" id="pre_mar_pos">
+                                    <option></option>
+                                    <option value="flat">flat</option>
+                                    <option value="short">short</option>
+                                    <option value="long">long</option>
+                                </select>        
+                            </p>
+                            <p>
+                                <label for="pre_mar_pos_size">Pre. Mar. Pos. Size:&nbsp</label>
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer"> 
+                            </p>
+                            <input id="order_comment" name="order_comment" type="hidden" value=" "/>
+                            <input name="passphrase" type="hidden" value="webhook"/>
+                            <input name="order_status" type="hidden" value="waiting"/>
+                                                       
+                            <br><br>
+                            <button type="submit">Create JSON</button>
+                        </div>
+                    </form>
+                </section>
+            
+                <section>
+                    <div id="jsondiv-webhook" class="results-webhook" display= "none">
+                        <h2 id="jsontext-webhook" class="hidden" >JSON</h2>
+                        <pre></pre>
+            
+                    </div>
+                </section>
+            
+                </div>
+            
+                <div class="column">
+                    <h3> List of Order Signals </h3>
+                    <p>
+                    <ul id="signallist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <div id="prev-signals" class="pages" style=" float: left;">Prev</div>
+                    <div id="next-signals" class="pages" style=" float: right;">Next</div>
+                </div>
+                
+                <div class="column">
+                    <h3> Update Signal </h3>
+                    <section class="signals-update">
+                        <div class="deletebutton" onclick="alertBefore_signals()">&nbsp;DELETE!&nbsp;</div>
+                        <form>  
+                            <p>
+                                <label for="rowid_update">RowId:</label>
+                                <input type="text" name="rowid" id="rowid_update" readonly>                          
+                            </p>
+                            <p>
+                                <label for="ticker_webhook_update">Signal:</label>
+                                <input type="text" name="ticker" id="ticker_webhook_update" readonly>                          
+                            </p>
+                                                 
+                            <p>
+                                <label for="order_action_update">Order Action(*):&nbsp;</label>
+                                <select name="order_action" id="order_action_update">
+                                    <option disabled selected value></option>
+                                    <option value="buy">buy</option>
+                                    <option value="sell">sell</option>
+                                </select>          
+                            </p>
+                            <p>
+                                <label for="order_contracts_update"># of Contracts(*):&nbsp;</label>
+                                <input type="text" name="order_contracts" id="order_contracts_update" class="integer"> 
+                            </p>
+                            <p>
+                                <label for="order_price_update">Order Price:&nbsp;</label>
+                                <input type="text" name="order_price" id="order_price_update" class="float"> 
+                            </p>
+                            <p>
+                                <label for="mar_pos_update">Market Position:&nbsp;</label>
+                                <select name="mar_pos" id="mar_pos_update">
+                                    <option></option>
+                                    <option value="flat">flat</option>
+                                    <option value="short">short</option>
+                                    <option value="long">long</option>
+                                </select>        
+                            </p>
+                            <p>
+                                <label for="mar_pos_size_update">Mar. Pos. Size:&nbsp;</label>
+                                <input type="text" name="mar_pos_size" id="mar_pos_size_update" class="integer"> 
+                            </p>
+                            <p>
+                                <label for="pre_mar_pos_update">Previous Mar. Pos.:&nbsp;</label>
+                                <select name="pre_mar_pos" id="pre_mar_pos_update">
+                                    <option></option>
+                                    <option value="flat">flat</option>
+                                    <option value="short">short</option>
+                                    <option value="long">long</option>
+                                </select>        
+                            </p>
+                            <p>
+                                <label for="pre_mar_pos_size_update">Pre. Mar. Pos. Size:&nbsp;</label>
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size_update" class="integer"> 
+                            </p>
+                            
+                            <p>
+                                <label for="order_status_update">Order Status:&nbsp;</label>
+                                <select name="order_status" id="order_status_update" >
+                                    <option></option>
+                                    <option value="waiting">waiting</option>
+                                    <option value="created">created</option>
+                                    <option value="canceled">canceled</option>
+                                    <option value="filled">filled</option>
+                                </select> 
+                            </p>
+                            <p>
+                                <label for="order_comment_update">Order Comment:&nbsp;</label>
+                                <input type="text" name="order_comment" id="order_comment_update"> 
+                            </p>
+                            <input name="passphrase" type="hidden" value="webhook"/>
+                            <br><br>
+                            <button type="submit">Create JSON</button>                          
+                        </form>
+                        
+                    </section>
+                
+                    <section>
+                        <div id="jsondiv-webhook-update" class="results-webhook-update" display= "none">
+                            <h2 id="jsontext-webhook-update" class="hidden" >JSON</h2>
+                            <pre></pre>
+                
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="legend">
+                <span class='numberCircle' style='background-color: lightgoldenrodyellow';>&nbsp;</span> waiting
+                <span class='numberCircle' style='background-color: orange';>&nbsp;</span> canceled
+                <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created 
+                <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
+            </div>
+        </div>
+        <div id="tab2" class="tab">
+            <div class="container">
+                <div class="column">
+                <h3> Add Pair </h3>
+                <section class="pairs-form">
+                    <form>
+                        <div>
+                            <!-- if you need datalist with a value restriction use below:-->
+                            <!-- datalist
+                            <label for="ticker1">Stock 1:</label>
+                            <input list="tickerlist" name="ticker1" id="ticker1" class="ticker">
+                            <datalist id="tickerlist">
+                            </datalist>
+                            <br>
+                            <label for="ticker2">Stock 2:</label>
+                            <input list="tickerlist" name="ticker2" id="ticker2" class="ticker">
+                            <datalist id="tickerlist">
+                            </datalist> -->
+                            <p>
+                                <label for="ticker1">Stock 1:&nbsp;</label>
+                                <select name="ticker1" id="ticker1">
+                                <option disabled selected value></option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="ticker2">Stock 2:&nbsp;</label>
+                                <select name="ticker2" id="ticker2">
+                                <option disabled selected value></option> 
+                                </select>
+                            </p>          
+                            <p>
+                                <label for="hedge">Hedge:&nbsp;</label>
+                                <input type="text" name="hedge" id="hedge" class="float"> 
+                                <input name="status" type="hidden" value="0"/>
+                            </p>
+                            <br><br>
+                            <button type="submit">Create JSON</button>
+                        </div>
+                    </form>
+                </section>
+            
+                <section>
+                    <div id="jsondiv-pairs" class="results-pairs" display= "none">
+                        <h2 id="jsontext-pairs" class="hidden" >JSON</h2>
+                        <pre></pre>
+            
+                    </div>
+                </section>
+            
+                </div>
+            
+                <div class="column">
+                    <h3> List of Pairs </h3>
+                    <button id="getpairs_button" type="submit" onclick="listPairs()">GET Pairs</button>
+                    <button id="sort_button_pairs" onclick="sortList_pairs()" class="hidden">Sort</button>
+                    <br>
+                    <ul id="pairlist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <div id="pages-pairs" class="hidden">
+                        <div id="prev-pairs" class="pages" style=" float: left;">Prev</div>
+                        <div id="next-pairs" class="pages" style=" float: right;">Next</div>
+                    </div>
+                </div>
+            
+                <div class="column">
+                    <h3> Update Pair </h3>
+                    <section class="pairs-update">
+                        <div class="deletebutton" onclick="alertBefore_pairs()">&nbsp;DELETE&nbsp;</div>
+                        <form>
+                            <div>
+                                <p>
+                                    <label for="pair-update">Pair Name:&nbsp;</label>
+                                    <input type="text" id="pair-update" name="name" class="pair-update" readonly/>
+                                </p>    
+                                <br> 
+                                <p>
+                                    <label for="hedge-update">Hedge Value:&nbsp;</label>
+                                    <input type="text" name="hedge" id="hedge-update" class="float">
+                                </p>
+                                <br>
+                                <p>
+                                    <label>Trade Status:&nbsp;</label>                              
+                                    <input type="radio" id="active-pair-update" name="status" value="1"><span>active</span>
+                                </p>
+                                <p>
+                                    <label>&nbsp;</label>  
+                                    <input type="radio" id="passive-pair-update" name="status" value="0"><span>passive</span>
+                                    
+                                </p>
+                                <br><br>
+
+
+                                <button type="submit">Create JSON</button>
+                            </div>
+                        </form>
+                    </section>
+                
+                    <section>
+                        <div id="jsondiv-pairs-update" class="results-pairs-update" display= "none">
+                            <h2 id="jsontext-pairs-update" class="hidden" >JSON</h2>
+                            <pre></pre>
+                
+                        </div>
+                    </section>
+                </div>
+            
+            </div>
+            <div class="legend">
+                <span class='round' style='background-color: yellow';>&nbsp;</span> active
+                <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+            </div>
+        </div>
+        <div id="tab3" class="tab">
+            <div class="container">
+                <div class="column">
+                <h3> Add Stock </h3>
+                <section class="stocks-form">
+                    <form>
+                        <div>
+                            <p>
+                                <label for="ticker">Ticker Symbol:&nbsp;</label>
+                                <input type="text" id="ticker" class="ticker" name="symbol" style="text-transform: uppercase;" pattern="^\S{1,9}$" required placeholder="Add Here"
+                                oninvalid="this.setCustomValidity('Less than 10 charachers with no spaces!')" oninput="this.setCustomValidity('')"/>
+                            </p>
+                            <p>
+                                <label for="prixch">Pri. Exchange:&nbsp; </label>
+                                <select name="prixch" id="prixch" name="prixch">
+                                    <option value="SMART">SMART</option>
+                                    <option value="ISLAND">ISLAND</option>
+                                    <option value="BYX">BYX</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="secxch">Sec. Exchange:&nbsp;  </label>
+                                <select name="secxch" id="secxch" name="secxch">
+                                    <option value="SMART">SMART</option>
+                                    <option value="ISLAND">ISLAND</option>
+                                    <option value="BYX">BYX</option>
+                                </select>
+                            </p>
+                            <input name="active" type="hidden" value="0"/>
+                            <br><br>
+                            <button type="submit">Create JSON</button>
+                        </div>
+                    </form>
+                </section>          
+                <section>
+                    <div id="jsondiv" class="results" display= "none">
+                        <h2 id="jsontext" class="hidden" >JSON</h2>
+                        <pre></pre>
+            
+                    </div>
+                </section>          
+                </div>
+            
+                <div class="column">
+                    <h3> List of Stocks </h3>
+                    <button id="getstock_button" type="submit" onclick="getStocks()">GET Stocks</button>
+                    <button id="sort_button" onclick="sortList()" class="hidden">Sort</button>
+                    <br>
+                    <ul id="stklist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <div id="pages-stocks" class="hidden">
+                        <div id="prev-stk" class="pages" style=" float: left;">Prev</div>
+                        <div id="next-stk" class="pages" style=" float: right;">Next</div>
+                    </div>
+                </div>
+            
+                <div class="column">
+                    <h3> Update Stock </h3>
+                    <section class="stocks-update">
+                        <div class="deletebutton" onclick="alertBefore()">&nbsp;DELETE&nbsp;</div>
+                        <form>
+                            <div>
+                                <p>
+                                    <label for="ticker-update">Ticker Symbol:&nbsp; </label>
+                                    <input type="text" id="ticker-update" name="symbol" class="ticker-update" readonly/>
+                                </p>
+                                <br>
+                                <p>
+                                    <label for="prixch-update">Pri. Exchange:&nbsp; </label>
+                                    <select name="prixch" id="prixch-update" name="prixch">
+                                        <option value="SMART">SMART</option>
+                                        <option value="ISLAND">ISLAND</option>
+                                        <option value="BYX">BYX</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="secxch-update">Sec. Exchange:&nbsp; </label>
+                                    <select name="secxch" id="secxch-update" name="secxch">
+                                        <option value="SMART">SMART</option>
+                                        <option value="ISLAND">ISLAND</option>
+                                        <option value="BYX">BYX</option>
+                                    </select>
+                                </p>
+                                <br>
+                                <p>
+                                    <label>Trade Status:&nbsp;</label>
+                        
+                                    <input type="radio" id="active-update" name="active" value="1"><span>active</span>
+                                </p>
+                                <p>
+                                    <label>&nbsp;</label>            
+                                    <input type="radio" id="passive-update" name="active" value="0"><span>passive</span>
+                                    
+                                </p>
+                                <br><br>
+                                <button type="submit">Create JSON</button>
+                            </div>
+                        </form>
+                    </section>
+                
+                    <section>
+                        <div id="jsondiv-update" class="results-update" display= "none">
+                            <h2 id="jsontext-update" class="hidden" >JSON</h2>
+                            <pre></pre>
+                
+                        </div>
+                    </section>
+                </div>
+            
+            </div>
+            <div class="legend">
+                <span class='round' style='background-color: yellow';>&nbsp;</span> active
+                <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript" src={{ url_for("static",filename="stock.js") }} > </script>
+<script type="text/javascript" src={{ url_for("static",filename="pairs.js") }} > </script>
+<script type="text/javascript" src={{ url_for("static",filename="signals.js") }} > </script>
+
+
+</body>
+</html>
