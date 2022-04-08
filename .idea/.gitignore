@@ -6,6 +6,12 @@
 **/.idea/shelf/*
 **/.idea/dictionaries
 **/.idea/httpRequests/
+/misc.xml
+/modules.xml
+/pairs_api.iml
+/inspectionProfiles/profiles_settings.xml
+/vcs.xml
+/workspace.xml
 
 # Sensitive or high-churn files
 **/.idea/**/dataSources/
