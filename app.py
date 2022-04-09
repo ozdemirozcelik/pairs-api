@@ -34,7 +34,8 @@ server_url = "https://api-pairs.herokuapp.com/"
 def dashboard():
     server_url_read = server_url + "v1/signals/0"
 
-    response = requests.get(server_url_read, timeout=5)
+    # response = requests.get(server_url_read, timeout=5)
+    response = requests.get(server_url_read)
 
     signals = response.json()['signals']
 
