@@ -40,7 +40,7 @@ proxies = {
 
 @app.get('/')
 def dashboard():
-    server_url_read = server_url + "v1/signals/0"
+    server_url_read = server_url + "v1/signals/50"
 
     response = requests.get(server_url_read, proxies=proxies, timeout=5)
 
