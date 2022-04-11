@@ -26,7 +26,10 @@ api.add_resource(StockRegister, '/v1/regstock')
 api.add_resource(StockList, '/v1/stocks/<string:number_of_items>')
 api.add_resource(Stock, '/v1/stock/<string:symbol>')
 
+# if testing locally
 # server_url = "http://127.0.0.1:5000/"
+
+# test server url:
 server_url = "http://api-pairs.herokuapp.com/"
 
 
