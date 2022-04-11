@@ -32,12 +32,16 @@ api.add_resource(Stock, '/v1/stock/<string:symbol>')
 # test server url:
 server_url = "http://api-pairs.herokuapp.com/"
 
+proxies = {
+    'get': 'https://api-pairs-cors.herokuapp.com/'
+    }
+
 
 @app.get('/')
 def dashboard():
     server_url_read = server_url + "v1/signals/0"
 
-    response = requests.get(server_url_read, timeout=5)
+    response = requests.get(server_url_read, proxies=proxies, timeout=5)
 
     signals = response.json()['signals']
 
