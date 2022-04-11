@@ -32,6 +32,7 @@ api.add_resource(Stock, '/v1/stock/<string:symbol>')
 # test server url:
 server_url = "http://api-pairs.herokuapp.com/"
 
+# proxy to bypass CORS limitations
 proxies = {
     'get': 'https://api-pairs-cors.herokuapp.com/'
     }
