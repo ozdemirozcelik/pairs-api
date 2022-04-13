@@ -27,11 +27,11 @@ Pairs-API v1 can be a good starting point for developing trading bots. You can:
 # Installation
 (commands in parenthesis for anaconda prompt)
 
-####clone git repository:
+### clone git repository:
 ```bash
 $ git clone https://github.com/ozdemirozcelik/pairs-api.git
 ````
-####create and activate virtual environment:
+### create and activate virtual environment:
 ````bash
 $ pip install virtualenv
 (conda install virtualenv)
@@ -48,7 +48,7 @@ $ source pairs-api/bin/activate
 .\pairs-api\scripts\activate (windows)
 (conda activate pairs-api)
 ````
-####install requirements:
+### install requirements:
 
 IMPORTANT: delete line 'uwsgi' from the requirements.txt before installing.
 uwsgi is needed for Heroku deployment only.
@@ -64,7 +64,7 @@ delete data.db (windows)
 
 $ python create_db.py
 ````
-####run flask:
+### run flask:
 ````
 $ export FLASK_APP=app
 $ export FLASK_ENV=development
@@ -132,7 +132,7 @@ var server_url = "http://127.0.0.1:5000/";
 // var server_url = proxy_url + goto_url;
 ```
 
-Check [Heroku deployment](#Heroku-Deployment:) to learn for more about using your own proxy server.
+Check [Heroku deployment](#heroku-deployment) to learn for more about using your own proxy server.
 
 # Resources
 
