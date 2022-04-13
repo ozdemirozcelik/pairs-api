@@ -1,9 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.pairs import PairModel
 
-TABLE_PAIRS = 'pairs'
-
-
 class PairRegister(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name',

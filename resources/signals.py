@@ -1,9 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.signals import SignalModel
 
-TABLE_SIGNALS = 'signals'
-
-
 class SignalWebhook(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('passphrase',

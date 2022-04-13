@@ -196,11 +196,10 @@ async function getPairs_webhook() {
             
             opt.innerHTML += '<option>' + str + '</option>';
             opt.setAttribute('value',str);        
-            ticker_webhook.appendChild(opt);
-                    
+            ticker_webhook.appendChild(opt);                 
         }
     }
-    changeStatusColor(ticker_webhook.value);
+    changeStatusColor(ticker_webhook);
 }
 
 
@@ -236,11 +235,10 @@ async function getStocks_webhook() {
 
             opt.innerHTML += '<option>' + str + '</option>';
             opt.setAttribute('value', str);        
-            ticker_webhook.appendChild(opt);
-                      
+            ticker_webhook.appendChild(opt);                    
         }
     }
-    changeStatusColor(ticker_webhook.value);
+    changeStatusColor(ticker_webhook);
 }
 
 function changeStatusColor(ticker) {
@@ -293,11 +291,11 @@ function handleFormSubmit_pairs(event) {
         } else {
             // edit hidden comments
             if (formJSON_signals.mar_pos == 'flat'){
-                formJSON_signals['comment'] = "Pos. Closed";
+                formJSON_signals['order_comment'] = "Pos. Closed";
             } else if (formJSON_signals.order_action == 'buy'){
-                formJSON_signals['comment']  = "Enter Long";
+                formJSON_signals['order_comment']  = "Enter Long";
             } else {
-                formJSON_signals['comment']  = "Enter Short";
+                formJSON_signals['order_comment']  = "Enter Short";
             }
         }
 
