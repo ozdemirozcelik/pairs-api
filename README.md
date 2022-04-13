@@ -5,7 +5,7 @@ Pairs-API catches and stores webhooks from trading platforms such as Tradingview
 
 Deployed in Heroku for testing purposes:
 
-http://api-pairs.herokuapp.com
+`http://api-pairs.herokuapp.com`
 
 Front-end demo (Javascript):
 
@@ -330,6 +330,7 @@ Pull requests are welcome.
 
 # Help
 
+This part is currently under review, it will be here soon.
 
 
 
