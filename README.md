@@ -154,7 +154,7 @@ api.add_resource(Stock, '/v1/stock/<string:symbol>')
 
 # Request & Response Examples
 
-POST request to register a single stock:
+### POST request to register a single stock:
 ```python
 'http://api-pairs.herokuapp.com/v1/regstock'
 ```
@@ -175,7 +175,7 @@ Response:
 }
 ```
 
-PUT request to update a single stock:
+### PUT request to update a single stock:
 ```python
 'http://api-pairs.herokuapp.com/v1/regstock'
 ```
@@ -201,12 +201,12 @@ Response:
 
 
 
-GET request to get all stocks:
+### GET request to get all stocks:
 ```python
 'http://api-pairs.herokuapp.com/v1/stocks/0'
 ```
 
-GET request to receive certain number of stocks (for exp: 50):
+### GET request to receive certain number of stocks (for exp: 50):
 ```python
 'http://api-pairs.herokuapp.com/v1/stocks/2'
 ```
@@ -230,7 +230,7 @@ Response:
 }
 ```
 
-GET request to get details of a certain stock:
+### GET request to get details of a certain stock:
 ```python
 'http://api-pairs.herokuapp.com/v1/stock/AAPL'
 ```
@@ -244,7 +244,7 @@ Response:
     "active": 1
 }
 ```
-DELETE request for a certain stock:
+### DELETE request for a certain stock:
 ```python
 'http://api-pairs.herokuapp.com/v1/stock/AAPL'
 ```
@@ -255,7 +255,7 @@ Response:
 }
 ```
 
-PUT request to register a webhook signal:
+### POST request to register a webhook signal:
 ```python
 'http://api-pairs.herokuapp.com/v1/webhook'
 ```
@@ -283,7 +283,7 @@ Response:
 }
 ```
 
-Test the demo application for more:
+#### Test the demo application here:
 
 https://api-pairs-test.herokuapp.com/apitest
 
