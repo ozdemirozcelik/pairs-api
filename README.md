@@ -11,6 +11,8 @@ Front-end demo (Javascript):
 
 https://api-pairs-test.herokuapp.com/apitest
 
+https://api-pairs.herokuapp.com/apitest
+
 # Use Cases
 
 Pairs-API v1 can be a good starting point for developing trading bots. You can:
