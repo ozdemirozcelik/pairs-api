@@ -43,19 +43,19 @@ md pairs-api (windows)
 
 $ cd pairs-api
 
-$ python -m venv pairs-api
-(conda create --name pairs-api)
+$ python -m venv pairs-env
+(conda create --name pairs-env)
 
-$ source pairs-api/bin/activate
-.\pairs-api\scripts\activate (windows)
-(conda activate pairs-api)
+$ source pairs-env/bin/activate
+.\pairs-env\scripts\activate (windows)
+(conda activate pairs-env)
 ````
 ### install requirements:
 
 IMPORTANT: delete line 'uwsgi' from the requirements.txt before installing.
 uwsgi is needed for Heroku deployment only.
 
-(anaconda prompt: change version declarations from 'requests~=2.24.0'' to 'requests=2.24.0')
+(windows: change -if necessary- version declarations from 'requests~=2.24.0'' to 'requests==2.24.0')
 
 ````
 $ pip install -r requirements.txt

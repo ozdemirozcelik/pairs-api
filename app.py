@@ -26,16 +26,16 @@ api.add_resource(StockList, '/v1/stocks/<string:number_of_items>')
 api.add_resource(Stock, '/v1/stock/<string:symbol>')
 
 # enable if running locally
-# server_url = "http://127.0.0.1:5000/"
+server_url = "http://127.0.0.1:5000/"
 
-# disable if running locally
-# test server url:
-server_url = "http://api-pairs.herokuapp.com/"
+# # disable if running locally
+# # test server url:
+# server_url = "http://api-pairs.herokuapp.com/"
 
-# proxy to bypass CORS limitations
-proxies = {
-    'get': 'https://api-pairs-cors.herokuapp.com/'
-    }
+# # proxy to bypass CORS limitations
+# proxies = {
+#     'get': 'https://api-pairs-cors.herokuapp.com/'
+#     }
 
 
 @app.get('/')

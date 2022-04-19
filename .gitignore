@@ -1,0 +1,3 @@
+pairs-env
+*.pyc
+__pycache__
