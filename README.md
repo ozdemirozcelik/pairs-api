@@ -1,6 +1,6 @@
-# Pairs-API V1 for trading stocks (single or pairs), deployed on Heroku
+# Pairs-API V2 for trading stocks (single or pairs), deployed on Heroku
 
-Version 1 of the RESTful API built from the ground-up with Python.
+Version 2 of the RESTful API built from the ground-up with Python.
 Pairs-API catches and stores webhooks from trading platforms such as Tradingview.
 
 Deployed in Heroku for testing purposes:
@@ -15,7 +15,7 @@ https://api-pairs.herokuapp.com/apitest
 
 # Use Cases
 
-Pairs-API v1 can be a good starting point for developing trading bots. You can:
+Pairs-API v2 can be a good starting point for developing trading bots. You can:
 - list, save, update and delete stocks and pairs
 - enable and disable stocks and pairs for active trading
 - catch webhooks from trading platforms or signal generators
