@@ -1,5 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.signals import SignalModel
+from flask_jwt_extended import get_jwt_identity, jwt_required
+
 
 class SignalWebhook(Resource):
     parser = reqparse.RequestParser()
@@ -115,9 +117,23 @@ class SignalWebhook(Resource):
 class SignalList(Resource):
 
     @staticmethod
+    @jwt_required(optional=True)
     def get(number_of_items="0"):
+
+        username = get_jwt_identity()
+
+        max_number_of_items = 50
+        print(username)
+        # TODO: check. without Authorization header, returns None.
+        if username is None:
+            print("inside none")
+            # limit the number of items to get if not logged-in
+            if number_of_items == "0":
+                number_of_items = max(int(number_of_items), max_number_of_items)
+            else:
+                number_of_items = min(int(number_of_items), max_number_of_items)
         try:
-            items = SignalModel.get_rows(number_of_items)
+            items = SignalModel.get_rows(str(number_of_items))
 
         except Exception as e:
             print('Error occurred - ', e)

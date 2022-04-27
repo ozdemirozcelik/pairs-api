@@ -2,9 +2,10 @@
 // test get, put, delete requests for the stocks
 
 // define api constants for the stocks:
-const api_url_get= server_url +'v1/stock/';
-const api_url_get_all= server_url +'v1/stocks/0';// "0" for all stocks
-const api_url_post_put= server_url +'v1/regstock';
+const api_url_get= server_url +'v2/stock/';
+const api_url_get_all= server_url +'v2/stocks/0';// "0" for all stocks
+const api_url_post_put= server_url +'v2/regstock';
+const api_url_post_login= server_url +'v2/login';
 
 // form data to be collected in these variables:
 var formJSON;
@@ -195,70 +196,82 @@ function createUpdateButton() {
 
 function postSave() {
 
-    // disable save button until next confirmation
-    document.getElementById("saveall").disabled = true;
+    // check token status
+    if (!localStorage.access_token) {
 
-    // show alert msg
-    stock_text = (formJSON.symbol + "-" + formJSON.prixch + "-" + formJSON.secxch).toUpperCase();
-    alert("Sending POST request for: " + stock_text);
+        alert('You need to login to Add Stock (POST)')
 
-    var body_msg = JSON.stringify(formJSON, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-    });
+    } else {
 
-    fetch(api_url_post_put, {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'}, 
-            body: body_msg
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else if (response.status == 400) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
-            // handle JSON response
-            // show response msg
-            alert(jsonResponse.message + " | Code: " + return_code);
-            
-            // add stock to the list of stocks
-            if (return_code != 400) {
-                
-                // check if the stocks are already listed or not
-                // create new node if listed
-                if (window.getComputedStyle(getstock_button).display === "none") {
+        // disable save button until next confirmation
+        document.getElementById("saveall").disabled = true;
 
-                    var li = document.createElement("li");
+        // show alert msg
+        stock_text = (formJSON.symbol + "-" + formJSON.prixch + "-" + formJSON.secxch).toUpperCase();
+        alert("Sending POST request for: " + stock_text);
 
-                    // create span element according to stock status
-                    if (jsonResponse.active) {
-                        li.innerHTML = "<span title='active' class='round' style='background-color: yellow';></span>";
-                    } else {
-                        li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
-                    }
+        var body_msg = JSON.stringify(formJSON, function(a, b) {
+                return typeof b === "string" ? b.toUpperCase() : b
+        });
 
-                    li.setAttribute('id', ticker.value.toUpperCase());
-                    li.appendChild(document.createTextNode(ticker.value.toUpperCase()));
-                    li.setAttribute("onclick", "Update(this)");
-                    stklist.insertBefore(li, stklist.firstChild);
-
-                    createPages();
-        
+        fetch(api_url_post_put, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.access_token,          
+                }, 
+                body: body_msg
+            }).then(response => {
+                if (response.status >= 200 && response.status <= 401) {
+                    return_code = response.status;
+                    return response.json();
                 } else {
-                    // list if not listed before
-                    getStocks();
-                }
-            }
+                    throw Error(response.statusText + " " + response.status);
+                }	
+            })
+            .then((jsonResponse) => {
+                // handle JSON response
+                // show response msg
+                alert(jsonResponse.message + " | Code: " + return_code);
 
-            }).catch((error) => {
-            // handle the error, show error text
-            alert(error);
-            });
+                // add stock to the list of stocks
+                if (return_code != 400 && return_code != 401) {
+                    
+                    // check if the stocks are already listed or not
+                    // create new node if listed
+                    if (window.getComputedStyle(getstock_button).display === "none") {
+
+                        var li = document.createElement("li");
+
+                        // create span element according to stock status
+                        if (jsonResponse.active) {
+                            li.innerHTML = "<span title='active' class='round' style='background-color: yellow';></span>";
+                        } else {
+                            li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                        }
+
+                        li.setAttribute('id', ticker.value.toUpperCase());
+                        li.appendChild(document.createTextNode(ticker.value.toUpperCase()));
+                        li.setAttribute("onclick", "Update(this)");
+                        stklist.insertBefore(li, stklist.firstChild);
+
+                        createPages();
+            
+                    } else {
+                        // list if not listed before
+                        getStocks();
+                    }
+                }
+
+                if (return_code == 401) {
+                    alert('You need to re-login!')
+                }
+                
+                }).catch((error) => {
+                // handle the error, show error text
+                alert(error);
+                });
+    }
 }
 
 function putUpdate() {
@@ -319,6 +332,7 @@ function putUpdate() {
 
 // TO-DO: needs error handling in this function
 async function getStocks() {
+
     const response = await fetch(api_url_get_all);
     stocks_data = await response.json();
 

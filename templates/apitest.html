@@ -94,11 +94,37 @@
 
 
     </script>
-
 </head>
 
 <body>
+    <div id="loginbox" class="modal">
+        <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
+        <section class="login-form">
+            <form class="modal-content animate">   
+            <div class="modal-container">
+                <label for="username"><b>username:</b></label>
+                <input type="text" placeholder="username: admin" autocomplete='username' name="username" required>       
+                <label for="password"><b>password:</b></label>
+                <input type="password" placeholder="password: 123" autocomplete='password' name="password" required>
+                <label for="expire"><b>validity:</b></label>
+                <select name="expire" id="expire">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="30">30</option>
+                </select> (min) 
+                <br><br>
+                <button type="submit" >Login</button>
+            </div>
+            </form>
+        </section>
+    </div>
+    <div class="countdown" id="countdown"></div>
+    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">&nbsp;LOGIN&nbsp;</div>
     <div class="tabs">
+        
         <ul class="tabs-list">
             <li id="signalstab" class="active"><a href="#tab1">Signals</a></li>
             <li id="pairstab"><a href="#tab2">Pairs</a></li>
@@ -535,6 +561,7 @@ var server_url = "http://127.0.0.1:5000/";
 <script type="text/javascript" src={{ url_for("static",filename="stock.js") }} > </script>
 <script type="text/javascript" src={{ url_for("static",filename="pairs.js") }} > </script>
 <script type="text/javascript" src={{ url_for("static",filename="signals.js") }} > </script>
+<script type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>
 
 
 </body>

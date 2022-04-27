@@ -1,27 +1,26 @@
 import sqlite3
 
-TABLE_PAIRS = 'pairs'
+TABLE_USERS = 'users'
 
 
-class PairModel:
+class UserModel:
 
-    def __init__(self, name, hedge, status):
-        self.name = name
-        self.hedge = hedge
-        self.status = status
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
 
     def json(self):
-        return {'name': self.name, 'hedge': self.hedge, 'status': self.status}
+        return {'username': self.username}
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_username(cls, username):
 
         connection = sqlite3.connect('data.db', timeout=10)
         try:
             cursor = connection.cursor()
 
-            query = "SELECT * FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
-            cursor.execute(query, (name,))
+            query = "SELECT * FROM {table} WHERE username=?".format(table=TABLE_USERS)
+            cursor.execute(query, (username,))
             row = cursor.fetchone()
 
         except sqlite3.Error as e:
@@ -37,15 +36,17 @@ class PairModel:
 
         return None
 
+    # TODO: def find_by_id
+
     def insert(self):
 
         connection = sqlite3.connect('data.db', timeout=10)
         try:
             cursor = connection.cursor()
 
-            query = "INSERT INTO {table} VALUES(?, ?, ?)".format(table=TABLE_PAIRS)
+            query = "INSERT INTO {table} VALUES(?, ?)".format(table=TABLE_USERS)
 
-            cursor.execute(query, (self.name, self.hedge, self.status))
+            cursor.execute(query, (self.username, self.password))
 
             connection.commit()
 
@@ -59,13 +60,13 @@ class PairModel:
 
     def update(self):
 
-        connection = sqlite3.connect('data.db')
+        connection = sqlite3.connect('data.db', timeout=10)
         try:
             cursor = connection.cursor()
 
-            query = "UPDATE {table} SET hedge=?, status=? WHERE name=?".format(table=TABLE_PAIRS)
+            query = "UPDATE {table} SET password=? WHERE username=?".format(table=TABLE_USERS)
 
-            cursor.execute(query, (self.hedge, self.status, self.name))
+            cursor.execute(query, (self.password, self.username))
 
             connection.commit()
 
@@ -81,12 +82,13 @@ class PairModel:
     def get_rows(cls, number_of_items):
 
         if number_of_items == "0":
-            query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_PAIRS)
+            query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_USERS)
         else:
             query = "SELECT * FROM {table} ORDER BY rowid DESC " \
-                    "LIMIT {number}".format(table=TABLE_PAIRS, number=number_of_items)
+                    "LIMIT {number}".format(table=TABLE_USERS, number=number_of_items)
 
         connection = sqlite3.connect('data.db', timeout=10)
+
         try:
             cursor = connection.cursor()
 
@@ -109,16 +111,15 @@ class PairModel:
 
         return items
 
-    # @jwt_required()
     @staticmethod
-    def delete_name(name):
+    def delete(username):
 
         connection = sqlite3.connect('data.db', timeout=10)
         try:
             cursor = connection.cursor()
 
-            query = "DELETE FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
-            cursor.execute(query, (name,))
+            query = "DELETE FROM {table} WHERE username=?".format(table=TABLE_USERS)
+            cursor.execute(query, (username,))
 
             connection.commit()
 

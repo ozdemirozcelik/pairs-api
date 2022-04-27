@@ -2,11 +2,11 @@
 // test get, put, delete requests for the pairs
 
 // define api constants for the pairs:
-const api_url_get_pair= server_url +'v1/pair/';
-const api_url_get_all_pairs= server_url +'v1/pairs/0';// "0" for all pairs.
-const api_url_post_put_pair= server_url +'v1/regpair';
+const api_url_get_pair= server_url +'v2/pair/';
+const api_url_get_all_pairs= server_url +'v2/pairs/0';// "0" for all pairs.
+const api_url_post_put_pair= server_url +'v2/regpair';
 // define other api constants (defining as a separate constant to be used as a standalone script):
-const api_url_get_all_stocks= server_url +'v1/stocks/0';
+const api_url_get_all_stocks= server_url +'v2/stocks/0';
 
 
 // form data to be collected in these variables

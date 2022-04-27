@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.stocks import StockModel
+from flask_jwt_extended import jwt_required, get_jwt
 
 
 class StockRegister(Resource):
@@ -23,6 +24,7 @@ class StockRegister(Resource):
                         )
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token if fresh=true
     def post():
         data = StockRegister.parser.parse_args()
 
@@ -41,6 +43,7 @@ class StockRegister(Resource):
         return {"message": "Stock created successfully."}, 201  # Return Successful Creation of Resource
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token if fresh=true
     def put():
         data = StockRegister.parser.parse_args()
         item = StockModel.find_by_symbol(data['symbol'])
@@ -99,9 +102,15 @@ class Stock(Resource):
 
         return {'message': 'Item not found'}, 404  # Return Not Found
 
-    # @jwt_required()
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token if fresh=true
     def delete(symbol):
+
+        claims = get_jwt()
+
+        # TODO: Delete only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
             StockModel.delete_symbol(symbol)

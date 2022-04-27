@@ -2,12 +2,12 @@
 // test get, put, delete requests for the signals
 
 // define api constants for the signals:
-const api_url_get_signal= server_url + 'v1/signal/';
-const api_url_get_all_signals= server_url + 'v1/signals/100'; // "0" for all signals. Better to define a limit such as 100.
-const api_url_post_put_signal= server_url + 'v1/webhook';
+const api_url_get_signal= server_url + 'v2/signal/';
+const api_url_get_all_signals= server_url + 'v2/signals/100'; // "0" for all signals. Better to define a limit such as 100.
+const api_url_post_put_signal= server_url + 'v2/webhook';
 // define other api constants (defining as a separate constant to be used as a standalone script):
-const api_url_get_all_stock= server_url + 'v1/stocks/0';
-const api_url_get_all_pair= server_url + 'v1/pairs/0';
+const api_url_get_all_stock= server_url + 'v2/stocks/0';
+const api_url_get_all_pair= server_url + 'v2/pairs/0';
 
 
 // form data to be collected in these variables

@@ -17,8 +17,9 @@ class StockModel:
     @classmethod
     def find_by_symbol(cls, symbol):
 
+        connection = sqlite3.connect('data.db', timeout=10)
+
         try:
-            connection = sqlite3.connect('data.db', timeout=10)
             cursor = connection.cursor()
 
             query = "SELECT * FROM {table} WHERE symbol=?".format(table=TABLE_STOCKS)
@@ -40,9 +41,9 @@ class StockModel:
 
     def insert(self):
 
-        try:
-            connection = sqlite3.connect('data.db', timeout=10)
+        connection = sqlite3.connect('data.db', timeout=10)
 
+        try:
             cursor = connection.cursor()
 
             query = "INSERT INTO {table} VALUES(?, ?, ?, ?)".format(table=TABLE_STOCKS)
@@ -61,9 +62,9 @@ class StockModel:
 
     def update(self):
 
-        try:
-            connection = sqlite3.connect('data.db', timeout=10)
+        connection = sqlite3.connect('data.db', timeout=10)
 
+        try:
             cursor = connection.cursor()
 
             query = "UPDATE {table} SET prixch=?, secxch=?, active=? WHERE symbol=?".format(table=TABLE_STOCKS)
@@ -89,9 +90,9 @@ class StockModel:
             query = "SELECT * FROM {table} ORDER BY rowid DESC " \
                     "LIMIT {number}".format(table=TABLE_STOCKS, number=number_of_items)
 
-        try:
-            connection = sqlite3.connect('data.db', timeout=10)
+        connection = sqlite3.connect('data.db', timeout=10)
 
+        try:
             cursor = connection.cursor()
 
             cursor.execute(query)
@@ -116,8 +117,9 @@ class StockModel:
     @staticmethod
     def delete_symbol(symbol):
 
+        connection = sqlite3.connect('data.db', timeout=10)
+
         try:
-            connection = sqlite3.connect('data.db', timeout=10)
             cursor = connection.cursor()
 
             query = "DELETE FROM {table} WHERE symbol=?".format(table=TABLE_STOCKS)

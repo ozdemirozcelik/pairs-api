@@ -1,3 +1,4 @@
 pairs-env
 *.pyc
 __pycache__
+.ideagit

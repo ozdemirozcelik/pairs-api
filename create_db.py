@@ -51,6 +51,10 @@ import sqlite3
 # active: to define if single trade is active (1) or not (0) as INTEGER (BOOLEAN).
 #        If active (1) then trade as single stock, if not (0) then check pair status
 
+# TODO: complete comments
+# USERS table includes ...
+
+
 connection = sqlite3.connect('data.db')
 
 try:
@@ -85,6 +89,7 @@ try:
 
     cursor.execute(create_signals)
 
+    # TODO: you can include stock names and a foreign key. do you need it?
     create_pairs = "CREATE TABLE IF NOT EXISTS pairs (name TEXT, hedge NUMERIC, status INTEGER)"
 
     cursor.execute(create_pairs)
@@ -93,9 +98,16 @@ try:
 
     cursor.execute(create_stocks)
 
+    # TODO: is it possible to encrypt the password?
+    create_users = "CREATE TABLE IF NOT EXISTS users (username TEXT NOT NULL UNIQUE, password TEXT)"
+
+    # TODO: create master password here?
+
+    cursor.execute(create_users)
+
     connection.commit()
 
-    print('signals and pairs tables are created')
+    print('tables (for signals, pairs, stocks, users) are created')
 
 except sqlite3.Error as error:
     print('Error occurred during db creation - ', error)
