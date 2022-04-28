@@ -229,26 +229,33 @@ function createUpdateButton_pairs() {
 
 function postSave_pairs() {
 
-    // disable save button until next confirmation
-    document.getElementById("saveall_pairs").disabled = true;
+    // check token status
+    if (!localStorage.access_token) {
 
-     // show alert msg
-    pair_text = formJSON_pairs.name;
-    alert("Sending POST request for: " + pair_text);
+        alert('You need to login to Add Pair (POST)')
 
-    var body_msg = JSON.stringify(formJSON_pairs, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-    });
+    } else {
+    
+        // disable save button until next confirmation
+        document.getElementById("saveall_pairs").disabled = true;
 
-    fetch(api_url_post_put_pair, {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'}, 
-            body: body_msg
+        // show alert msg
+        pair_text = formJSON_pairs.name;
+        alert("Sending POST request for: " + pair_text);
+
+        var body_msg = JSON.stringify(formJSON_pairs, function(a, b) {
+                return typeof b === "string" ? b.toUpperCase() : b
+        });
+
+        fetch(api_url_post_put_pair, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.access_token, 
+                },
+                body: body_msg
         }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else if (response.status == 400) {
+            if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
                 return response.json();
             } else {
@@ -261,7 +268,7 @@ function postSave_pairs() {
             alert(jsonResponse.message + " | Code: " + return_code);
             
             // add pair to the list of pairs
-            if (return_code != 400) {
+            if (return_code != 400 && return_code != 401) {
                 
                 // check if the pairs are already listed or not
                 // create new node if listed
@@ -289,40 +296,52 @@ function postSave_pairs() {
                 }
             }
 
-            }).catch((error) => {
-            // handle the error, show error text
-            alert(error);
-            });
+            if (return_code == 401) {
+                alert('You need to re-login!')
+            }
+
+        }).catch((error) => {
+        // handle the error, show error text
+        alert(error);
+        });
+    }
 }
 
 function putUpdate_pairs() {
     
-    // disable update button until next confirmation
-    document.getElementById("updateall_pairs").disabled = true;
+    // check token status
+    if (!localStorage.access_token) {
+
+        alert('You need to login to Edit Stock (PUT)')
+
+    } else {
     
-    if (pair_update.value == "") {
-        alert("Please select a stock from the list!");
-        return
+        // disable update button until next confirmation
+        document.getElementById("updateall_pairs").disabled = true;
+        
+        if (pair_update.value == "") {
+            alert("Please select a stock from the list!");
+            return
 
-    }
-    
-    pair_text = formJSON_update_pairs.name;
-    alert("Sending PUT request for: " + pair_text + " | Hedge: " + formJSON_update_pairs.hedge + " | Status: " + formJSON_update_pairs.status);
+        }
+        
+        pair_text = formJSON_update_pairs.name;
+        alert("Sending PUT request for: " + pair_text + " | Hedge: " + formJSON_update_pairs.hedge + " | Status: " + formJSON_update_pairs.status);
 
 
-    var body_msg = JSON.stringify(formJSON_update_pairs, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-    });
+        var body_msg = JSON.stringify(formJSON_update_pairs, function(a, b) {
+                return typeof b === "string" ? b.toUpperCase() : b
+        });
 
-    fetch(api_url_post_put_pair, {
-            method: "PUT",
-            headers: {'Content-Type': 'application/json'}, 
-            body: body_msg
+        fetch(api_url_post_put_pair, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                }, 
+                body: body_msg
         }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else if (response.status == 400) {
+            if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
                 return response.json();
             } else {
@@ -330,25 +349,28 @@ function putUpdate_pairs() {
             }	
         })
         .then((jsonResponse) => {
-            // Handle JSON response
+        // Handle JSON response
+            if (return_code == 401) {
+                alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
+            } else {
+                var status_msg
 
-            var status_msg
+                switch(jsonResponse.status) { case 0: status_msg = "passive"; break; case 1: status_msg = "active"; break; default: status_msg = "unknown" };
 
-            switch(jsonResponse.status) { case 0: status_msg = "passive"; break; case 1: status_msg = "active"; break; default: status_msg = "unknown" };
+                alert("Updated " + jsonResponse.name + " | Code: " + return_code + "\nTrade Status is " + status_msg.toUpperCase());
 
-            alert("Updated " + jsonResponse.name + " | Code: " + return_code + "\nTrade Status is " + status_msg.toUpperCase());
-
-            var item = document.getElementById(jsonResponse.name);
-            
-            // mark updated tickers
-            if (!item.innerText.includes("Updated")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
-            }    
-            
-            }).catch((error) => {
-            // Handle the error
-            alert(error);
-            });
+                var item = document.getElementById(jsonResponse.name);
+                
+                // mark updated tickers
+                if (!item.innerText.includes("Updated")) {
+                    item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
+                }  
+            }  
+        }).catch((error) => {
+        // Handle the error
+        alert(error);
+        });
+    }
 }
 
 // TO-DO: needs error handling in this function
@@ -508,43 +530,57 @@ function alertBefore_pairs() {
 
 function deletePair() {
 
-    if (pair_update.value == "") {
-        alert("Please select a pair from the list!");
-        return
+    // check token status
+    if (!localStorage.access_token) {
 
+        alert('You need to login to Delete Stock (DELETE)')
+
+    } else {
+
+        if (pair_update.value == "") {
+            alert("Please select a pair from the list!");
+            return
+
+        }
+        
+        alert("Sending DELETE request for: " + pair_update.value);
+
+        var api_url_delete_pair = api_url_get_pair + pair_update.value
+
+        fetch(api_url_delete_pair, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                },
+            }).then(response => {
+                if (response.status >= 200 && response.status <= 401) {
+                    return_code = response.status;
+                    return response.json();
+                } else {
+                    throw Error(response.statusText + " " + response.status);
+                }	
+            })
+            .then((jsonResponse) => {
+                // Handle JSON response
+
+                if (return_code == 401) {
+                    alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!');
+                } else {
+
+                    var item = document.getElementById(pair_update.value);
+                    
+                    // mark deleted tickers
+                    if (!item.innerText.includes("Deleted")) {
+                        item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
+                    }
+                    
+                    pair_update.value = "";
+                }
+                
+        }).catch((error) => {
+        // Handle the error
+        alert(error);
+        //console.log(error);
+        });
     }
-    
-    alert("Sending DELETE request for: " + pair_update.value);
-
-    var api_url_delete_pair = api_url_get_pair + pair_update.value
-
-    fetch(api_url_delete_pair, {
-            method: "DELETE",
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
-            // Handle JSON response
-
-            alert(jsonResponse.message + " | Code: " + return_code);
-
-            var item = document.getElementById(pair_update.value);
-            
-            // mark deleted tickers
-            if (!item.innerText.includes("Deleted")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
-            }
-            
-           pair_update.value = "";
-            
-            }).catch((error) => {
-            // Handle the error
-            alert(error);
-            //console.log(error);
-            });
 }

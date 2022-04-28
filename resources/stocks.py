@@ -24,7 +24,7 @@ class StockRegister(Resource):
                         )
 
     @staticmethod
-    @jwt_required(fresh=True)  # need fresh token if fresh=true
+    @jwt_required(fresh=True)  # need fresh token
     def post():
         data = StockRegister.parser.parse_args()
 
@@ -43,7 +43,7 @@ class StockRegister(Resource):
         return {"message": "Stock created successfully."}, 201  # Return Successful Creation of Resource
 
     @staticmethod
-    @jwt_required(fresh=True)  # need fresh token if fresh=true
+    @jwt_required(fresh=True)  # need fresh token
     def put():
         data = StockRegister.parser.parse_args()
         item = StockModel.find_by_symbol(data['symbol'])
@@ -103,7 +103,7 @@ class Stock(Resource):
         return {'message': 'Item not found'}, 404  # Return Not Found
 
     @staticmethod
-    @jwt_required(fresh=True)  # need fresh token if fresh=true
+    @jwt_required(fresh=True)  # need fresh token
     def delete(symbol):
 
         claims = get_jwt()

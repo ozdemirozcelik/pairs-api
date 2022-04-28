@@ -5,7 +5,6 @@
 const api_url_get= server_url +'v2/stock/';
 const api_url_get_all= server_url +'v2/stocks/0';// "0" for all stocks
 const api_url_post_put= server_url +'v2/regstock';
-const api_url_post_login= server_url +'v2/login';
 
 // form data to be collected in these variables:
 var formJSON;
@@ -267,67 +266,77 @@ function postSave() {
                     alert('You need to re-login!')
                 }
                 
-                }).catch((error) => {
-                // handle the error, show error text
-                alert(error);
-                });
+            }).catch((error) => {
+            // handle the error, show error text
+            alert(error);
+            });
     }
 }
 
 function putUpdate() {
     
-    // disable update button until next confirmation
-    document.getElementById("updateall").disabled = true;
+    // check token status
+    if (!localStorage.access_token) {
 
-    if (ticker_update.value == "") {
-        alert("Please select a stock from the list!");
-        return
+        alert('You need to login to Edit Stock (PUT)')
 
-    }
-    
-    stock_text = ticker_update.value.concat("-", formJSON_update.prixch,"-",formJSON_update.secxch).toUpperCase();
-    alert("Sending PUT request for: " + stock_text);
+    } else {
+
+        // disable update button until next confirmation
+        document.getElementById("updateall").disabled = true;
+
+        if (ticker_update.value == "") {
+            alert("Please select a stock from the list!");
+            return
+
+        }
+        
+        stock_text = ticker_update.value.concat("-", formJSON_update.prixch,"-",formJSON_update.secxch).toUpperCase();
+        alert("Sending PUT request for: " + stock_text);
 
 
-    var body_msg = JSON.stringify(formJSON_update, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-    });
+        var body_msg = JSON.stringify(formJSON_update, function(a, b) {
+                return typeof b === "string" ? b.toUpperCase() : b
+        });
 
-    fetch(api_url_post_put, {
-            method: "PUT",
-            headers: {'Content-Type': 'application/json'}, 
-            body: body_msg
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else if (response.status == 400) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
+        fetch(api_url_post_put, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json', 
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                },
+                body: body_msg
+            }).then(response => {
+                if (response.status >= 200 && response.status <= 401) {
+                    return_code = response.status;
+                    return response.json();
+                } else {
+                    throw Error(response.statusText + " " + response.status);
+                }	
+            })
+            .then((jsonResponse) => {
             // Handle JSON response
+                if (return_code == 401) {
+                    alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
+                } else {
+                    var active_msg
 
-            var active_msg
+                    switch(jsonResponse.active) { case 0: active_msg = "passive"; break; case 1: active_msg = "active"; break; default: active_msg = "unknown" };
 
-            switch(jsonResponse.active) { case 0: active_msg = "passive"; break; case 1: active_msg = "active"; break; default: active_msg = "unknown" };
+                    alert("Updated " + jsonResponse.symbol + " | Code: " + return_code + "\nTrade Status is " + active_msg.toUpperCase());
 
-            alert("Updated " + jsonResponse.symbol + " | Code: " + return_code + "\nTrade Status is " + active_msg.toUpperCase());
-
-            var item = document.getElementById(jsonResponse.symbol);
-            
-            // mark updated tickers
-            if (!item.innerText.includes("Updated")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
-            }    
-            
+                    var item = document.getElementById(jsonResponse.symbol);
+                    
+                    // mark updated tickers
+                    if (!item.innerText.includes("Updated")) {
+                        item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
+                    }    
+                }
             }).catch((error) => {
             // Handle the error
             alert(error);
             });
+    }
 }
 
 // TO-DO: needs error handling in this function
@@ -451,43 +460,57 @@ function alertBefore() {
 
 function deleteStock() {
 
-    if (ticker_update.value == "") {
-        alert("Please select a stock from the list!");
-        return
+    // check token status
+    if (!localStorage.access_token) {
 
-    }
+        alert('You need to login to Delete Stock (DELETE)')
 
-    alert("Sending DELETE request for: " + ticker_update.value);
+    } else {
 
-    var api_url_delete_stock = api_url_get + ticker_update.value
+        if (ticker_update.value == "") {
+            alert("Please select a stock from the list!");
+            return
 
-    fetch(api_url_delete_stock, {
-            method: "DELETE",
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
+        }
+
+        alert("Sending DELETE request for: " + ticker_update.value);
+
+        var api_url_delete_stock = api_url_get + ticker_update.value
+
+        fetch(api_url_delete_stock, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                },
+            }).then(response => {
+                if (response.status >= 200 && response.status <= 401) {
+                    return_code = response.status;
+                    return response.json();
+                } else {
+                    throw Error(response.statusText + " " + response.status);
+                }	
+            })
+            .then((jsonResponse) => {
             // Handle JSON response
 
-            alert(jsonResponse.message + " | Code: " + return_code);
+            if (return_code == 401) {
+                alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!');
+            } else {
 
-            var item = document.getElementById(ticker_update.value);
-            
-            // mark deleted tickers
-            if (!item.innerText.includes("Deleted")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
+                var item = document.getElementById(ticker_update.value);
+                
+                // mark deleted tickers
+                if (!item.innerText.includes("Deleted")) {
+                    item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
+                }
+                
+                ticker_update.value = "";
             }
-            
-            ticker_update.value = "";
 
-            }).catch((error) => {
-            // Handle the error
-            alert(error);
-            //console.log(error);
-            });
+        }).catch((error) => {
+        // Handle the error
+        alert(error);
+        //console.log(error);
+        });
+    } 
 }

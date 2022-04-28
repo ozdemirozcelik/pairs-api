@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.signals import SignalModel
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
 
 class SignalWebhook(Resource):
@@ -84,6 +84,7 @@ class SignalWebhook(Resource):
         return {"message": "Signal created successfully."}, 201  # Return Successful Creation of Resource
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def put():
         data = SignalWebhook.parser.parse_args()
 
@@ -122,12 +123,12 @@ class SignalList(Resource):
 
         username = get_jwt_identity()
 
-        max_number_of_items = 50
-        print(username)
+        # limit the number of items to get if not logged-in
+        max_number_of_items = 5
+
         # TODO: check. without Authorization header, returns None.
+        # with Authorization header, returns username
         if username is None:
-            print("inside none")
-            # limit the number of items to get if not logged-in
             if number_of_items == "0":
                 number_of_items = max(int(number_of_items), max_number_of_items)
             else:
@@ -161,7 +162,14 @@ class Signal(Resource):
         return {'message': 'Item not found'}, 404  # Return Not Found
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def delete(rowid):
+
+        claims = get_jwt()
+
+        # TODO: Delete only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
             SignalModel.delete_name(rowid)

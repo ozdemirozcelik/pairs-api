@@ -31,7 +31,15 @@ _parser.add_argument('expire',
 class UserRegister(Resource):
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def post():
+
+        claims = get_jwt()
+
+        # TODO: Register only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
+
         data = _parser.parse_args()
 
         if UserModel.find_by_username(data['username']):
@@ -49,7 +57,15 @@ class UserRegister(Resource):
         return {"message": "User created successfully."}, 201  # Return Successful Creation of Resource
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def put():
+
+        claims = get_jwt()
+
+        # TODO: Update only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
+
         data = _parser.parse_args()
         item = UserModel.find_by_username(data['username'])
 
@@ -78,7 +94,15 @@ class UserRegister(Resource):
 class UserList(Resource):
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def get(number_of_users="0"):
+
+        claims = get_jwt()
+
+        # TODO: List only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
+
         try:
             users = UserModel.get_rows(number_of_users)
 
@@ -93,7 +117,14 @@ class UserList(Resource):
 class User(Resource):
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def get(username):
+
+        claims = get_jwt()
+
+        # TODO: Show only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
             item = UserModel.find_by_username(username)
@@ -108,7 +139,14 @@ class User(Resource):
         return {'message': 'User not found'}, 404  # Return Not Found
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def delete(username):
+
+        claims = get_jwt()
+
+        # TODO: Delete only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
             UserModel.delete(username)

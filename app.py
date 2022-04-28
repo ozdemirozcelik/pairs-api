@@ -28,6 +28,7 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']  # allow blackl
 jwt = JWTManager(app)
 
 
+# If necessary to check admin rights, is_admin can be used
 @jwt.additional_claims_loader
 def add_claims_to_jwt(identity):
     if identity == "admin":  # TODO: read from a config file

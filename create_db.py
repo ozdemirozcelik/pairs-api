@@ -105,9 +105,15 @@ try:
 
     cursor.execute(create_users)
 
+    print('tables (for signals, pairs, stocks, users) are created')
+
+    query = "INSERT INTO {table} VALUES(?, ?),(?, ?)".format(table='users')
+
+    cursor.execute(query, ("admin", "123", "user1", "123"))
+
     connection.commit()
 
-    print('tables (for signals, pairs, stocks, users) are created')
+    print('admin and user1 is created')
 
 except sqlite3.Error as error:
     print('Error occurred during db creation - ', error)
@@ -116,3 +122,4 @@ finally:
     if connection:
         connection.close()
         print('SQLite Connection closed')
+

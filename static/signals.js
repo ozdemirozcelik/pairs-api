@@ -52,7 +52,7 @@ var order_status_update = document.getElementById("order_status_update");
 var order_comment_update = document.getElementById("order_comment_update");
 var prev_button_signals = document.getElementById("prev-signals");
 var next_button_signals = document.getElementById("next-signals");
-
+var login_txt = document.getElementById("login-txt");
 var getsignals_button = document.getElementById("getsignals_button");
 var signallist = document.getElementById("signallist");
 
@@ -410,62 +410,59 @@ function postSave_signals() {
             method: "POST",
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify(formJSON_signals)
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            // Return 400 is for "passphrase incorrect" and wrong input type
-            // wrong input type is omitted, returns a different response message for each wrong input
-            } else if (response.status == 400) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
+    }).then(response => {
+        if (response.status >= 200 && response.status <= 400) {
+            return_code = response.status;
+            return response.json();
+        } else {
+            throw Error(response.statusText + " " + response.status);
+        }	
+    })
+    .then((jsonResponse) => {
 
-            // handle JSON response
-            // show response msg
-            alert(jsonResponse.message + " | Code: " + return_code);
+        // handle JSON response
+        // show response msg
+        alert(jsonResponse.message + " | Code: " + return_code);
 
-            // update the list
-            listSignals();
+        // update the list
+        listSignals();
 
-            }).catch((error) => {
-            // handle the error, , show error text
-            alert(error);
-            });
+        }).catch((error) => {
+        // handle the error, , show error text
+        alert(error);
+        });
 }
 
 function putUpdate_signals() {
+
+    // check token status
+    if (!localStorage.access_token) {
+
+        alert('You need to login to Edit Stock (PUT)')
+
+    } else {
     
-    // disable update button until next confirmation
-    document.getElementById("updateall_signals").disabled = true;
-    
-    if (ticker_webhook_update.value == "") {
-        alert("Please select a signal from the list!");
-        return
+        // disable update button until next confirmation
+        document.getElementById("updateall_signals").disabled = true;
+        
+        if (ticker_webhook_update.value == "") {
+            alert("Please select a signal from the list!");
+            return
 
-    }
-    
-    signal_text = formJSON_update_signals.ticker;
-    alert("Sending PUT request for the order #"+ formJSON_update_signals.rowid + " (" +signal_text + ")\n'Order status' is '" + formJSON_update_signals.order_status.toUpperCase() + "'");
+        }
+        
+        signal_text = formJSON_update_signals.ticker;
+        alert("Sending PUT request for the order #"+ formJSON_update_signals.rowid + " (" +signal_text + ")\n'Order status' is '" + formJSON_update_signals.order_status.toUpperCase() + "'");
 
-
-    // var body_msg = JSON.stringify(formJSON_update_pairs, function(a, b) {
-    //         return typeof b === "string" ? b.toUpperCase() : b
-    // });
-
-    fetch(api_url_post_put_signal, {
-            method: "PUT",
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify(formJSON_update_signals)
+        fetch(api_url_post_put_signal, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                }, 
+                body: JSON.stringify(formJSON_update_signals)
         }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else if (response.status == 400) {
+            if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
                 return response.json();
             } else {
@@ -474,20 +471,25 @@ function putUpdate_signals() {
         })
         .then((jsonResponse) => {
             // Handle JSON response
+            if (return_code == 401) {
+                alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
+            } else {
 
-            alert("Updated order #" + jsonResponse.rowid);
+                alert("Updated order #" + jsonResponse.rowid);
 
-            var item = document.getElementById(jsonResponse.rowid);
-            
-            // mark updated tickers
-            if (!item.innerText.includes("Updated")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
-            }    
-            
-            }).catch((error) => {
-            // Handle the error
-            alert(error);
-            });
+                var item = document.getElementById(jsonResponse.rowid);
+                
+                // mark updated tickers
+                if (!item.innerText.includes("Updated")) {
+                    item.insertAdjacentHTML("beforeend", '<b><i> (Updated) </i></b>');
+                }  
+        }  
+        
+        }).catch((error) => {
+        // Handle the error
+        alert(error);
+        });
+    }
 }
 
 // TO-DO: needs error handling in this function
@@ -495,9 +497,23 @@ function putUpdate_signals() {
 async function listSignals() {
     // reset the current list
     signallist.innerHTML = "";
-    
-    // fetch and list items
-    const response = await fetch(api_url_get_all_signals);
+
+    var response
+
+    // if logged in once, fresh or not fresh, get the whole list
+    // if no token, then get the max number of rows defined in the api
+    if (!localStorage.access_token) {
+        // fetch and list items
+        response = await fetch(api_url_get_all_signals);
+    } else {
+        response = await fetch(api_url_get_all_signals, {
+            method: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.access_token,
+            },
+        });       
+    }
+
     signals_data = await response.json();
 
     for (var key in signals_data.signals) {
@@ -526,6 +542,8 @@ async function listSignals() {
             signallist.appendChild(li);     
         }
     }
+
+    if (!localStorage.access_token){ login_txt.style.display = 'block'} else { login_txt.style.display = 'none'};
 
     createPages_signals();
 
@@ -590,43 +608,59 @@ function alertBefore_signals() {
 
 function deleteSignal() {
 
-    if (rowid_update.value == "") {
-        alert("Please select a signal from the list!");
-        return
+    // check token status
+    if (!localStorage.access_token) {
 
-    }
+        alert('You need to login to Delete Stock (DELETE)')
+
+    } else {
+
+        if (rowid_update.value == "") {
+            alert("Please select a signal from the list!");
+            return
+
+        }
+        
+        alert("Sending DELETE request for signal #" + rowid_update.value);
+
+        var api_url_delete_signal = api_url_get_signal + rowid_update.value
+
+        fetch(api_url_delete_signal, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.access_token,
+                },
+            }).then(response => {
+                if (response.status >= 200 && response.status <= 401) {
+                    return_code = response.status;
+                    return response.json();
+                } else {
+                    throw Error(response.statusText + " " + response.status);
+                }	
+            })
+            .then((jsonResponse) => {
+                // Handle JSON response
+
+                if (return_code == 401) {
+                    alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!');
+                } else {
+
+                    alert(jsonResponse.message + " | Code: " + return_code);
+
+                    var item = document.getElementById(rowid_update.value);
+                    
+                    // mark deleted signals
+                    if (!item.innerText.includes("Deleted")) {
+                        item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
+                    }
+
+                    rowid_update.value = "";
+                }
     
-    alert("Sending DELETE request for signal #" + rowid_update.value);
-
-    var api_url_delete_signal = api_url_get_signal + rowid_update.value
-
-    fetch(api_url_delete_signal, {
-            method: "DELETE",
-        }).then(response => {
-            if (response.status >= 200 && response.status <= 299) {
-                return_code = response.status;
-                return response.json();
-            } else {
-                throw Error(response.statusText + " " + response.status);
-            }	
-        })
-        .then((jsonResponse) => {
-            // Handle JSON response
-
-            alert(jsonResponse.message + " | Code: " + return_code);
-
-            var item = document.getElementById(rowid_update.value);
-            
-            // mark deleted signals
-            if (!item.innerText.includes("Deleted")) {
-                item.insertAdjacentHTML("beforeend", '<b><i> (Deleted) </i></b>');
-            }
-            
-           rowid_update.value = "";
-            
             }).catch((error) => {
             // Handle the error
             alert(error);
             //console.log(error);
-            });
+        });
+    }
 }

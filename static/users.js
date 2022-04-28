@@ -1,3 +1,7 @@
+// define api constants for the users:
+const api_url_post_login= server_url +'v2/login';
+const api_url_post_logout= server_url +'v2/logout';
+
 // define token defaults
 var token_data;
 
@@ -32,7 +36,7 @@ function handleFormLogin(event) {
 
 }
 
-// get access token
+// login & get access token
 async function getToken() {
 
     var invalid_credentials = 0;
@@ -74,6 +78,9 @@ async function getToken() {
             // reset countdown
             setExpire();
 
+             // list all signals, if logged-in once, all signals are visible
+            listSignals();
+
         }
               
         }).catch((error) => {
@@ -82,8 +89,59 @@ async function getToken() {
         });
 }
 
-// set countdown default value
+// logout
+async function logout() {
 
+    var no_token = 0;
+
+    fetch(api_url_post_logout, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.access_token
+        }, 
+        body: JSON.stringify(userpassJSON)
+    }).then(response => {
+        if (response.status == 200) {
+            return response.json();
+        } else if (response.status == 401) {
+            no_token = 1
+            return response.json();
+        }       
+        else {
+            throw Error(response.statusText + " " + response.status);
+        }	
+    })
+    .then((jsonResponse) => {
+        // Handle JSON response
+
+        if (no_token) {
+            alert("Nothing to logout! " + jsonResponse.message);
+
+        } else {
+            alert(jsonResponse.message);
+            
+        }
+
+        // clear token and other local storage variables
+        window.localStorage.clear();
+
+        // reset counter
+        clearInterval(intervalid);
+        document.getElementById("countdown").innerHTML = "No Access Token!";
+
+        // list all signals, if logged-out limited signals are visible
+        listSignals();
+              
+    }).catch((error) => {
+    // Handle the error
+    alert(error);
+    });
+}
+
+
+// set countdown default value
+var intervalid;
 setExpire();
 
 // set countdown
@@ -92,13 +150,13 @@ function setExpire() {
 
     if (!localStorage.access_token_validity) {
 
-        document.getElementById("countdown").innerHTML = "Need Access Token!";
+        document.getElementById("countdown").innerHTML = "No Access Token!";
         
     } else {
         // get stored token time
         countDownDate = new Date(localStorage.access_token_validity).getTime();
     
-        var x = setInterval(function() {
+        intervalid = setInterval(function() {
         
             // Get today's date and time
             var now = new Date().getTime();
@@ -118,8 +176,8 @@ function setExpire() {
                 
             // If the count down is over, write some text 
             if (distance < 0) {
-                clearInterval(x);
-                document.getElementById("countdown").innerHTML = "Need Fresh Token!";
+                clearInterval(intervalid);
+                document.getElementById("countdown").innerHTML = "No Fresh Token!";
             }
         }, 1000);
     }

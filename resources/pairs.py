@@ -1,5 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.pairs import PairModel
+from flask_jwt_extended import jwt_required, get_jwt
+
 
 class PairRegister(Resource):
     parser = reqparse.RequestParser()
@@ -19,6 +21,7 @@ class PairRegister(Resource):
                         )
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def post():
         data = PairRegister.parser.parse_args()
 
@@ -39,6 +42,7 @@ class PairRegister(Resource):
         return {"message": "Pair created successfully."}, 201  # Return Successful Creation of Resource
 
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def put():
         data = PairRegister.parser.parse_args()
         item = PairModel.find_by_name(data['name'])
@@ -97,9 +101,15 @@ class Pair(Resource):
 
         return {'message': 'Item not found'}, 404  # Return Not Found
 
-    # @jwt_required()
     @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
     def delete(name):
+
+        claims = get_jwt()
+
+        # TODO: Delete only if admin
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
             PairModel.delete_name(name)

@@ -103,9 +103,9 @@
             <form class="modal-content animate">   
             <div class="modal-container">
                 <label for="username"><b>username:</b></label>
-                <input type="text" placeholder="username: admin" autocomplete='username' name="username" required>       
+                <input type="text" placeholder="admin or user1" autocomplete='username' name="username" required>       
                 <label for="password"><b>password:</b></label>
-                <input type="password" placeholder="password: 123" autocomplete='password' name="password" required>
+                <input type="password" placeholder="123" autocomplete='password' name="password" required>
                 <label for="expire"><b>validity:</b></label>
                 <select name="expire" id="expire">
                     <option value="1">1</option>
@@ -121,8 +121,10 @@
             </form>
         </section>
     </div>
+    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
     <div class="countdown" id="countdown"></div>
-    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">&nbsp;LOGIN&nbsp;</div>
+    <br><br>
+    <div class="logoutbutton" onclick="logout()">LOGOUT</div>
     <div class="tabs">
         
         <ul class="tabs-list">
@@ -219,6 +221,7 @@
                     <h3> List of Order Signals </h3>
                     <p>
                     <ul id="signallist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <div id="login-txt" style=" float: left; display: none"><br>Login once to see all signals...</div>
                     <div id="prev-signals" class="pages" style=" float: left;">Prev</div>
                     <div id="next-signals" class="pages" style=" float: right;">Next</div>
                 </div>
