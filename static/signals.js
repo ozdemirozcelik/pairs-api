@@ -611,7 +611,7 @@ function deleteSignal() {
     // check token status
     if (!localStorage.access_token) {
 
-        alert('You need to login to Delete Stock (DELETE)')
+        alert('You need to login to Delete Signal (DELETE)')
 
     } else {
 

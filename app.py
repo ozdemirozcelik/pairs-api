@@ -22,7 +22,7 @@ api = Api(app)
 
 # Start of JWT configuration
 
-app.config['JWT_SECRET_KEY'] = 'oz'  # TODO: check the use of this
+app.config['JWT_SECRET_KEY'] = 'mysecretkey'  # TODO: check the use of this
 app.config['JWT_BLACKLIST_ENABLED'] = True  # enable blacklist feature
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']  # allow blacklisting for access and refresh tokens
 jwt = JWTManager(app)
