@@ -1,9 +1,14 @@
-import sqlite3
-
-TABLE_PAIRS = 'pairs'
+from db import db
 
 
-class PairModel:
+class PairModel(db.Model):
+
+    __tablename__ = 'pairs'
+
+    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
+    name = db.Column(db.String(81))  # sqlalchemy needs a primary key (either dummy or real)
+    hedge = db.Column(db.Float(precision=8))
+    status = db.Column(db.Integer)
 
     def __init__(self, name, hedge, status):
         self.name = name
@@ -16,116 +21,145 @@ class PairModel:
     @classmethod
     def find_by_name(cls, name):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        return cls.query.filter_by(name=name).first()
 
-            query = "SELECT * FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
-            cursor.execute(query, (name,))
-            row = cursor.fetchone()
-
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
-
-        if row:
-            return cls(*row)
-
-        return None
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
+        #
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "SELECT * FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
+        #     cursor.execute(query, (name,))
+        #     row = cursor.fetchone()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
+        #
+        # if row:
+        #     return cls(*row)
+        #
+        # return None
 
     def insert(self):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        db.session.add(self)
+        db.session.commit()
 
-            query = "INSERT INTO {table} VALUES(?, ?, ?)".format(table=TABLE_PAIRS)
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-            cursor.execute(query, (self.name, self.hedge, self.status))
-
-            connection.commit()
-
-        except sqlite3.Error as e:  # handling the exception with generic SQL error code
-            print('Database error occurred - ', e)  # better to log the error
-            raise
-
-        finally:
-            if connection:
-                connection.close()  # disconnect the database even if exception occurs
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "INSERT INTO {table} VALUES(?, ?, ?)".format(table=TABLE_PAIRS)
+        #
+        #     cursor.execute(query, (self.name, self.hedge, self.status))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:  # handling the exception with generic SQL error code
+        #     print('Database error occurred - ', e)  # better to log the error
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()  # disconnect the database even if exception occurs
 
     def update(self):
 
-        connection = sqlite3.connect('data.db')
-        try:
-            cursor = connection.cursor()
+        item_to_update = self.query.filter_by(name=self.name).first()
 
-            query = "UPDATE {table} SET hedge=?, status=? WHERE name=?".format(table=TABLE_PAIRS)
+        item_to_update.hedge = self.hedge
+        item_to_update.status = self.status
 
-            cursor.execute(query, (self.hedge, self.status, self.name))
+        db.session.commit()
 
-            connection.commit()
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
+        # connection = sqlite3.connect('data.db')
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "UPDATE {table} SET hedge=?, status=? WHERE name=?".format(table=TABLE_PAIRS)
+        #
+        #     cursor.execute(query, (self.hedge, self.status, self.name))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
 
     @classmethod
     def get_rows(cls, number_of_items):
 
         if number_of_items == "0":
-            query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_PAIRS)
+            # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
+            return cls.query.order_by(cls.rowid.desc())  # better, no need to import
         else:
-            query = "SELECT * FROM {table} ORDER BY rowid DESC " \
-                    "LIMIT {number}".format(table=TABLE_PAIRS, number=number_of_items)
+            return cls.query.order_by(cls.rowid.desc()).limit(number_of_items).all()
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-            cursor.execute(query)
+        # if number_of_items == "0":
+        #     query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_PAIRS)
+        # else:
+        #     query = "SELECT * FROM {table} ORDER BY rowid DESC " \
+        #             "LIMIT {number}".format(table=TABLE_PAIRS, number=number_of_items)
+        #
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     cursor.execute(query)
+        #
+        #     result = cursor.fetchall()  # Keep the result in memory after closing the database
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
+        #
+        # items = []
+        #
+        # for row in result:
+        #     items.append(cls(*row))
+        #
+        # return items
 
-            result = cursor.fetchall()  # Keep the result in memory after closing the database
+    def delete(self):
 
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
+        db.session.delete(self)
+        db.session.commit()
 
-        finally:
-            if connection:
-                connection.close()
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-        items = []
-
-        for row in result:
-            items.append(cls(*row))
-
-        return items
-
-    # @jwt_required()
-    @staticmethod
-    def delete_name(name):
-
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
-
-            query = "DELETE FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
-            cursor.execute(query, (name,))
-
-            connection.commit()
-
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "DELETE FROM {table} WHERE name=?".format(table=TABLE_PAIRS)
+        #     cursor.execute(query, (name,))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()

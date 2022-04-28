@@ -3,3 +3,4 @@ flask==2.0.2
 Flask-RESTful==0.3.9
 Flask-JWT-Extended==4.1.0
 pyjwt==1.7.1
+flask-sqlalchemy==2.5.1

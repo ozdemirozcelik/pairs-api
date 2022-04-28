@@ -70,7 +70,7 @@ class SignalWebhook(Resource):
         if SignalModel.passphrase_wrong(data['passphrase']):
             return {"message": "Passphrase incorrect."}, 400  # Return Bad Request
 
-        item = SignalModel("", "", data['ticker'], data['order_action'], data['order_contracts'], data['order_price'],
+        item = SignalModel(data['ticker'], data['order_action'], data['order_contracts'], data['order_price'],
                            data['mar_pos'], data['mar_pos_size'], data['pre_mar_pos'], data['pre_mar_pos_size'],
                            data['order_comment'], data['order_status'])
 
@@ -91,22 +91,21 @@ class SignalWebhook(Resource):
         if SignalModel.passphrase_wrong(data['passphrase']):
             return {"message": "Passphrase incorrect."}, 400  # Return Bad Request
 
-        item = SignalModel.find_by_rowid(data['rowid'])
+        if SignalModel.find_by_rowid(data['rowid']):
 
-        if item:
-            item_to_put = SignalModel("", "", data['ticker'], data['order_action'], data['order_contracts'],
-                                      data['order_price'], data['mar_pos'], data['mar_pos_size'], data['pre_mar_pos'],
-                                      data['pre_mar_pos_size'], data['order_comment'], data['order_status'])
+            item = SignalModel(data['ticker'], data['order_action'], data['order_contracts'],
+                               data['order_price'], data['mar_pos'], data['mar_pos_size'], data['pre_mar_pos'],
+                               data['pre_mar_pos_size'], data['order_comment'], data['order_status'])
 
             try:
-                item_to_put.update(data['rowid'])
+                item.update(data['rowid'])
 
             except Exception as e:
                 print('Error occurred - ', e)
                 return {"message": "An error occurred updating the item."}, 500  # Return Interval Server Error
 
-            item_to_put.rowid = data['rowid']
-            return_json = item_to_put.json()
+            item.rowid = data['rowid']
+            return_json = item.json()
 
             return_json.pop('timestamp')
 
@@ -124,15 +123,15 @@ class SignalList(Resource):
         username = get_jwt_identity()
 
         # limit the number of items to get if not logged-in
-        max_number_of_items = 5
+        notoken_limit = 5
 
         # TODO: check. without Authorization header, returns None.
         # with Authorization header, returns username
         if username is None:
             if number_of_items == "0":
-                number_of_items = max(int(number_of_items), max_number_of_items)
+                number_of_items = max(int(number_of_items), notoken_limit)
             else:
-                number_of_items = min(int(number_of_items), max_number_of_items)
+                number_of_items = min(int(number_of_items), notoken_limit)
         try:
             items = SignalModel.get_rows(str(number_of_items))
 
@@ -141,7 +140,7 @@ class SignalList(Resource):
             return {"message": "An error occurred while getting the items."}, 500  # Return Interval Server Error
 
         # return {'signals': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
-        return {'signals': [item.json() for item in items]}  # but this one is slightly more readable
+        return {'signals': [item.json() for item in items], 'notoken_limit': notoken_limit}  # this is more readable
 
 
 class Signal(Resource):
@@ -172,7 +171,12 @@ class Signal(Resource):
             return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
-            SignalModel.delete_name(rowid)
+            item_to_delete = SignalModel.find_by_rowid(rowid)
+
+            if item_to_delete:
+                item_to_delete.delete()
+            else:
+                return {'message': 'No item to delete'}
 
         except Exception as e:
             print('Error occurred - ', e)

@@ -25,8 +25,6 @@ class PairRegister(Resource):
     def post():
         data = PairRegister.parser.parse_args()
 
-        print(len(data))
-
         if PairModel.find_by_name(data['name']):
             return {"message": "Pair with that name already exists."}, 400  # Return Bad Request
 
@@ -45,22 +43,21 @@ class PairRegister(Resource):
     @jwt_required(fresh=True)  # need fresh token
     def put():
         data = PairRegister.parser.parse_args()
-        item = PairModel.find_by_name(data['name'])
 
-        item_to_put = PairModel(data['name'], data['hedge'], data['status'])
+        item = PairModel(data['name'], data['hedge'], data['status'])
 
-        if item:
+        if PairModel.find_by_name(data['name']):
             try:
-                item_to_put.update()
+                item.update()
 
             except Exception as e:
                 print('Error occurred - ', e)
                 return {"message": "An error occurred updating the item."}, 500  # Return Interval Server Error
 
-            return item_to_put.json()
+            return item.json()
 
         try:
-            item_to_put.insert()
+            item.insert()
 
         except Exception as e:
             print('Error occurred - ', e)
@@ -112,7 +109,12 @@ class Pair(Resource):
             return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
-            PairModel.delete_name(name)
+            item_to_delete = PairModel.find_by_name(name)
+
+            if item_to_delete:
+                item_to_delete.delete()
+            else:
+                return {'message': 'No item to delete'}
 
         except Exception as e:
             print('Error occurred - ', e)

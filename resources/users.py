@@ -31,6 +31,16 @@ _parser.add_argument('expire',
 class UserRegister(Resource):
 
     @staticmethod
+    def default_users():
+        # Add Default Users
+        if not UserModel.find_by_username("admin"):
+            admin = UserModel("admin", "123")
+            admin.insert()
+        if not UserModel.find_by_username("user1"):
+            user = UserModel("user1", "123")
+            user.insert()
+
+    @staticmethod
     @jwt_required(fresh=True)  # need fresh token
     def post():
 
@@ -67,22 +77,21 @@ class UserRegister(Resource):
             return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         data = _parser.parse_args()
-        item = UserModel.find_by_username(data['username'])
 
-        item_to_put = UserModel(data['username'], data['password'])
+        item = UserModel(data['username'], data['password'])
 
-        if item:
+        if UserModel.find_by_username(data['username']):
             try:
-                item_to_put.update()
+                item.update()
 
             except Exception as e:
                 print('Error occurred - ', e)
                 return {"message": "An error occurred updating the item."}, 500  # Return Interval Server Error
 
-            return item_to_put.json()
+            return item.json()
 
         try:
-            item_to_put.insert()
+            item.insert()
 
         except Exception as e:
             print('Error occurred - ', e)

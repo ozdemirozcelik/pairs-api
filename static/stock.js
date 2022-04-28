@@ -2,9 +2,9 @@
 // test get, put, delete requests for the stocks
 
 // define api constants for the stocks:
-const api_url_get= server_url +'v2/stock/';
-const api_url_get_all= server_url +'v2/stocks/0';// "0" for all stocks
-const api_url_post_put= server_url +'v2/regstock';
+const api_url_get= server_url +'v3/stock/';
+const api_url_get_all= server_url +'v3/stocks/0';// "0" for all stocks
+const api_url_post_put= server_url +'v3/regstock';
 
 // form data to be collected in these variables:
 var formJSON;

@@ -90,16 +90,17 @@ try:
     cursor.execute(create_signals)
 
     # TODO: you can include stock names and a foreign key. do you need it?
-    create_pairs = "CREATE TABLE IF NOT EXISTS pairs (name TEXT, hedge NUMERIC, status INTEGER)"
+    create_pairs = "CREATE TABLE IF NOT EXISTS pairs (name TEXT PRIMARY KEY, hedge NUMERIC, status INTEGER)"
 
     cursor.execute(create_pairs)
 
-    create_stocks = "CREATE TABLE IF NOT EXISTS stocks (symbol TEXT, prixch TEXT, secxch TEXT, active INTEGER)"
+    create_stocks = "CREATE TABLE IF NOT EXISTS stocks (symbol TEXT PRIMARY KEY, prixch TEXT, secxch TEXT, " \
+                    "active INTEGER) "
 
     cursor.execute(create_stocks)
 
     # TODO: is it possible to encrypt the password?
-    create_users = "CREATE TABLE IF NOT EXISTS users (username TEXT NOT NULL UNIQUE, password TEXT)"
+    create_users = "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)"
 
     # TODO: create master password here?
 
@@ -122,4 +123,3 @@ finally:
     if connection:
         connection.close()
         print('SQLite Connection closed')
-

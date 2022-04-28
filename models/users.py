@@ -1,9 +1,12 @@
-import sqlite3
-
-TABLE_USERS = 'users'
+from db import db
 
 
-class UserModel:
+class UserModel(db.Model):
+    __tablename__ = 'users'
+
+    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
+    username = db.Column(db.String(80))  # sqlalchemy needs a primary key (either dummy or real)
+    password = db.Column(db.String(80))
 
     def __init__(self, username, password):
         self.username = username
@@ -15,118 +18,148 @@ class UserModel:
     @classmethod
     def find_by_username(cls, username):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        return cls.query.filter_by(username=username).first()
 
-            query = "SELECT * FROM {table} WHERE username=?".format(table=TABLE_USERS)
-            cursor.execute(query, (username,))
-            row = cursor.fetchone()
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
-
-        if row:
-            return cls(*row)
-
-        return None
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "SELECT * FROM {table} WHERE username=?".format(table=TABLE_USERS)
+        #     cursor.execute(query, (username,))
+        #     row = cursor.fetchone()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
+        #
+        # if row:
+        #     return cls(*row)
+        #
+        # return None
 
     # TODO: def find_by_id
 
     def insert(self):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        db.session.add(self)
+        db.session.commit()
 
-            query = "INSERT INTO {table} VALUES(?, ?)".format(table=TABLE_USERS)
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-            cursor.execute(query, (self.username, self.password))
-
-            connection.commit()
-
-        except sqlite3.Error as e:  # handling the exception with generic SQL error code
-            print('Database error occurred - ', e)  # better to log the error
-            raise
-
-        finally:
-            if connection:
-                connection.close()  # disconnect the database even if exception occurs
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "INSERT INTO {table} VALUES(?, ?)".format(table=TABLE_USERS)
+        #
+        #     cursor.execute(query, (self.username, self.password))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:  # handling the exception with generic SQL error code
+        #     print('Database error occurred - ', e)  # better to log the error
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()  # disconnect the database even if exception occurs
 
     def update(self):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        item_to_update = self.query.filter_by(username=self.username).first()
 
-            query = "UPDATE {table} SET password=? WHERE username=?".format(table=TABLE_USERS)
+        item_to_update.password = self.password
 
-            cursor.execute(query, (self.password, self.username))
+        db.session.commit()
 
-            connection.commit()
-
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
+        # # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
+        #
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "UPDATE {table} SET password=? WHERE username=?".format(table=TABLE_USERS)
+        #
+        #     cursor.execute(query, (self.password, self.username))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
 
     @classmethod
     def get_rows(cls, number_of_items):
 
         if number_of_items == "0":
-            query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_USERS)
+            # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
+            return cls.query.order_by(cls.rowid.desc())  # better, no need to import
         else:
-            query = "SELECT * FROM {table} ORDER BY rowid DESC " \
-                    "LIMIT {number}".format(table=TABLE_USERS, number=number_of_items)
+            return cls.query.order_by(cls.rowid.desc()).limit(number_of_items).all()
 
-        connection = sqlite3.connect('data.db', timeout=10)
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
-        try:
-            cursor = connection.cursor()
-
-            cursor.execute(query)
-
-            result = cursor.fetchall()  # Keep the result in memory after closing the database
-
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
-
-        items = []
-
-        for row in result:
-            items.append(cls(*row))
-
-        return items
+        # if number_of_items == "0":
+        #     query = "SELECT * FROM {table} ORDER BY rowid DESC".format(table=TABLE_USERS)
+        # else:
+        #     query = "SELECT * FROM {table} ORDER BY rowid DESC " \
+        #             "LIMIT {number}".format(table=TABLE_USERS, number=number_of_items)
+        #
+        # connection = sqlite3.connect('data.db', timeout=10)
+        #
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     cursor.execute(query)
+        #
+        #     result = cursor.fetchall()  # Keep the result in memory after closing the database
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()
+        #
+        # items = []
+        #
+        # for row in result:
+        #     items.append(cls(*row))
+        #
+        # return items
 
     @staticmethod
     def delete(username):
 
-        connection = sqlite3.connect('data.db', timeout=10)
-        try:
-            cursor = connection.cursor()
+        db.session.delete(username)
+        db.session.commit()
 
-            query = "DELETE FROM {table} WHERE username=?".format(table=TABLE_USERS)
-            cursor.execute(query, (username,))
-
-            connection.commit()
-
-        except sqlite3.Error as e:
-            print('Database error occurred - ', e)
-            raise
-
-        finally:
-            if connection:
-                connection.close()
+        # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
+        #
+        # connection = sqlite3.connect('data.db', timeout=10)
+        # try:
+        #     cursor = connection.cursor()
+        #
+        #     query = "DELETE FROM {table} WHERE username=?".format(table=TABLE_USERS)
+        #     cursor.execute(query, (username,))
+        #
+        #     connection.commit()
+        #
+        # except sqlite3.Error as e:
+        #     print('Database error occurred - ', e)
+        #     raise
+        #
+        # finally:
+        #     if connection:
+        #         connection.close()

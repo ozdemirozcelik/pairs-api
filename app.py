@@ -2,20 +2,30 @@ from flask import Flask, render_template
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from jwt import ExpiredSignatureError
-
 from blacklist import BLACKLIST
 from resources.pairs import PairRegister, PairList, Pair
 from resources.signals import SignalWebhook, SignalList, Signal
 from resources.stocks import StockRegister, StockList, Stock
 from resources.users import UserRegister, UserList, User, UserLogin, UserLogout, TokenRefresh
 import requests
+from db import db
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'  # database location
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # flask-sqlalchemy tracker is off, sqlalchemy has its own tracker
 app.config['PROPAGATE_EXCEPTIONS'] = True  # to allow flask propagating exception even if debug is set to false
 
-if __name__ == '__main__':  # to avoid duplicate calls to app.run
+
+# Create tables and default users
+@app.before_first_request
+def create_tables():
+    db.create_all()
+    UserRegister.default_users()
+
+
+db.init_app(app)
+
+if __name__ == '__main__':  # to avoid duplicate calls
     app.run(debug=True)
 
 api = Api(app)
@@ -97,30 +107,31 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
 
 # Resource definitions
 
-api.add_resource(SignalWebhook, '/v2/webhook')
-api.add_resource(SignalList, '/v2/signals/<string:number_of_items>')
-api.add_resource(Signal, '/v2/signal/<string:rowid>')
+api.add_resource(SignalWebhook, '/v3/webhook')
+api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
+api.add_resource(Signal, '/v3/signal/<string:rowid>')
 
-api.add_resource(PairRegister, '/v2/regpair')
-api.add_resource(PairList, '/v2/pairs/<string:number_of_items>')
-api.add_resource(Pair, '/v2/pair/<string:name>')
+api.add_resource(PairRegister, '/v3/regpair')
+api.add_resource(PairList, '/v3/pairs/<string:number_of_items>')
+api.add_resource(Pair, '/v3/pair/<string:name>')
 
-api.add_resource(StockRegister, '/v2/regstock')
-api.add_resource(StockList, '/v2/stocks/<string:number_of_items>')
-api.add_resource(Stock, '/v2/stock/<string:symbol>')
+api.add_resource(StockRegister, '/v3/regstock')
+api.add_resource(StockList, '/v3/stocks/<string:number_of_items>')
+api.add_resource(Stock, '/v3/stock/<string:symbol>')
 
-api.add_resource(UserRegister, '/v2/reguser')
-api.add_resource(UserList, '/v2/users/<string:number_of_users>')
-api.add_resource(User, '/v2/user/<string:username>')
-api.add_resource(UserLogin, '/v2/login')
-api.add_resource(UserLogout, '/v2/logout')
-api.add_resource(TokenRefresh, '/v2/refresh')
+api.add_resource(UserRegister, '/v3/reguser')
+api.add_resource(UserList, '/v3/users/<string:number_of_users>')
+api.add_resource(User, '/v3/user/<string:username>')
+api.add_resource(UserLogin, '/v3/login')
+api.add_resource(UserLogout, '/v3/logout')
+api.add_resource(TokenRefresh, '/v3/refresh')
 
 # End of resource definitions
 
 
 # enable if running locally
 server_url = "http://127.0.0.1:5000/"
+
 
 # # disable if running locally
 # # test server url:
@@ -134,7 +145,7 @@ server_url = "http://127.0.0.1:5000/"
 
 @app.get('/')
 def dashboard():
-    server_url_read = server_url + "v2/signals/50"  # get the recent 50 signals
+    server_url_read = server_url + "v3/signals/50"  # get the recent 50 signals
 
     try:
         # # disable if using locally:
@@ -159,4 +170,3 @@ def dashboard():
 @app.get('/apitest')
 def apitest():
     return render_template('apitest.html')
-

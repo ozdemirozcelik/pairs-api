@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.stocks import StockModel
 from flask_jwt_extended import jwt_required, get_jwt
+from db import db
 
 
 class StockRegister(Resource):
@@ -46,22 +47,21 @@ class StockRegister(Resource):
     @jwt_required(fresh=True)  # need fresh token
     def put():
         data = StockRegister.parser.parse_args()
-        item = StockModel.find_by_symbol(data['symbol'])
 
-        item_to_put = StockModel(data['symbol'], data['prixch'], data['secxch'], data['active'])
+        item = StockModel(data['symbol'], data['prixch'], data['secxch'], data['active'])
 
-        if item:
+        if StockModel.find_by_symbol(data['symbol']):
             try:
-                item_to_put.update()
+                item.update()
 
             except Exception as e:
                 print('Error occurred - ', e)
                 return {"message": "An error occurred updating the item."}, 500  # Return Interval Server Error
 
-            return item_to_put.json()
+            return item.json()
 
         try:
-            item_to_put.insert()
+            item.insert()
 
         except Exception as e:
             print('Error occurred - ', e)
@@ -113,7 +113,12 @@ class Stock(Resource):
             return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
 
         try:
-            StockModel.delete_symbol(symbol)
+            item_to_delete = StockModel.find_by_symbol(symbol)
+
+            if item_to_delete:
+                item_to_delete.delete()
+            else:
+                return {'message': 'No item to delete'}
 
         except Exception as e:
             print('Error occurred - ', e)
