@@ -339,7 +339,7 @@ function putUpdate() {
     }
 }
 
-// TO-DO: needs error handling in this function
+// TODO: error handling
 async function getStocks() {
 
     const response = await fetch(api_url_get_all);
@@ -412,7 +412,7 @@ function sortList() {
     }
   }
 
-// TO-DO: needs error handling in this function
+// TODO: error handling
 async function getStock(symbol) {
 
    var updateButton = document.getElementById("updateall")

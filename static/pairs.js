@@ -373,7 +373,7 @@ function putUpdate_pairs() {
     }
 }
 
-// TO-DO: needs error handling in this function
+// TODO: error handling
 // list the stocks in the pair selection options
 async function getStocks_pairs() {
     const response = await fetch(api_url_get_all_stocks);
@@ -410,7 +410,7 @@ async function getStocks_pairs() {
     }
 }
 
-// TO-DO: needs error handling in this function
+// TODO: error handling
 // list the pairs in the tab
 async function listPairs() {
     // todo: needs error handling in this function
@@ -483,7 +483,7 @@ function sortList_pairs() {
     }
   }
 
-// TO-DO: needs error handling in this function
+// TODO: error handling
 async function getPair(name) {
 
     var updateButton = document.getElementById("updateall_pairs")

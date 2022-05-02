@@ -144,8 +144,7 @@ async function logout() {
 var intervalid;
 setExpire();
 
-// set countdown
-
+// set session countdown
 function setExpire() {
 
     if (!localStorage.access_token_validity) {

@@ -1,30 +1,36 @@
-# TO BE UPDATED
 # Pairs-API V3 for trading stocks (single or pairs), deployed on Heroku
 
-Version 3 of the RESTful API built from the ground-up with Python.
-Pairs-API catches and stores webhooks from trading platforms such as Tradingview.
+Version 3 of the Flask-RESTful API.
 
-Deployed in Heroku for testing purposes:
+Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
+Configured to be used with SQLite3 for local use.
+
+Deployed in Heroku with PostgreSQL for testing purposes:
 
 `http://api-pairs.herokuapp.com`
 
 Front-end demo (Javascript):
 
-https://api-pairs-test.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 https://api-pairs.herokuapp.com/apitest
 
 # Use Cases
 
-Pairs-API v3 can be a good starting point for developing trading bots. You can:
-- list, save, update and delete stocks and pairs
+With Pairs-API v3 you can:
+- list, save, update and delete stocks and pairs with API calls
 - enable and disable stocks and pairs for active trading
 - catch webhooks from trading platforms or signal generators
+- use access tokens for authentication purposes
 
 # Requirements
-* requests~=2.24.0
-* flask~=2.0.2
-* Flask-RESTful
+
+* requests==2.24.0
+* flask==2.0.2
+* Flask-RESTful==0.3.9
+* Flask-JWT-Extended==4.1.0
+* flask-sqlalchemy==2.5.1
+* pyjwt==1.7.1
 * uwsgi (for Heroku deployment only)
 
 # Installation
@@ -32,7 +38,7 @@ Pairs-API v3 can be a good starting point for developing trading bots. You can:
 
 ### clone git repository:
 ```bash
-$ git clone https://github.com/ozdemirozcelik/pairs-api.git
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 ````
 ### create and activate virtual environment:
 ````bash
@@ -61,11 +67,14 @@ uwsgi is needed for Heroku deployment only.
 ````
 $ pip install -r requirements.txt
 (conda install --file requirements.txt)
-
+````
+SQLAlchemy normally takes care of the database creation. 
+If you want to manually create the database:
+````
 $ rm data.db
 delete data.db (windows)
 
-$ python create_db.py
+$ python local/create_db.py
 ````
 ### run flask:
 ````
@@ -85,12 +94,48 @@ browse to "http://127.0.0.1:5000/" to see the dashboard.
 
 # Authorization
 
-No authorization needed at the moment, webhooks need a passphrase, by default it is set as 'webhook'.
-Check signals.py:
+### webhooks
+need a passphrase, by default it is set as 'webhook'; check signals.py:
 
 ```python
 PASSPHRASE = 'webhook'
 ```
+
+### default admin and a user
+is created during database creation; check users.py::
+
+```python
+    @staticmethod
+    def default_users():
+        # Add Default Users
+        if not UserModel.find_by_username("admin"):
+            admin = UserModel("admin", "123")
+            admin.insert()
+        if not UserModel.find_by_username("user1"):
+            user = UserModel("user1", "123")
+            user.insert()
+```
+
+### resource authorization
+needs currently set with Flask- JWT:
+
+- no token required:
+  - POST signal
+  - GET stock & pair & signal
+  - GET stocks & pairs
+  
+- optional token required: "@jwt_required(optional=True)":
+  - GET signals (get more signals if token is available )
+  
+- fresh token required "@jwt_required(fresh=True)":
+  - PUT, Delete signal
+  - POST, PUT pair & stock
+
+- admin rights & fresh token required "@jwt_required(fresh=True)":
+  - DELETE signal & pair & stock
+  - GET, POST, PUT, DELETE user
+
+
 
 # Configuration
 
@@ -142,24 +187,31 @@ Check [Heroku deployment](#heroku-deployment) to learn for more about using your
 Resources defined with flask_restful are:
 
 ```python
-api.add_resource(SignalWebhook, '/v1/webhook')
-api.add_resource(SignalList, '/v1/signals/<string:number_of_items>')
-api.add_resource(Signal, '/v1/signal/<string:rowid>')
+api.add_resource(SignalWebhook, '/v3/webhook')
+api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
+api.add_resource(Signal, '/v3/signal/<string:rowid>')
 
-api.add_resource(PairRegister, '/v1/regpair')
-api.add_resource(PairList, '/v1/pairs/<string:number_of_items>')
-api.add_resource(Pair, '/v1/pair/<string:name>')
+api.add_resource(PairRegister, '/v3/regpair')
+api.add_resource(PairList, '/v3/pairs/<string:number_of_items>')
+api.add_resource(Pair, '/v3/pair/<string:name>')
 
-api.add_resource(StockRegister, '/v1/regstock')
-api.add_resource(StockList, '/v1/stocks/<string:number_of_items>')
-api.add_resource(Stock, '/v1/stock/<string:symbol>')
+api.add_resource(StockRegister, '/v3/regstock')
+api.add_resource(StockList, '/v3/stocks/<string:number_of_items>')
+api.add_resource(Stock, '/v3/stock/<string:symbol>')
+
+api.add_resource(UserRegister, '/v3/reguser')
+api.add_resource(UserList, '/v3/users/<string:number_of_users>')
+api.add_resource(User, '/v3/user/<string:username>')
+api.add_resource(UserLogin, '/v3/login')
+api.add_resource(UserLogout, '/v3/logout')
+api.add_resource(TokenRefresh, '/v3/refresh')
 ```
 
 # Request & Response Examples
 
 ### POST request to register a single stock:
 ```python
-'http://api-pairs.herokuapp.com/v1/regstock'
+'http://api-pairs.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -180,7 +232,7 @@ Response:
 
 ### PUT request to update a single stock:
 ```python
-'http://api-pairs.herokuapp.com/v1/regstock'
+'http://api-pairs.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -206,12 +258,12 @@ Response:
 
 ### GET request to get all stocks:
 ```python
-'http://api-pairs.herokuapp.com/v1/stocks/0'
+'http://api-pairs.herokuapp.com/v3/stocks/0'
 ```
 
 ### GET request to receive certain number of stocks (for exp: 50):
 ```python
-'http://api-pairs.herokuapp.com/v1/stocks/2'
+'http://api-pairs.herokuapp.com/v3/stocks/2'
 ```
 Response:
 ```json
@@ -235,7 +287,7 @@ Response:
 
 ### GET request to get details of a certain stock:
 ```python
-'http://api-pairs.herokuapp.com/v1/stock/AAPL'
+'http://api-pairs.herokuapp.com/v3/stock/AAPL'
 ```
 
 Response:
@@ -249,7 +301,7 @@ Response:
 ```
 ### DELETE request for a certain stock:
 ```python
-'http://api-pairs.herokuapp.com/v1/stock/AAPL'
+'http://api-pairs.herokuapp.com/v3/stock/AAPL'
 ```
 Response:
 ```json
@@ -260,7 +312,7 @@ Response:
 
 ### POST request to register a webhook signal:
 ```python
-'http://api-pairs.herokuapp.com/v1/webhook'
+'http://api-pairs.herokuapp.com/v3/webhook'
 ```
 Request Body:
 ```json
@@ -288,11 +340,11 @@ Response:
 
 #### Test the demo application here:
 
-https://api-pairs-test.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 # Status Codes
 
-Pairs-API v1 returns the following status codes:
+Pairs-API v3 returns the following status codes:
 
 | Status Code | Description             |
 | :--- |:------------------------|
@@ -310,22 +362,20 @@ This part is currently under review, it will be here soon.
 # Demo:
 (Automatic deploys are disabled)
 
-https://api-pairs-test.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 # Acknowledgements
 snippets:
 * [Sort a List](https://w3schools.com/howto/howto_js_sort_list.asp)
 * [Table Display](http://jsfiddle.net/DaS39)
 * [jQuery input filter](https://jsfiddle.net/KarmaProd/hw8j34f2/4/)
+* [JavaScript Countdown Timer](https://www.w3schools.com/howto/howto_js_countdown.asp)
 
 # Considerations
 
 Considering for the next version:
-- simplify storage with SQLAlchemy
-- add PostgreSQL
-- add token refreshing and Flask-JWT-Extended
-- serialize with Marshmallow
-- improve demo with TradingView realtime webhooks
+- improve demo with live TradingView realtime webhooks
+- send real time orders to exchanges
 
 # Contributing
 

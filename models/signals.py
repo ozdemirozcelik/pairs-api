@@ -1,7 +1,7 @@
 from db import db
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
 
-PASSPHRASE = 'webhook'
+PASSPHRASE = 'webhook'  # Passphrase is required to register webhooks
 
 
 class SignalModel(db.Model):

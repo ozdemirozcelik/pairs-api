@@ -4,8 +4,9 @@ from db import db
 class StockModel(db.Model):
     __tablename__ = 'stocks'
 
+    # sqlalchemy needs a primary key (either dummy or real)
     rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    symbol = db.Column(db.String(40))  # sqlalchemy needs a primary key (either dummy or real)
+    symbol = db.Column(db.String(40))
     prixch = db.Column(db.String(40))
     secxch = db.Column(db.String(40))
     active = db.Column(db.Integer)

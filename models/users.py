@@ -4,8 +4,9 @@ from db import db
 class UserModel(db.Model):
     __tablename__ = 'users'
 
+    # sqlalchemy needs a primary key (either dummy or real)
     rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    username = db.Column(db.String(80))  # sqlalchemy needs a primary key (either dummy or real)
+    username = db.Column(db.String(80))
     password = db.Column(db.String(80))
 
     def __init__(self, username, password):

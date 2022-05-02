@@ -55,7 +55,7 @@ import sqlite3
 # USERS table includes ...
 
 
-connection = sqlite3.connect('data.db')
+connection = sqlite3.connect('../data.db')
 
 try:
     cursor = connection.cursor()

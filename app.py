@@ -30,7 +30,7 @@ if __name__ == '__main__':  # to avoid duplicate calls
 
 api = Api(app)
 
-# Start of JWT configuration
+# JWT configuration (Start)
 
 app.config['JWT_SECRET_KEY'] = 'mysecretkey'  # TODO: check the use of this
 app.config['JWT_BLACKLIST_ENABLED'] = True  # enable blacklist feature
@@ -60,7 +60,7 @@ def my_expired_token_callback(*args):
            }, 401
 
 
-# TODO: Invalid token returns 500 instead of 401
+# TODO: Solution to invalid token returns 500 instead of 401
 # jwt.exceptions.ExpiredSignatureError: Signature has expired
 # check the workaround: _handle_expired_signature
 @jwt.invalid_token_loader
@@ -103,9 +103,9 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
            }, 401
 
 
-# End of JWT configuration
+# JWT configuration (End)
 
-# Resource definitions
+# Resource definitions (Start)
 
 api.add_resource(SignalWebhook, '/v3/webhook')
 api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
@@ -126,21 +126,21 @@ api.add_resource(UserLogin, '/v3/login')
 api.add_resource(UserLogout, '/v3/logout')
 api.add_resource(TokenRefresh, '/v3/refresh')
 
-# End of resource definitions
+# Resource definitions (End)
 
 
-# enable if running locally
-server_url = "http://127.0.0.1:5000/"
+# # enable if running locally
+# server_url = "http://127.0.0.1:5000/"
 
 
-# # disable if running locally
-# # test server url:
-# server_url = "http://api-pairs.herokuapp.com/"
+# disable if running locally
+# test server url:
+server_url = "http://api-pairs.herokuapp.com/"
 
-# # proxy to bypass CORS limitations
-# proxies = {
-#     'get': 'https://api-pairs-cors.herokuapp.com/'
-#     }
+# proxy to bypass CORS limitations
+proxies = {
+    'get': 'https://api-pairs-cors.herokuapp.com/'
+    }
 
 
 @app.get('/')

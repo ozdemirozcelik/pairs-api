@@ -1,0 +1,729 @@
+{
+	"info": {
+		"_postman_id": "832f50c9-7c00-485c-b45b-b0072ee1af1e",
+		"name": "pairs_api v3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "stocks",
+			"item": [
+				{
+					"name": "register (a stock)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"symbol\": \"GGG\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"NASDAQ\",\r\n    \"active\": 0\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regstock",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regstock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update(a stock)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"symbol\": \"GGG\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"ISLAND\",\r\n    \"active\": 1\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regstock",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regstock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stocks (# of items)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/stocks/0",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"stocks",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stock (details)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/stock/AAA",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"stock",
+								"AAA"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stock (delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/stock/CCC",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"stock",
+								"CCC"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "pairs",
+			"item": [
+				{
+					"name": "register (a pair)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"XXX-ZZZ\",\r\n    \"hedge\": 1.123456789,\r\n    \"status\": 1,\r\n    \"do not save\": 0\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regpair",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regpair"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update (a pair)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"XXX-ZZZ\",\r\n    \"hedge\": 1.5878878979879879879877,\r\n    \"status\": 0\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regpair",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regpair"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pairs (# of items)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{pairs_api_v3}}/pairs/0",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"pairs",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pair (details)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{pairs_api_v3}}/pair/AAA-BBB",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"pair",
+								"AAA-BBB"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pair (delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/pair/XXX-ZZZ",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"pair",
+								"XXX-ZZZ"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "signals",
+			"item": [
+				{
+					"name": "register (a signal)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"DRH-0.55*HST\",\r\n    \"order_action\": \"sell\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 25.2,\r\n    \"mar_pos_size\": 50,\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\":\"Order Comment Here\"\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/webhook",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update (a signal)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"rowid\": 10,\r\n    \"timestamp\": \"2022-04-29 21:49:40\",\r\n    \"ticker\": \"DRH-0.56*HST\",\r\n    \"order_action\": \"sell\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 25.3,\r\n    \"mar_pos\": null,\r\n    \"mar_pos_size\": 50,\r\n    \"pre_mar_pos\": null,\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \"Order Comment Here\",\r\n    \"order_status\": \"waiting\"\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/webhook",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signals (# of items)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/signals/0",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"signals",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signal details)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{pairs_api_v3}}/signal/10",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"signal",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signal (delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/signal/10",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"signal",
+								"10"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "login(with a user)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"access_token not empty\", function () {\r",
+									"    pm.expect(jsonData.access_token).not.eql(undefined);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"refresh token not empty\", function () {\r",
+									"    pm.expect(jsonData.refresh_token).not.eql(undefined);\r",
+									"});\r",
+									"// set access token as environement variable\r",
+									"if (jsonData.access_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", null);\r",
+									"}\r",
+									"// set refresh token as environement variable\r",
+									"if (jsonData.refresh_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", null);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"123\",\r\n    \"expire\":10\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/login",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"access_token not empty\", function () {\r",
+									"    pm.expect(jsonData.access_token).not.eql(undefined);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"refresh token not empty\", function () {\r",
+									"    pm.expect(jsonData.refresh_token).not.eql(undefined);\r",
+									"});\r",
+									"// set access token as environement variable\r",
+									"if (jsonData.access_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", null);\r",
+									"}\r",
+									"// set refresh token as environement variable\r",
+									"if (jsonData.refresh_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", null);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/logout",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh (token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"access_token not empty\", function () {\r",
+									"    pm.expect(jsonData.access_token).not.eql(undefined);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"refresh token not empty\", function () {\r",
+									"    pm.expect(jsonData.refresh_token).not.eql(undefined);\r",
+									"});\r",
+									"// set access token as environement variable\r",
+									"if (jsonData.access_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"access_token\", null);\r",
+									"}\r",
+									"// set refresh token as environement variable\r",
+									"if (jsonData.refresh_token !== undefined) {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);\r",
+									"} else {\r",
+									"    postman.setEnvironmentVariable(\"refresh_token\", null);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{refresh_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/refresh",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register (a user)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"user5\",\r\n    \"password\": \"pass\"\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/reguser",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"reguser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update(a user)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"user1\",\r\n    \"password\": \"123\"\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/reguser",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"reguser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users (# of users)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/users/0",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"users",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user (details)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/user/user1",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"user",
+								"user1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user (delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/user/user",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"user",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

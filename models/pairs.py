@@ -5,8 +5,9 @@ class PairModel(db.Model):
 
     __tablename__ = 'pairs'
 
+    # sqlalchemy needs a primary key (either dummy or real)
     rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    name = db.Column(db.String(81))  # sqlalchemy needs a primary key (either dummy or real)
+    name = db.Column(db.String(81))
     hedge = db.Column(db.Float(precision=8))
     status = db.Column(db.Integer)
 
