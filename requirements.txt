@@ -1,9 +1,7 @@
-requests==2.24.0
-flask==2.0.2
-Flask-RESTful==0.3.9
-Flask-JWT-Extended==4.1.0
-flask-sqlalchemy==2.5.1
-pyjwt==1.7.1
-
-# ↓ Needed for Heroku deployment, delete for local.
+flask~=2.0.2
+requests~=2.24.0
+Flask-RESTful
+Flask-JWT-Extended
+flask-sqlalchemy
+pyjwt
 uwsgi

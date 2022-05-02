@@ -21,7 +21,7 @@ With Pairs-API v3 you can:
 - list, save, update and delete stocks and pairs with API calls
 - enable and disable stocks and pairs for active trading
 - catch webhooks from trading platforms or signal generators
-- use access tokens for authentication purposes
+- use access tokens for authentication purposes with login system backend
 
 # Requirements
 
@@ -357,7 +357,21 @@ Pairs-API v3 returns the following status codes:
 
 # Heroku Deployment:
 
-This part is currently under review, it will be here soon.
+Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli).
+
+Clone repository, login to Heroku, add git remote and push:
+````
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
+$ heroku login -i
+$ heroku git:remote -a api-pairs-v3
+$ git push heroku main
+````
+See the links below to add CORS headers to the proxied request:
+
+https://github.com/Rob--W/cors-anywhere
+
+https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-heroku-3lcb
+
 
 # Demo:
 (Automatic deploys are disabled)

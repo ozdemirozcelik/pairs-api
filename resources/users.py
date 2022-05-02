@@ -180,8 +180,10 @@ class UserLogin(Resource):
             access_token = create_access_token(identity=user.username, fresh=timedelta(minutes=data['expire']))
             refresh_token = create_refresh_token(user.username)
             return {
-                       'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
-                       'refresh_token': refresh_token.decode('utf-8'),
+                       # 'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
+                       # 'refresh_token': refresh_token.decode('utf-8'), # for earlier versions of pyjwt
+                       'access_token': access_token,
+                       'refresh_token': refresh_token,
                        'expire': data['expire']
                    }, 200
 
@@ -207,6 +209,6 @@ class TokenRefresh(Resource):
         refresh_token = create_refresh_token(current_user)
 
         return {
-                   'access_token': new_token.decode('utf-8'),
-                   'refresh_token': refresh_token.decode('utf-8')
+                   'access_token': new_token,
+                   'refresh_token': refresh_token
                }, 200

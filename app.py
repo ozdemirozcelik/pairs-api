@@ -15,20 +15,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'  # database location
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # flask-sqlalchemy tracker is off, sqlalchemy has its own tracker
 app.config['PROPAGATE_EXCEPTIONS'] = True  # to allow flask propagating exception even if debug is set to false
 
+if __name__ == '__main__':  # to avoid duplicate calls
+    app.run(debug=True)
+
+api = Api(app)
+
+db.init_app(app)
 
 # Create tables and default users
 @app.before_first_request
 def create_tables():
     db.create_all()
     UserRegister.default_users()
-
-
-db.init_app(app)
-
-if __name__ == '__main__':  # to avoid duplicate calls
-    app.run(debug=True)
-
-api = Api(app)
 
 # JWT configuration (Start)
 
@@ -128,19 +126,20 @@ api.add_resource(TokenRefresh, '/v3/refresh')
 
 # Resource definitions (End)
 
+# run_at = "local"
+run_at = "remote"
 
-# # enable if running locally
-# server_url = "http://127.0.0.1:5000/"
 
+if run_at == "local":
+    server_url = "http://127.0.0.1:5000/"
+else:
+    # test server url:
+    server_url = "https://api-pairs-v3.herokuapp.com/"
 
-# disable if running locally
-# test server url:
-server_url = "http://api-pairs.herokuapp.com/"
-
-# proxy to bypass CORS limitations
-proxies = {
-    'get': 'https://api-pairs-cors.herokuapp.com/'
-    }
+    # proxy to bypass CORS limitations
+    proxies = {
+        'get': 'https://api-pairs-cors.herokuapp.com/'
+}
 
 
 @app.get('/')
@@ -148,11 +147,11 @@ def dashboard():
     server_url_read = server_url + "v3/signals/50"  # get the recent 50 signals
 
     try:
-        # # disable if using locally:
-        # response = requests.get(server_url_read, proxies=proxies, timeout=10)
-
-        # enable if using locally:
-        response = requests.get(server_url_read, timeout=5)
+        # disable if using locally:
+        if run_at == "local":
+            response = requests.get(server_url_read, timeout=5)
+        else:
+            response = requests.get(server_url_read, proxies=proxies, timeout=10)
 
     except requests.Timeout:
         # back off and retry
