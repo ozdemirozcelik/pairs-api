@@ -134,7 +134,7 @@ if run_at == "local":
     server_url = "http://127.0.0.1:5000/"
 else:
     # test server url:
-    server_url = "http://api-pairs-v3.herokuapp.com/"
+    server_url = "http://api-pairs-v3.herokuapp.com/"  # https doesn't work with Heroku free tier.
 
     # proxy to bypass CORS limitations
     proxies = {

@@ -1,4 +1,4 @@
-# Pairs-API V3 for trading stocks (single or pairs), deployed on Heroku
+# Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku
 
 Version 3 of the Flask-RESTful API.
 
@@ -7,11 +7,13 @@ Configured to be used with SQLite3 for local use.
 
 Deployed in Heroku with PostgreSQL for testing purposes:
 
-`http://api-pairs.herokuapp.com`
+`http://api-pairs-v3.herokuapp.com`
 
-Front-end demo (Javascript):
+Front-end demo for v3 (Javascript):
 
 https://api-pairs-v3.herokuapp.com/apitest
+
+The most recent version is available here:
 
 https://api-pairs.herokuapp.com/apitest
 
@@ -25,16 +27,16 @@ With Pairs-API v3 you can:
 
 # Requirements
 
-* requests==2.24.0
 * flask==2.0.2
+* requests==2.24.0
 * Flask-RESTful==0.3.9
-* Flask-JWT-Extended==4.1.0
+* Flask-JWT-Extended==4.4.0
 * flask-sqlalchemy==2.5.1
-* pyjwt==1.7.1
+* pyjwt==2.3.0
 * uwsgi (for Heroku deployment only)
 
 # Installation
-(commands in parenthesis for anaconda prompt)
+(commands in parentheses for anaconda prompt)
 
 ### clone git repository:
 ```bash
@@ -209,9 +211,11 @@ api.add_resource(TokenRefresh, '/v3/refresh')
 
 # Request & Response Examples
 
+POSTMAN collection can be found under "local" folder.
+
 ### POST request to register a single stock:
 ```python
-'http://api-pairs.herokuapp.com/v3/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -232,7 +236,7 @@ Response:
 
 ### PUT request to update a single stock:
 ```python
-'http://api-pairs.herokuapp.com/v3/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -258,12 +262,12 @@ Response:
 
 ### GET request to get all stocks:
 ```python
-'http://api-pairs.herokuapp.com/v3/stocks/0'
+'http://api-pairs-v3.herokuapp.com/v3/stocks/0'
 ```
 
 ### GET request to receive certain number of stocks (for exp: 50):
 ```python
-'http://api-pairs.herokuapp.com/v3/stocks/2'
+'http://api-pairs-v3.herokuapp.com/v3/stocks/2'
 ```
 Response:
 ```json
@@ -287,7 +291,7 @@ Response:
 
 ### GET request to get details of a certain stock:
 ```python
-'http://api-pairs.herokuapp.com/v3/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
 ```
 
 Response:
@@ -301,7 +305,7 @@ Response:
 ```
 ### DELETE request for a certain stock:
 ```python
-'http://api-pairs.herokuapp.com/v3/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
 ```
 Response:
 ```json
@@ -312,7 +316,7 @@ Response:
 
 ### POST request to register a webhook signal:
 ```python
-'http://api-pairs.herokuapp.com/v3/webhook'
+'http://api-pairs-v3.herokuapp.com/v3/webhook'
 ```
 Request Body:
 ```json
@@ -337,6 +341,28 @@ Response:
     "message": "Signal created successfully."
 }
 ```
+
+### POST request to login with a user
+```python
+'http://api-pairs-v3.herokuapp.com/v3/login'
+```
+Request Body (Token to expire in 30 min, default is 10 min):
+```json
+{
+    "username": "user1",
+    "password": "123",
+    "expire":30
+}
+```
+Response:
+```json
+{
+    "access_token": "eyJ0eXAx...",
+    "refresh_token": "eyJ0eXC...",
+    "expire": 30
+}
+```
+
 
 #### Test the demo application here:
 
@@ -388,16 +414,14 @@ snippets:
 # Considerations
 
 Considering for the next version:
+
 - improve demo with live TradingView realtime webhooks
-- send real time orders to exchanges
+- send real time orders to exchange (possibly via Interactive Brokers)
 
 # Contributing
 
 Pull requests are welcome.
 
-# Help
-
-This part is currently under review, it will be here soon.
 
 
 

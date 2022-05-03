@@ -557,7 +557,7 @@
 
 // disable if using locally, test page with proxy to bypass CORS limitations
 var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-var goto_url = "http://api-pairs-v3.herokuapp.com/";
+var goto_url = "http://api-pairs-v3.herokuapp.com/"; // # https doesn't work with Heroku free tier.
 var server_url = proxy_url + goto_url;
 
 
