@@ -1,6 +1,6 @@
 // define api constants for the users:
-const api_url_post_login= server_url +'v3/login';
-const api_url_post_logout= server_url +'v3/logout';
+const api_url_post_login= server_url +'v2/login';
+const api_url_post_logout= server_url +'v2/logout';
 
 // define token defaults
 var token_data;

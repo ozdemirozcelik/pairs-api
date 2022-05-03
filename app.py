@@ -105,24 +105,24 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
 
 # Resource definitions (Start)
 
-api.add_resource(SignalWebhook, '/v3/webhook')
-api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
-api.add_resource(Signal, '/v3/signal/<string:rowid>')
+api.add_resource(SignalWebhook, '/v2/webhook')
+api.add_resource(SignalList, '/v2/signals/<string:number_of_items>')
+api.add_resource(Signal, '/v2/signal/<string:rowid>')
 
-api.add_resource(PairRegister, '/v3/regpair')
-api.add_resource(PairList, '/v3/pairs/<string:number_of_items>')
-api.add_resource(Pair, '/v3/pair/<string:name>')
+api.add_resource(PairRegister, '/v2/regpair')
+api.add_resource(PairList, '/v2/pairs/<string:number_of_items>')
+api.add_resource(Pair, '/v2/pair/<string:name>')
 
-api.add_resource(StockRegister, '/v3/regstock')
-api.add_resource(StockList, '/v3/stocks/<string:number_of_items>')
-api.add_resource(Stock, '/v3/stock/<string:symbol>')
+api.add_resource(StockRegister, '/v2/regstock')
+api.add_resource(StockList, '/v2/stocks/<string:number_of_items>')
+api.add_resource(Stock, '/v2/stock/<string:symbol>')
 
-api.add_resource(UserRegister, '/v3/reguser')
-api.add_resource(UserList, '/v3/users/<string:number_of_users>')
-api.add_resource(User, '/v3/user/<string:username>')
-api.add_resource(UserLogin, '/v3/login')
-api.add_resource(UserLogout, '/v3/logout')
-api.add_resource(TokenRefresh, '/v3/refresh')
+api.add_resource(UserRegister, '/v2/reguser')
+api.add_resource(UserList, '/v2/users/<string:number_of_users>')
+api.add_resource(User, '/v2/user/<string:username>')
+api.add_resource(UserLogin, '/v2/login')
+api.add_resource(UserLogout, '/v2/logout')
+api.add_resource(TokenRefresh, '/v2/refresh')
 
 # Resource definitions (End)
 
@@ -134,7 +134,7 @@ if run_at == "local":
     server_url = "http://127.0.0.1:5000/"
 else:
     # test server url:
-    server_url = "http://api-pairs-v3.herokuapp.com/"  # https doesn't work with Heroku free tier.
+    server_url = "http://api-pairs-v2.herokuapp.com/"  # https doesn't work with Heroku free tier.
 
     # proxy to bypass CORS limitations
     proxies = {
@@ -144,7 +144,7 @@ else:
 
 @app.get('/')
 def dashboard():
-    server_url_read = server_url + "v3/signals/50"  # get the recent 50 signals
+    server_url_read = server_url + "v2/signals/50"  # get the recent 50 signals
 
     try:
         # disable if using locally:
