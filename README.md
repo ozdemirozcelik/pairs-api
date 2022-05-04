@@ -34,6 +34,7 @@ With Pairs-API v2 you can:
 * flask-sqlalchemy==2.5.1
 * pyjwt==2.3.0
 * uwsgi (for Heroku deployment only)
+* psycopg2 (for Heroku Postgres deployment only)
 
 # Installation
 (commands in parentheses for anaconda prompt)
@@ -61,8 +62,8 @@ $ source pairs-env/bin/activate
 ````
 ### install requirements:
 
-IMPORTANT: delete line 'uwsgi' from the requirements.txt before installing.
-uwsgi is needed for Heroku deployment only.
+IMPORTANT: you may need to delete line 'uwsgi' and 'psycopg2' from the requirements.txt before installing.
+These are needed for Heroku deployment only.
 
 (windows: change -if necessary- version declarations from 'requests~=2.24.0'' to 'requests==2.24.0')
 
@@ -383,6 +384,8 @@ Pairs-API v2 returns the following status codes:
 
 # Heroku Deployment:
 
+####TODO: Update with images & more detailed explanation
+
 Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli).
 
 Clone repository, login to Heroku, add git remote and push:
@@ -392,6 +395,15 @@ $ heroku login -i
 $ heroku git:remote -a api-pairs-v2
 $ git push heroku main
 ````
+
+To enable PostgreSQL in your Heroku account:
+- go to Resources in your Heroku account and install 'Heroku Postgres'
+- go to Settings->Config Vars and you will see 'DATABASE_URL'
+- copy 'DATABASE_URL' value which should look like 'postgres://sdfyebdbfbf..'
+- add a new system variable 'DATABASE_URL_SQLALCHEMY' and paste the value
+- change 'postgre' to 'postgresql' and save, it should look like: 'postgresql://sdfyebdbfbf..'
+
+
 See the links below to add CORS headers to the proxied request:
 
 https://github.com/Rob--W/cors-anywhere

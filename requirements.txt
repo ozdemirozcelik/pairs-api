@@ -5,3 +5,4 @@ Flask-JWT-Extended~=4.4.0
 flask-sqlalchemy~=2.5.1
 pyjwt~=2.3.0
 uwsgi
+psycopg2

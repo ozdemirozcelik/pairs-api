@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -11,7 +12,8 @@ import requests
 from db import db
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'  # database location
+# check for postgres database, if not found use local sqlite database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL_SQLALCHEMY', 'sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # flask-sqlalchemy tracker is off, sqlalchemy has its own tracker
 app.config['PROPAGATE_EXCEPTIONS'] = True  # to allow flask propagating exception even if debug is set to false
 
