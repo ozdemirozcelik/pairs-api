@@ -1,23 +1,28 @@
+from typing import Dict, Union  # for type hinting
 from db import db
+
+UserJSON = Dict[str, str]  # custom type hint
 
 
 class UserModel(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     # sqlalchemy needs a primary key (either dummy or real)
-    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    username = db.Column(db.String(80))
+    rowid = db.Column(
+        db.Integer, primary_key=True, autoincrement=True
+    )  # using 'rowid' as the default key
+    username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(80))
 
-    def __init__(self, username, password):
+    def __init__(self, username: str, password: str):
         self.username = username
         self.password = password
 
-    def json(self):
-        return {'username': self.username}
+    def json(self) -> UserJSON:
+        return {"username": self.username}
 
     @classmethod
-    def find_by_username(cls, username):
+    def find_by_username(cls, username) -> "UserModel":
 
         return cls.query.filter_by(username=username).first()
 
@@ -46,7 +51,7 @@ class UserModel(db.Model):
 
     # TODO: def find_by_id
 
-    def insert(self):
+    def insert(self) -> None:
 
         db.session.add(self)
         db.session.commit()
@@ -71,7 +76,7 @@ class UserModel(db.Model):
         #     if connection:
         #         connection.close()  # disconnect the database even if exception occurs
 
-    def update(self):
+    def update(self) -> None:
 
         item_to_update = self.query.filter_by(username=self.username).first()
 
@@ -100,7 +105,7 @@ class UserModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items):
+    def get_rows(cls, number_of_items) -> "UserModel":
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
@@ -141,7 +146,7 @@ class UserModel(db.Model):
         # return items
 
     @staticmethod
-    def delete(username):
+    def delete(username) -> None:
 
         db.session.delete(username)
         db.session.commit()

@@ -1,26 +1,30 @@
+from typing import Dict, Union  # for type hinting
 from db import db
+
+PairJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
 
 class PairModel(db.Model):
-
-    __tablename__ = 'pairs'
+    __tablename__ = "pairs"
 
     # sqlalchemy needs a primary key (either dummy or real)
-    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    name = db.Column(db.String(81))
+    rowid = db.Column(
+        db.Integer, primary_key=True, autoincrement=True
+    )  # using 'rowid' as the default key
+    name = db.Column(db.String(81), unique=True)
     hedge = db.Column(db.Float(precision=8))
     status = db.Column(db.Integer)
 
-    def __init__(self, name, hedge, status):
+    def __init__(self, name: str, hedge: float, status: int):
         self.name = name
         self.hedge = hedge
         self.status = status
 
-    def json(self):
-        return {'name': self.name, 'hedge': self.hedge, 'status': self.status}
+    def json(self) -> PairJSON:
+        return {"name": self.name, "hedge": self.hedge, "status": self.status}
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_name(cls, name: str) -> "PairModel":
 
         return cls.query.filter_by(name=name).first()
 
@@ -47,7 +51,7 @@ class PairModel(db.Model):
         #
         # return None
 
-    def insert(self):
+    def insert(self) -> None:
 
         db.session.add(self)
         db.session.commit()
@@ -72,7 +76,7 @@ class PairModel(db.Model):
         #     if connection:
         #         connection.close()  # disconnect the database even if exception occurs
 
-    def update(self):
+    def update(self) -> None:
 
         item_to_update = self.query.filter_by(name=self.name).first()
 
@@ -102,7 +106,7 @@ class PairModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items):
+    def get_rows(cls, number_of_items) -> "PairModel":
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
@@ -141,7 +145,7 @@ class PairModel(db.Model):
         #
         # return items
 
-    def delete(self):
+    def delete(self) -> None:
 
         db.session.delete(self)
         db.session.commit()

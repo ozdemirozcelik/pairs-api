@@ -1,14 +1,23 @@
+from typing import Dict, Union  # for type hinting
 from db import db
-from sqlalchemy.sql import func  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
+from sqlalchemy.sql import (
+    func,
+)  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
 
-PASSPHRASE = 'webhook'  # Passphrase is required to register webhooks
+SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
+
+PASSPHRASE = "webhook"  # Passphrase is required to register webhooks
 
 
 class SignalModel(db.Model):
-    __tablename__ = 'signals'
+    __tablename__ = "signals"
 
-    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())  # DATETIME DEFAULT (CURRENT_TIMESTAMP)
+    rowid = db.Column(
+        db.Integer, primary_key=True, autoincrement=True
+    )  # using 'rowid' as the default key
+    timestamp = db.Column(
+        db.DateTime(timezone=True), server_default=func.now()
+    )  # DATETIME DEFAULT (CURRENT_TIMESTAMP)
     ticker = db.Column(db.String)
     order_action = db.Column(db.String)
     order_contracts = db.Column(db.Integer)
@@ -20,8 +29,19 @@ class SignalModel(db.Model):
     order_comment = db.Column(db.String)
     order_status = db.Column(db.String)
 
-    def __init__(self, ticker, order_action, order_contracts, order_price, mar_pos, mar_pos_size,
-                 pre_mar_pos, pre_mar_pos_size, order_comment, order_status):
+    def __init__(
+        self,
+        ticker: str,
+        order_action: str,
+        order_contracts: int,
+        order_price: float,
+        mar_pos: str,
+        mar_pos_size: int,
+        pre_mar_pos: str,
+        pre_mar_pos_size: int,
+        order_comment: str,
+        order_status: str,
+    ):
         self.ticker = ticker
         self.order_action = order_action
         self.order_contracts = order_contracts
@@ -33,21 +53,30 @@ class SignalModel(db.Model):
         self.order_comment = order_comment
         self.order_status = order_status
 
-    def json(self):
-        return {'rowid': self.rowid, 'timestamp': str(self.timestamp), 'ticker': self.ticker,
-                'order_action': self.order_action, 'order_contracts': self.order_contracts,
-                'order_price': self.order_price, 'mar_pos': self.mar_pos, 'mar_pos_size': self.mar_pos_size,
-                'pre_mar_pos': self.pre_mar_pos, 'pre_mar_pos_size': self.pre_mar_pos_size,
-                'order_comment': self.order_comment, 'order_status': self.order_status}
+    def json(self) -> SignalJSON:
+        return {
+            "rowid": self.rowid,
+            "timestamp": str(self.timestamp),
+            "ticker": self.ticker,
+            "order_action": self.order_action,
+            "order_contracts": self.order_contracts,
+            "order_price": self.order_price,
+            "mar_pos": self.mar_pos,
+            "mar_pos_size": self.mar_pos_size,
+            "pre_mar_pos": self.pre_mar_pos,
+            "pre_mar_pos_size": self.pre_mar_pos_size,
+            "order_comment": self.order_comment,
+            "order_status": self.order_status,
+        }
 
     @staticmethod
-    def passphrase_wrong(passphrase):
+    def passphrase_wrong(passphrase) -> bool:
         if passphrase == PASSPHRASE:
             return False
         return True
 
     @classmethod
-    def find_by_rowid(cls, rowid):
+    def find_by_rowid(cls, rowid) -> "SignalModel":
 
         return cls.query.filter_by(rowid=rowid).first()
 
@@ -78,7 +107,7 @@ class SignalModel(db.Model):
         #
         # return None
 
-    def insert(self):
+    def insert(self) -> None:
 
         db.session.add(self)
         db.session.commit()
@@ -108,7 +137,7 @@ class SignalModel(db.Model):
         #     if connection:
         #         connection.close()  # disconnect the database even if exception occurs
 
-    def update(self, rowid):
+    def update(self, rowid) -> None:
 
         item_to_update = self.query.filter_by(rowid=rowid).first()
 
@@ -151,7 +180,7 @@ class SignalModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items):
+    def get_rows(cls, number_of_items) -> "SignalModel":
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
@@ -191,7 +220,7 @@ class SignalModel(db.Model):
         #
         # return items
 
-    def delete(self):
+    def delete(self) -> None:
 
         db.session.delete(self)
         db.session.commit()

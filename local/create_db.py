@@ -55,7 +55,7 @@ import sqlite3
 # USERS table includes ...
 
 
-connection = sqlite3.connect('../data.db')
+connection = sqlite3.connect("../data.db")
 
 try:
     cursor = connection.cursor()
@@ -94,32 +94,36 @@ try:
 
     cursor.execute(create_pairs)
 
-    create_stocks = "CREATE TABLE IF NOT EXISTS stocks (symbol TEXT PRIMARY KEY, prixch TEXT, secxch TEXT, " \
-                    "active INTEGER) "
+    create_stocks = (
+        "CREATE TABLE IF NOT EXISTS stocks (symbol TEXT PRIMARY KEY, prixch TEXT, secxch TEXT, "
+        "active INTEGER) "
+    )
 
     cursor.execute(create_stocks)
 
     # TODO: is it possible to encrypt the password?
-    create_users = "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)"
+    create_users = (
+        "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)"
+    )
 
     # TODO: create master password here?
 
     cursor.execute(create_users)
 
-    print('tables (for signals, pairs, stocks, users) are created')
+    print("tables (for signals, pairs, stocks, users) are created")
 
-    query = "INSERT INTO {table} VALUES(?, ?),(?, ?)".format(table='users')
+    query = "INSERT INTO {table} VALUES(?, ?),(?, ?)".format(table="users")
 
     cursor.execute(query, ("admin", "123", "user1", "123"))
 
     connection.commit()
 
-    print('admin and user1 is created')
+    print("admin and user1 is created")
 
 except sqlite3.Error as error:
-    print('Error occurred during db creation - ', error)
+    print("Error occurred during db creation - ", error)
 
 finally:
     if connection:
         connection.close()
-        print('SQLite Connection closed')
+        print("SQLite Connection closed")

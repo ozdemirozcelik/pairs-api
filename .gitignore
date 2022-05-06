@@ -3,3 +3,7 @@ pairs-env
 *.pyc
 __pycache__
 .ideagit
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

@@ -2,120 +2,133 @@ from flask_restful import Resource, reqparse
 from models.signals import SignalModel
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
+EMPTY_ERR = "'{}' cannot be empty!"
+PASS_ERR = "incorrect passphrase."
+INSERT_ERR = "an error occurred inserting the item."
+UPDATE_ERR = "an error occurred updating the item."
+DELETE_ERR = "an error occurred deleting the item."
+GET_ERR = "an error occurred while getting the item(s)."
+CREATE_OK = "'{}' created successfully."
+DELETE_OK = "'{}' deleted successfully."
+NOT_FOUND = "item not found."
+PRIV_ERR = "'{}' privilege required."
+
 
 class SignalWebhook(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('passphrase',
-                        type=str,
-                        required=True,
-                        help="This webhook needs a passphrase!"
-                        )
-    parser.add_argument('ticker',
-                        type=str,
-                        required=True,
-                        help="This webhook needs a ticker!"
-                        )
-    parser.add_argument('order_action',
-                        type=str,
-                        required=True,
-                        help="This webhook needs an order action!"
-                        )
-    parser.add_argument('order_contracts',
-                        type=int,
-                        required=True,
-                        help="This webhook needs an order amount!"
-                        )
-    parser.add_argument('order_price',
-                        type=float,
-                        # required=True,
-                        # help="This webhook needs an order price!"
-                        )
-    parser.add_argument('mar_pos',
-                        type=str,
-                        # required=True,
-                        # help="This webhook needs an order action!"
-                        )
-    parser.add_argument('mar_pos_size',
-                        type=int,
-                        # required=True,
-                        # help="This webhook needs a market position size!"
-                        )
-    parser.add_argument('pre_mar_pos',
-                        type=str,
-                        # required=True,
-                        # help="This webhook needs an order action!"
-                        )
-    parser.add_argument('pre_mar_pos_size',
-                        type=int,
-                        # required=True,
-                        # help="This webhook needs a previous market position size!"
-                        )
-    parser.add_argument('order_comment',
-                        type=str,
-                        default=""
-                        )
-    parser.add_argument('order_status',
-                        type=str,
-                        default="waiting"
-                        )
-    parser.add_argument('rowid',
-                        type=int,
-                        default=0
-                        )
+    parser.add_argument(
+        "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
+    )
+    parser.add_argument(
+        "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
+    )
+    parser.add_argument(
+        "order_action", type=str, required=True, help=EMPTY_ERR.format("order_action"),
+    )
+    parser.add_argument(
+        "order_contracts",
+        type=int,
+        required=True,
+        help=EMPTY_ERR.format("order_contracts"),
+    )
+    parser.add_argument(
+        "order_price", type=float,
+    )
+    parser.add_argument(
+        "mar_pos", type=str,
+    )
+    parser.add_argument(
+        "mar_pos_size", type=int,
+    )
+    parser.add_argument(
+        "pre_mar_pos", type=str,
+    )
+    parser.add_argument(
+        "pre_mar_pos_size", type=int,
+    )
+    parser.add_argument("order_comment", type=str, default="")
+    parser.add_argument("order_status", type=str, default="waiting")
+    parser.add_argument("rowid", type=int, default=0)
 
     @staticmethod
     def post():
         data = SignalWebhook.parser.parse_args()
 
-        if SignalModel.passphrase_wrong(data['passphrase']):
-            return {"message": "Passphrase incorrect."}, 400  # Return Bad Request
+        if SignalModel.passphrase_wrong(data["passphrase"]):
+            return {"message": PASS_ERR}, 400  # Return Bad Request
 
-        item = SignalModel(data['ticker'], data['order_action'], data['order_contracts'], data['order_price'],
-                           data['mar_pos'], data['mar_pos_size'], data['pre_mar_pos'], data['pre_mar_pos_size'],
-                           data['order_comment'], data['order_status'])
+        item = SignalModel(
+            data["ticker"],
+            data["order_action"],
+            data["order_contracts"],
+            data["order_price"],
+            data["mar_pos"],
+            data["mar_pos_size"],
+            data["pre_mar_pos"],
+            data["pre_mar_pos_size"],
+            data["order_comment"],
+            data["order_status"],
+        )
 
         try:
             item.insert()
 
         except Exception as e:
-            print('Error occurred - ', e)  # better log the errors
-            return {"message": "An error occurred inserting the item."}, 500  # Return Interval Server Error
+            print("Error occurred - ", e)  # better log the errors
+            return (
+                {"message": INSERT_ERR},
+                500,
+            )  # Return Interval Server Error
 
-        return {"message": "Signal created successfully."}, 201  # Return Successful Creation of Resource
+        return (
+            {"message": CREATE_OK.format("signal")},
+            201,
+        )  # Return Successful Creation of Resource
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
     def put():
         data = SignalWebhook.parser.parse_args()
 
-        if SignalModel.passphrase_wrong(data['passphrase']):
-            return {"message": "Passphrase incorrect."}, 400  # Return Bad Request
+        if SignalModel.passphrase_wrong(data["passphrase"]):
+            return {"message": PASS_ERR}, 400  # Return Bad Request
 
-        if SignalModel.find_by_rowid(data['rowid']):
+        if SignalModel.find_by_rowid(data["rowid"]):
 
-            item = SignalModel(data['ticker'], data['order_action'], data['order_contracts'],
-                               data['order_price'], data['mar_pos'], data['mar_pos_size'], data['pre_mar_pos'],
-                               data['pre_mar_pos_size'], data['order_comment'], data['order_status'])
+            item = SignalModel(
+                data["ticker"],
+                data["order_action"],
+                data["order_contracts"],
+                data["order_price"],
+                data["mar_pos"],
+                data["mar_pos_size"],
+                data["pre_mar_pos"],
+                data["pre_mar_pos_size"],
+                data["order_comment"],
+                data["order_status"],
+            )
 
             try:
-                item.update(data['rowid'])
+                item.update(data["rowid"])
 
             except Exception as e:
-                print('Error occurred - ', e)
-                return {"message": "An error occurred updating the item."}, 500  # Return Interval Server Error
+                print("Error occurred - ", e)
+                return (
+                    {"message": UPDATE_ERR},
+                    500,
+                )  # Return Interval Server Error
 
-            item.rowid = data['rowid']
+            item.rowid = data["rowid"]
             return_json = item.json()
 
-            return_json.pop('timestamp')
+            return_json.pop("timestamp")
 
             return return_json
 
-        return {"message": "No item found to update."}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, 404  # Return Not Found
 
 
 class SignalList(Resource):
-
     @staticmethod
     @jwt_required(optional=True)
     def get(number_of_items="0"):
@@ -136,15 +149,20 @@ class SignalList(Resource):
             items = SignalModel.get_rows(str(number_of_items))
 
         except Exception as e:
-            print('Error occurred - ', e)
-            return {"message": "An error occurred while getting the items."}, 500  # Return Interval Server Error
+            print("Error occurred - ", e)
+            return (
+                {"message": GET_ERR},
+                500,
+            )  # Return Interval Server Error
 
         # return {'signals': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
-        return {'signals': [item.json() for item in items], 'notoken_limit': notoken_limit}  # this is more readable
+        return {
+            "signals": [item.json() for item in items],
+            "notoken_limit": notoken_limit,
+        }  # this is more readable
 
 
 class Signal(Resource):
-
     @staticmethod
     def get(rowid):
 
@@ -152,13 +170,16 @@ class Signal(Resource):
             item = SignalModel.find_by_rowid(rowid)
 
         except Exception as e:
-            print('Error occurred - ', e)
-            return {"message": "An error occurred while getting the item."}, 500  # Return Interval Server Error
+            print("Error occurred - ", e)
+            return (
+                {"message": GET_ERR},
+                500,
+            )  # Return Interval Server Error
 
         if item:
             return item.json()
 
-        return {'message': 'Item not found'}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, 404  # Return Not Found
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -167,8 +188,8 @@ class Signal(Resource):
         claims = get_jwt()
 
         # TODO: Delete only if admin
-        if not claims['is_admin']:
-            return {'message': 'Admin privilege required.'}, 401  # Return Unauthorized
+        if not claims["is_admin"]:
+            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
         try:
             item_to_delete = SignalModel.find_by_rowid(rowid)
@@ -176,10 +197,13 @@ class Signal(Resource):
             if item_to_delete:
                 item_to_delete.delete()
             else:
-                return {'message': 'No item to delete'}
+                return {"message": NOT_FOUND}
 
         except Exception as e:
-            print('Error occurred - ', e)
-            return {"message": "An error occurred while deleting the item."}, 500  # Return Interval Server Error
+            print("Error occurred - ", e)
+            return (
+                {"message": DELETE_ERR},
+                500,
+            )  # Return Interval Server Error
 
-        return {'message': 'Item deleted'}
+        return {"message": DELETE_OK.format("signal")}

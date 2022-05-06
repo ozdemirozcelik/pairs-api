@@ -1,27 +1,37 @@
+from typing import Dict, Union  # for type hinting
 from db import db
+
+StockJSON = Dict[str, Union[str, int]]  # custom type hint
 
 
 class StockModel(db.Model):
-    __tablename__ = 'stocks'
+    __tablename__ = "stocks"
 
     # sqlalchemy needs a primary key (either dummy or real)
-    rowid = db.Column(db.Integer, primary_key=True, autoincrement=True)  # using 'rowid' as the default key
-    symbol = db.Column(db.String(40))
+    rowid = db.Column(
+        db.Integer, primary_key=True, autoincrement=True
+    )  # using 'rowid' as the default key
+    symbol = db.Column(db.String(40), unique=True)
     prixch = db.Column(db.String(40))
     secxch = db.Column(db.String(40))
     active = db.Column(db.Integer)
 
-    def __init__(self, symbol, prixch, secxch, active):
+    def __init__(self, symbol: str, prixch: str, secxch: str, active: int):
         self.symbol = symbol
         self.prixch = prixch
         self.secxch = secxch
         self.active = active
 
-    def json(self):
-        return {'symbol': self.symbol, 'prixch': self.prixch, 'secxch': self.secxch, 'active': self.active}
+    def json(self) -> StockJSON:
+        return {
+            "symbol": self.symbol,
+            "prixch": self.prixch,
+            "secxch": self.secxch,
+            "active": self.active,
+        }
 
     @classmethod
-    def find_by_symbol(cls, symbol):
+    def find_by_symbol(cls, symbol: str) -> "StockModel":
 
         return cls.query.filter_by(symbol=symbol).first()
 
@@ -49,7 +59,7 @@ class StockModel(db.Model):
         #
         # return None
 
-    def insert(self):
+    def insert(self) -> None:
 
         db.session.add(self)
         db.session.commit()
@@ -75,7 +85,7 @@ class StockModel(db.Model):
     #         if connection:
     #             connection.close()  # disconnect the database even if exception occurs
 
-    def update(self):
+    def update(self) -> None:
 
         item_to_update = self.query.filter_by(symbol=self.symbol).first()
 
@@ -107,7 +117,7 @@ class StockModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items):
+    def get_rows(cls, number_of_items: str) -> "StockModel":
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
@@ -147,7 +157,7 @@ class StockModel(db.Model):
         #
         # return items
 
-    def delete(self):
+    def delete(self) -> None:
 
         db.session.delete(self)
         db.session.commit()
