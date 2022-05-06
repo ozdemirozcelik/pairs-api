@@ -552,14 +552,13 @@
 
 <script>
 
-// // enable if using locally
-// var server_url = "http://127.0.0.1:5000/";
+var server_url = window.location.origin + "/";
 
-// disable if using locally, test page with proxy to bypass CORS limitations
-var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-var goto_url = "http://api-pairs-v2.herokuapp.com/"; // # https doesn't work with Heroku free tier.
-var server_url = proxy_url + goto_url;
+if (server_url != "http://127.0.0.1:5000/") {
 
+    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
+    server_url = proxy_url + base_url;
+};
 
 </script>
 

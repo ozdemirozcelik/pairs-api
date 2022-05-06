@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from jwt import ExpiredSignatureError
@@ -128,32 +128,21 @@ api.add_resource(TokenRefresh, '/v2/refresh')
 
 # Resource definitions (End)
 
-# run_at = "local"
-run_at = "remote"
-
-
-if run_at == "local":
-    server_url = "http://127.0.0.1:5000/"
-else:
-    # test server url:
-    server_url = "http://api-pairs-v2.herokuapp.com/"  # https doesn't work with Heroku free tier.
-
-    # proxy to bypass CORS limitations
-    proxies = {
-        'get': 'https://api-pairs-cors.herokuapp.com/'
-}
-
 
 @app.get('/')
 def dashboard():
-    server_url_read = server_url + "v2/signals/50"  # get the recent 50 signals
-
+    base_url = request.base_url
+    server_url_read = base_url + "v2/signals/50"  # get the recent 50 signals
     try:
-        # disable if using locally:
-        if run_at == "local":
-            response = requests.get(server_url_read, timeout=5)
-        else:
+        if base_url != "http://127.0.0.1:5000/":
+            print("*** activating proxy! *** ")
+            # proxy to bypass CORS limitations
+            proxies = {
+                'get': 'https://api-pairs-cors.herokuapplication.com/'
+            }
             response = requests.get(server_url_read, proxies=proxies, timeout=10)
+        else:
+            response = requests.get(server_url_read, timeout=5)
 
     except requests.Timeout:
         # back off and retry
