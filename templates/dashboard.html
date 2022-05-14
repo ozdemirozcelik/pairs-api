@@ -1,37 +1,163 @@
-<html>
-    <head>
-        <title>dashboard</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RESTful API TEST PAGE</title>
+    <meta charset="UTF-8">
+    <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css"> 
+     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  
+    <script type="text/javascript" >
+        $(document).ready(function(){
 
-    <body>
-        <center><a href="/apitest">Click here to go to the settings and the webhook simulator </a></center>
-        <div class="container">
-            <h1>webhook signals</h1>
-            <table class="table">
-                <tr>
-                    <th>order_no</th>
-                    <th>timestamp(pct)</th>
-                    <th>ticker</th>
-                    <th>order_comment</th>
-                    <th>action</th>
-                    <th>quantity</th>
-                    <th>price</th>
-                    <th>order_status</th>
-                </tr>
-                {% for signal in signals %}
-                <tr>
-                    <td>{{ signal.rowid }}</td>
-                    <td>{{ signal.timestamp}}</td>
-                    <td>{{ signal.ticker }}</td>
-                    <td>{{ signal.order_comment }}</td> 
-                    <td>{{ signal.order_action }}</td>
-                    <td>{{ signal.order_contracts }}</td>
-                    <td>{{ signal.order_price }}</td>
-                    <td>{{ signal.order_status }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+            // for the tabs:
+            $(".tabs-list li a").click(function(e){
+                e.preventDefault();
+            });
+
+            $(".tabs-list li").click(function(){
+                var tabid = $(this).find("a").attr("href");
+                $(".tabs-list li,.tabs div.tab").removeClass("active");
+                $(".tab").hide();
+                $(tabid).show();
+                $(this).addClass("active");
+
+            });
+
+        });
+
+    </script>
+</head>
+
+<body>
+    <div id="loginbox" class="modal-login">
+        <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
+        <section class="login-form">
+            <form class="modal-login-content animate">   
+            <div class="modal-login-container">
+                <label for="username"><b>username:</b></label>
+                <input type="text" placeholder="admin or user1" autocomplete='username' name="username" required>       
+                <label for="password"><b>password:</b></label>
+                <input type="password" placeholder="123" autocomplete='password' name="password" required>
+                <label for="expire"><b>validity:</b></label>
+                <select name="expire" id="expire">
+                    <option value="1">1</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="60">60</option>
+                    <option value="120">120</option>
+                </select> (min) 
+                <br><br>
+                <button type="submit" >Login</button>
+            </div>
+            </form>
+        </section>
+    </div>
+    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
+    <div class="tabs">
+        
+        <ul class="tabs-list">
+            <li id="dashboard" class="active"><a href="#tab1">Dashboard</a></li>
+            <li id="listsignalstab"><a href="#tab2">List</a></li>
+        </ul>
+
+        <div id="tab1" class="tab active">
+                <div class="column_dashboard">
+                <h3> Signals </h3>
+                <table class="webhook">
+                    <tr>
+                        <th>row_id</th>
+                        <th>timestamp(pct)</th>
+                        <th>ticker</th>
+                        <th>order_comment</th>
+                        <th>action</th>
+                        <th>quantity</th>
+                        <th>price</th>
+                        <th>order_status</th>
+                        <th>fill_price</th>
+                        <th>slippage</th>
+                    </tr>
+                    {% for signal in signals %}
+                    <tr>
+                        <td>{{ signal.rowid }}</td>
+                        {% if signal.timestamp|iftoday %}
+                        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time}}</td>                 
+                        {% else %}
+                        <td>{{ signal.timestamp|pct_time}}</td>
+                        {% endif %} 
+                        <td>{{ signal.ticker }}</td>
+                        <td>{{ signal.order_comment }}</td> 
+                        <td>{{ signal.order_action }}</td>
+                        <td>{{ signal.order_contracts }}</td>
+                        <td>{{ signal.order_price }}</td>
+                        {% if "critical" in signal.order_status or "ticker" in signal.order_status%}
+                        <td style="background-color:#Ee8453">{{ signal.order_status }}</td> 
+                        {% elif "created" in signal.order_status %}
+                        <td>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)</td>
+                        {% elif "waiting" in signal.order_status or "rerouted" in signal.order_status %}
+                        <td>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)</td> 
+                        {% elif "filled" in signal.order_status %}
+                        <td style="background-color:#87F075">{{ signal.order_status }}</td>                              
+                        {% else %}
+                        <td style="background-color:#F0DC75">{{ signal.order_status }}</td>                                                   
+                        {% endif %}                
+                        <td>{{ signal.fill_price }}</td>
+                        {% if signal.fill_price == "" %}
+                        <td></td> 
+                        {% elif signal.order_action=="buy" %}
+                        <td>{{ signal.slip|float|round(3,) }}</td>
+                        {% elif signal.order_action=="sell" %}
+                        <td>{{ -(signal.slip|float|round(3,)) }}</td>
+                        {% else %}
+                        <td></td> 
+                        {% endif %}
+                    </tr>
+                    {% endfor %}                  
+                </table>
+                <div id="logintext"><br>Login to see more...</div>
+                </div>
+            <div class="legend">
+                <span class='numberCircle' style='background-color: lightgoldenrodyellow';>&nbsp;</span> waiting
+                <span class='numberCircle' style='background-color: orange';>&nbsp;</span> canceled
+                <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created 
+                <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
+            </div>
         </div>
-    </body>
+        <div id="tab2" class="tab">
+            <div class="container">
+            </div>
+            <div class="legend">
+                <span class='round' style='background-color: yellow';>&nbsp;</span> active
+                <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+            </div>
+        </div>
+    </div>
+
+
+<script>
+
+// use proxy to overcome CORS limitations
+var server_url = window.location.origin + "/";
+console.log("base_url: " + server_url);
+
+if (server_url != "http://127.0.0.1:5000/") {
+    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
+    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
+    server_url = proxy_url + updatedURL;
+};
+
+// display a 'login to see more' message if not received the complete list
+
+if (!localStorage.access_token){ document.getElementById("logintext").style.display = 'block'} else { document.getElementById("logintext").style.display = 'none'};
+
+
+</script>
+
+<script type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>
+
+
+</body>
 </html>

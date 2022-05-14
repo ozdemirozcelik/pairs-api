@@ -75,11 +75,21 @@ async function getToken() {
             // go back to main screen
             modal.style.display = "none";
             
-            // reset countdown
-            setExpire();
+            // check if on the dashboard or setup
+            if (server_url != window.location.href){
 
-             // list all signals, if logged-in once, all signals are visible
-            listSignals();
+                // reset countdown
+                setExpire();
+
+                // list all signals, if logged-in once, all signals are visible
+                listSignals();
+            } else {
+                // refresh to get server side data
+                window.location.reload(true);
+            }
+
+
+
 
         }
               
@@ -142,7 +152,13 @@ async function logout() {
 
 // set countdown default value
 var intervalid;
-setExpire();
+
+if (server_url != window.location.href){
+
+    // reset countdown
+    setExpire();
+
+}
 
 // set session countdown
 function setExpire() {

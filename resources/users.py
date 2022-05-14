@@ -1,5 +1,6 @@
 from datetime import timedelta
 from flask_restful import Resource, reqparse
+from flask import session
 from models.users import UserModel
 from blacklist import BLACKLIST
 from hmac import compare_digest
@@ -213,6 +214,7 @@ class UserLogin(Resource):
                 identity=user.username, fresh=timedelta(minutes=data["expire"])
             )
             refresh_token = create_refresh_token(user.username)
+            session["token"] = "yes_token"  # store token, use it as a dict
             return (
                 {
                     # 'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
@@ -233,6 +235,7 @@ class UserLogout(Resource):
     def post():
         jti = get_jwt()["jti"]  # jti is a unique identifier for JWT
         BLACKLIST.add(jti)
+        session["token"] = "no_token"
         return {"message": LOGOUT_OK}, 200
 
 

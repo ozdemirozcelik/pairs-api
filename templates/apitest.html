@@ -97,11 +97,11 @@
 </head>
 
 <body>
-    <div id="loginbox" class="modal">
+    <div id="loginbox" class="modal-login">
         <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
         <section class="login-form">
-            <form class="modal-content animate">   
-            <div class="modal-container">
+            <form class="modal-login-content animate">   
+            <div class="modal-login-container">
                 <label for="username"><b>username:</b></label>
                 <input type="text" placeholder="admin or user1" autocomplete='username' name="username" required>       
                 <label for="password"><b>password:</b></label>
@@ -199,9 +199,12 @@
                                 <label for="pre_mar_pos_size">Pre. Mar. Pos. Size:&nbsp</label>
                                 <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer"> 
                             </p>
-                            <input id="order_comment" name="order_comment" type="hidden" value=" "/>
-                            <input name="passphrase" type="hidden" value="webhook"/>
-                            <input name="order_status" type="hidden" value="waiting"/>
+                            <p>
+                                <label for="passphrase">Passphrase(*):&nbsp</label>
+                                <input type="text" name="passphrase" id="passphrase" autocomplete='passphrase'>
+                            </p>
+                            <input id="order_comment" name="order_comment" type="hidden" value=" ">
+                            <input name="order_status" type="hidden" value="waiting">
                                                        
                             <br><br>
                             <button type="submit">Create JSON</button>
@@ -223,7 +226,7 @@
                     <h3> List of Order Signals </h3>
                     <p>
                     <ul id="signallist" class="no-bullets" style="cursor: pointer;" > </ul>
-                    <div id="login-txt" style=" float: left; display: none"><br>Login once to see all signals...</div>
+                    <div id="login-txt" style=" float: left; display: none"><br>Login to see all signals...</div>
                     <div id="prev-signals" class="pages" style=" float: left;">Prev</div>
                     <div id="next-signals" class="pages" style=" float: right;">Next</div>
                 </div>
@@ -237,9 +240,30 @@
                                 <label for="rowid_update">RowId:</label>
                                 <input type="text" name="rowid" id="rowid_update" readonly>                          
                             </p>
+                            <br>
                             <p>
-                                <label for="ticker_webhook_update">Signal:</label>
+                                <label id="ticker_webhook_update_label" for="ticker_webhook_update">Signal:</label>
                                 <input type="text" name="ticker" id="ticker_webhook_update" readonly>                          
+                            </p>
+                            <p>
+                                <label  for="ticker_type_update">Ticker Type:</label>
+                                <select name="ticker_type" id="ticker_type_update" disabled>
+                                    <option></option>
+                                    <option value="single">single</option>
+                                    <option value="pair">pair</option>
+                                </select>                       
+                            </p>
+                            <p>
+                                <label  for="stk_ticker1_update">Ticker 1:</label>
+                                <input  type="text" name="stk_ticker1" id="stk_ticker1_update" readonly>                       
+                            </p>
+                            <p>
+                                <label  for="stk_ticker2_update">Ticker 2:</label>
+                                <input  type="text" name="stk_ticker2" id="stk_ticker2_update" readonly>                       
+                            </p>
+                            <p>
+                                <label  for="hedge_param_update">Hedge Param:</label>
+                                <input  type="text" name="hedge_param" id="hedge_param_update" class="float" readonly>                       
                             </p>
                                                  
                             <p>
@@ -290,16 +314,56 @@
                                 <select name="order_status" id="order_status_update" >
                                     <option></option>
                                     <option value="waiting">waiting</option>
+                                    <option value="rerouted">rerouted</option>
                                     <option value="created">created</option>
                                     <option value="canceled">canceled</option>
-                                    <option value="filled">filled</option>
+                                    <option value="filled">filled</option>                                    
+                                    <option value="critical err">critical err</option>
+                                    <option value="error">error</option>
                                 </select> 
                             </p>
                             <p>
                                 <label for="order_comment_update">Order Comment:&nbsp;</label>
                                 <input type="text" name="order_comment" id="order_comment_update"> 
                             </p>
-                            <input name="passphrase" type="hidden" value="webhook"/>
+
+                            <br>
+
+                            <p>
+                                <label  for="order_id1_update">Order ID 1:</label>
+                                <input  type="text" name="order_id1" id="order_id1_update" class="integer">                       
+                            </p>
+                            <p>
+                                <label  for="order_id2_update">Order ID 2:</label>
+                                <input  type="text" name="order_id2" id="order_id2_update" class="integer">                       
+                            </p>
+                            <p>
+                                <label  for="stock_price1_update">Ticker Price 1:</label>
+                                <input  type="text" name="stk_price1" id="stk_price1_update" class="float">                       
+                            </p>
+                            <p>
+                                <label  for="stock_price2_update">Ticker Price 2:</label>
+                                <input  type="text" name="stk_price2" id="stk_price2_update" class="float">                       
+                            </p>
+                            <p>
+                                <label  for="fill_price_update">Fill Price:</label>
+                                <input  type="text" name="fill_price" id="fill_price_update" class="float">                       
+                            </p>
+                            <p>
+                                <label  for="slip_update">Slip:</label>
+                                <input  type="text" name="slip" id="slip_update" class="float">                       
+                            </p>
+                            <p>
+                                <label  for="error_msg_update">Error Msg:</label>
+                                <input  type="text" name="error_msg" id="error_msg_update">                       
+                            </p>
+                            <p>
+                                <label for="passphrase">Passphrase(*):&nbsp</label>
+                                <input type="text" name="passphrase" id="passphrase_update" autocomplete='passphrase'>
+                            </p>
+             
+             
+             
                             <br><br>
                             <button type="submit">Create JSON</button>                          
                         </form>
@@ -438,7 +502,6 @@
                 <div class="column">
                 <h3> Add Stock </h3>
                 <section class="stocks-form">
-                    <form>
                         <div>
                             <p>
                                 <label for="ticker">Ticker Symbol:&nbsp;</label>

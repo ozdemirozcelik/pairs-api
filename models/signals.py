@@ -1,4 +1,5 @@
-from typing import Dict, Union  # for type hinting
+import re
+from typing import Dict, List, Union  # for type hinting
 from db import db
 from sqlalchemy.sql import (
     func,
@@ -29,6 +30,19 @@ class SignalModel(db.Model):
     order_comment = db.Column(db.String)
     order_status = db.Column(db.String)
 
+    # Columns needed for order creation
+    ticker_type = db.Column(db.String)
+    stk_ticker1 = db.Column(db.String)
+    stk_ticker2 = db.Column(db.String)
+    hedge_param = db.Column(db.Float)
+    order_id1 = db.Column(db.Integer)
+    order_id2 = db.Column(db.Integer)
+    stk_price1 = db.Column(db.Float)
+    stk_price2 = db.Column(db.Float)
+    fill_price = db.Column(db.Float)
+    slip = db.Column(db.Float)
+    error_msg = db.Column(db.String)
+
     def __init__(
         self,
         ticker: str,
@@ -41,6 +55,17 @@ class SignalModel(db.Model):
         pre_mar_pos_size: int,
         order_comment: str,
         order_status: str,
+        ticker_type: str,
+        stk_ticker1: str,
+        stk_ticker2: str,
+        hedge_param: float,
+        order_id1: int,
+        order_id2: int,
+        stk_price1: float,
+        stk_price2: float,
+        fill_price: float,
+        slip: float,
+        error_msg: str,
     ):
         self.ticker = ticker
         self.order_action = order_action
@@ -52,6 +77,17 @@ class SignalModel(db.Model):
         self.pre_mar_pos_size = pre_mar_pos_size
         self.order_comment = order_comment
         self.order_status = order_status
+        self.ticker_type = ticker_type
+        self.stk_ticker1 = stk_ticker1
+        self.stk_ticker2 = stk_ticker2
+        self.hedge_param = hedge_param
+        self.order_id1 = order_id1
+        self.order_id2 = order_id2
+        self.stk_price1 = stk_price1
+        self.stk_price2 = stk_price2
+        self.fill_price = fill_price
+        self.slip = slip
+        self.error_msg = error_msg
 
     def json(self) -> SignalJSON:
         return {
@@ -67,6 +103,17 @@ class SignalModel(db.Model):
             "pre_mar_pos_size": self.pre_mar_pos_size,
             "order_comment": self.order_comment,
             "order_status": self.order_status,
+            "ticker_type": self.ticker_type,
+            "stk_ticker1": self.stk_ticker1,
+            "stk_ticker2": self.stk_ticker2,
+            "hedge_param": self.hedge_param,
+            "order_id1": self.order_id1,
+            "order_id2": self.order_id2,
+            "stk_price1": self.stk_price1,
+            "stk_price2": self.stk_price2,
+            "fill_price": self.fill_price,
+            "slip": self.slip,
+            "error_msg": self.error_msg,
         }
 
     @staticmethod
@@ -151,6 +198,17 @@ class SignalModel(db.Model):
         item_to_update.pre_mar_pos_size = self.pre_mar_pos_size
         item_to_update.order_comment = self.order_comment
         item_to_update.order_status = self.order_status
+        item_to_update.ticker_type = self.ticker_type
+        item_to_update.stk_ticker1 = self.stk_ticker1
+        item_to_update.stk_ticker2 = self.stk_ticker2
+        item_to_update.hedge_param = self.hedge_param
+        item_to_update.order_id1 = self.order_id1
+        item_to_update.order_id2 = self.order_id2
+        item_to_update.stk_price1 = self.stk_price1
+        item_to_update.stk_price2 = self.stk_price2
+        item_to_update.fill_price = self.fill_price
+        item_to_update.slip = self.slip
+        item_to_update.error_msg = self.error_msg
 
         db.session.commit()
 
@@ -180,13 +238,13 @@ class SignalModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items) -> "SignalModel":
+    def get_rows(cls, number_of_items) -> List:
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
             return cls.query.order_by(cls.rowid.desc())  # better, no need to import
         else:
-            return cls.query.order_by(cls.rowid.desc()).limit(number_of_items).all()
+            return cls.query.order_by(cls.rowid.desc()).limit(number_of_items)
 
         # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:
 
@@ -244,3 +302,191 @@ class SignalModel(db.Model):
         # finally:
         #     if connection:
         #         connection.close()
+
+    @classmethod
+    def get_list_ticker(cls, ticker_name, number_of_items) -> List:
+
+        pair = False
+
+        tickers = ticker_name.split("-")  # check if pair or single
+        ticker1 = tickers[0]
+        ticker2 = ""
+        if len(tickers) == 2:
+            ticker2 = tickers[1]
+            pair = True
+
+        if number_of_items == "0":
+            if pair:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1) & (cls.stk_ticker2 == ticker2)
+                    )
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
+            else:
+                return (
+                    cls.query.filter(cls.stk_ticker1 == ticker1)
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
+        else:
+            if pair:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1) & (cls.stk_ticker2 == ticker2)
+                    )
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
+            else:
+                return (
+                    cls.query.filter(cls.stk_ticker1 == ticker1)
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
+
+    @classmethod
+    def get_list_status(cls, order_status, number_of_items) -> List:
+
+        print(order_status)
+
+        if number_of_items == "0":
+            return (
+                cls.query.filter_by(order_status=order_status)
+                .order_by(cls.rowid.desc())
+                .all()
+            )
+        else:
+            return (
+                cls.query.filter_by(order_status=order_status)
+                .order_by(cls.rowid.desc())
+                .limit(number_of_items)
+            )
+
+    def splitticker(self) -> bool:
+
+        # Split the received webhook equation into tickers and hedge parameters
+        # Tested with Tradingview webhooks and Interactive Brokers ticker format
+        # TESTED FOR THESE EQUATIONS:
+        # pair_equation = "TEST 123"
+        # pair_equation = "NYSE:LNT"
+        # pair_equation = "0.7*NYSE:BF.A"
+        # pair_equation = "NYSE:BF.A"
+        # pair_equation = "NYSE:LNT-NYSE:FTS*2.2"
+        # pair_equation = "NYSE:LNT*2-NYSE:FTS"
+        # pair_equation = "NYSE:LNT-NYSE:FTS/3"
+        # pair_equation = "1.3*NYSE:LNT-NYSE:FTS*2.2"
+        # pair_equation = "NYSE:LNT-1.25*NYSE:FTS"
+        # pair_equation = "LNT-1.25*NYSE:FTS"
+        # pair_equation = "NYSE:LNT-NYSE:FTS"
+        # pair_equation = "BF.A-0.7*NYSE:BF.B"
+
+        success_flag = True
+
+        eq12 = self.ticker.split("-")  # check if pair or single
+        print(eq12)  # ['LNT', '1.25*NYSE:FTS']
+
+        if len(eq12) <= 2:
+
+            eq1_hedge = re.findall(
+                r"[-+]?\d*\.\d+|\d+", eq12[0]
+            )  # hedge constant fot the 1st ticker
+            print("eq1_hedge: ", eq1_hedge)  # []
+
+            if len(eq1_hedge) > 0:
+                eq1 = eq12[0].replace(eq1_hedge[0], "")
+            else:
+                eq1 = eq12[0]  # LNT
+
+            eq1 = eq1.replace("*", "")
+            print("eq1: ", eq1)  # LNT
+
+            eq1_split = eq1.rsplit(":", maxsplit=1)
+            eq1_ticker_almost = eq1_split[len(eq1_split) - 1]
+
+            print("eq1_split: ", eq1_split)  # ['LNT']
+            print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
+
+            if "." in eq1_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
+                ticker_pair1 = eq1_ticker_almost.replace(
+                    ".", " "
+                )  # convert Tradingview -> IB format
+            else:
+                ticker_pair1 = "".join(
+                    char for char in eq1_ticker_almost if char.isalnum()
+                )
+
+                if eq1_ticker_almost != ticker_pair1:
+                    success_flag = False
+
+            print("ticker_pair1: ", ticker_pair1)  # LNT
+
+            if len(eq1_hedge) != 0:
+                if eq1_hedge[0] != 1:
+                    success_flag = False
+
+            print("problem_flag_first: ", success_flag)
+
+            self.ticker_type = "single"
+            self.stk_ticker1 = ticker_pair1
+
+        if len(eq12) == 2:
+
+            eq2_hedge = re.findall(
+                r"[-+]?\d*\.\d+|\d+", eq12[1]
+            )  # hedge constant fot the 2nd ticker
+            print("eq2_hedge: ", eq2_hedge)  # ['1.25']
+
+            if len(eq2_hedge) > 0:
+                eq2 = eq12[1].replace(eq2_hedge[0], "")
+            else:
+                eq2 = eq12[1]  # *NYSE:FTS
+
+            eq2 = eq2.replace("*", "")
+
+            print("eq2: ", eq2)  # NYSE:FTS
+
+            eq2_split = eq2.rsplit(":", maxsplit=1)
+            eq2_ticker_almost = eq2_split[len(eq2_split) - 1]
+
+            print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
+            print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
+
+            if "." in eq2_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
+                ticker_pair2 = eq2_ticker_almost.replace(
+                    ".", " "
+                )  # convert Tradingview -> IB format
+            else:
+                ticker_pair2 = "".join(
+                    char for char in eq2_ticker_almost if char.isalnum()
+                )
+
+                if eq2_ticker_almost != ticker_pair2:
+                    success_flag = False
+
+            print("ticker_pair2: ", ticker_pair2)  # FTS
+
+            if len(eq2_hedge) == 0:
+                hedge_const = 1
+            else:
+                hedge_const = eq2_hedge[0]
+
+            print("hedge_const: ", hedge_const)  # False
+            print("problem_flag_final: ", success_flag)
+            print("ticker_type: ", self.ticker_type)
+
+            self.ticker_type = "pair"
+            self.stk_ticker2 = ticker_pair2
+            self.hedge_param = hedge_const
+
+        if len(eq12) > 2:
+            success_flag = False
+
+        if not success_flag:
+            self.order_status = "canceled"
+            self.order_comment = "problematic ticker!"
+
+        return success_flag

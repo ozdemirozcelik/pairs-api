@@ -415,6 +415,7 @@ snippets:
 
 Considering for the next version:
 
+- serialization with Marshmallow
 - improve demo with live TradingView realtime webhooks
 - send real time orders to exchange (possibly via Interactive Brokers)
 

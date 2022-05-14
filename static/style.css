@@ -91,8 +91,23 @@ input { display: table-cell; }
     overflow: auto;
     letter-spacing:0.3px;
 }
+.column_dashboard {
+    flex: 33.33%;
+    height: 550px;
+    padding: 20px;
+    margin: 2px;
+    background-color: lightgrey;
+    overflow: auto;
+    letter-spacing:0.3px;
+}
 .container {
-display: flex;
+    display: flex;
+}
+
+.webhook {
+    table-layout: auto;
+    width: 100%;
+    text-align: center;
 }
 
 .ticker {
@@ -147,33 +162,87 @@ display: flex;
 
 [id^=order_price] {
     border-radius: 5%;
-    box-sizing: content-box;
     width: 45px;
+    border-style: none;
 }
 
 [id^=mar_pos_size] {
     border-radius: 5%;
-    box-sizing: content-box;
     width: 45px;
+    border-style: none;
 }
 
 [id^=pre_mar_pos_size] {
     border-radius: 5%;
-    box-sizing: content-box;
     width: 45px;
+    border-style: none;
 }
-
-#order_status_update {
-    border-radius: 5%;
-    box-sizing: content-box;
-    width: 90px;
-}
-
-#order_comment_update {
+[id^=passphrase] {
     border-radius: 5%;
     box-sizing: content-box;
     width: 85px;
 }
+
+#order_status_update {
+    border-radius: 5%;
+    width: 90px;
+}
+
+#order_comment_update {
+    border-style: none;
+    border-radius: 5%;
+    width: 85px;
+}
+#ticker_type_update {
+    border-style: none;
+    width: 70px;
+    background-color: lightgrey;
+}
+#stk_ticker1_update {
+    border-style: none;
+    width: 70px;
+    background-color: lightgrey;
+}
+#stk_ticker2_update {
+    border-style: none;
+    width: 70px;
+    background-color: lightgrey;
+}
+#hedge_param_update {
+    border-style: none;
+    width: 70px;
+    background-color: lightgrey;
+}
+#order_id1_update {
+    border-style: none;
+    width: 70px;
+}
+#order_id2_update {
+    border-style: none;
+    width: 70px;
+}
+#stk_price1_update{
+    border-style: none;
+    width: 70px;
+}
+#stk_price2_update{
+    border-style: none;
+    width: 70px;
+}
+#fill_price_update{
+    border-style: none;
+    width: 70px;
+}
+#slip_update{
+    border-style: none;
+    width: 70px;
+}
+#error_msg_update{
+    border-style: none;
+    width: 85px;
+}
+
+
 
 button:hover {
     background-color: aqua;
@@ -200,6 +269,29 @@ button:hover {
 
 .deletebutton:hover {
     background-color: tomato;
+}
+
+.editmorebutton {
+
+    /* display:inline-block; */
+    float: left;
+    font-size: 80%;
+    margin: 3px;
+    padding: 1px;
+    color:black;
+    border:2px solid black;
+    border-radius:5px;
+    background: whitesmoke;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+    
+}
+
+.editmorebutton:hover {
+    background-color:wheat;
 }
 
 .logoutbutton {
@@ -334,8 +426,9 @@ ul.no-bullets {
 
 /* Login Screen Style Below */
 
+
 /* The Modal (background) */
-.modal {
+.modal-login {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
@@ -347,7 +440,7 @@ ul.no-bullets {
 }
 
 /* Modal Content Box */
-.modal-content {
+.modal-login-content {
     position: fixed; /* Stay in place */
     width: 200px;
     height: 140px;
@@ -360,9 +453,10 @@ ul.no-bullets {
     box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
 }
 
-.modal-container {
+.modal-login-container {
     padding: 10px;
   }
+
 
 /* The Close Button (x) */
 .close {

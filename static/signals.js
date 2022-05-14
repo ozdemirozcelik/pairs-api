@@ -19,9 +19,9 @@ var statustext;
 // event listener
 // querySelector from class names (not defined in css)
 const form_webhook = document.querySelector('.webhook-form');
-form_webhook.addEventListener('submit', handleFormSubmit_pairs);
+form_webhook.addEventListener('submit', handleFormSubmit_signals);
 const form_update_signals = document.querySelector('.signals-update');
-form_update_signals.addEventListener('submit', handleFormSubmit_pairs_update);
+form_update_signals.addEventListener('submit', handleFormSubmit_signals_update);
 //const radiogroup = document.querySelector("#tradetype");
 const radioButtons = document.querySelectorAll('input[name="tradetype"]');
 for(const radioButton of radioButtons){
@@ -43,18 +43,35 @@ var order_price_update = document.getElementById("order_price_update");
 var mar_pos = document.getElementById("mar_pos");
 var mar_pos_update = document.getElementById("mar_pos_update");
 var mar_pos_size = document.getElementById("mar_pos_size");
-var mar_pos_size = document.getElementById("mar_pos_size_update");
+var mar_pos_size_update = document.getElementById("mar_pos_size_update");
 var pre_mar_pos = document.getElementById("pre_mar_pos");
 var pre_mar_pos_update = document.getElementById("pre_mar_pos_update");
 var pre_mar_pos_size = document.getElementById("pre_mar_pos_size");
 var pre_mar_pos_size_update = document.getElementById("pre_mar_pos_size_update");
 var order_status_update = document.getElementById("order_status_update");
 var order_comment_update = document.getElementById("order_comment_update");
+
+var ticker_type_update = document.getElementById("ticker_type_update");
+var stk_ticker1_update = document.getElementById("stk_ticker1_update");
+var stk_ticker2_update = document.getElementById("stk_ticker2_update");
+var hedge_param_update = document.getElementById("hedge_param_update");
+var order_id1_update = document.getElementById("order_id1_update");
+var order_id2_update = document.getElementById("order_id2_update");
+var stk_price1_update = document.getElementById("stk_price1_update");
+var stk_price2_update = document.getElementById("stk_price2_update");
+var fill_price_update = document.getElementById("fill_price_update");
+var slip_update = document.getElementById("slip_update");
+var error_msg_update = document.getElementById("error_msg_update");
+
+var passphrase = document.getElementById("passphrase");
+var passphrase_update = document.getElementById("passphrase_update");
+
 var prev_button_signals = document.getElementById("prev-signals");
 var next_button_signals = document.getElementById("next-signals");
 var login_txt = document.getElementById("login-txt");
 var getsignals_button = document.getElementById("getsignals_button");
 var signallist = document.getElementById("signallist");
+
 
 // other variables
 var hedge_dic = {}; // used to store pair hedge values to create webhook ticker
@@ -254,7 +271,7 @@ function changeStatusColor(ticker) {
 
 }
 
-function handleFormSubmit_pairs(event) {
+function handleFormSubmit_signals(event) {
 
     // keep default values after posting
     event.preventDefault();
@@ -263,7 +280,7 @@ function handleFormSubmit_pairs(event) {
     if(ticker_webhook.value == "") {
         alert("Please select a pair to create the webhook!");
     
-    } else if ( order_contracts.value == "" || order_contracts.value == 0 ||order_action.value == "" ) {
+    } else if ( order_contracts.value == "" || order_contracts.value == 0 ||order_action.value == "" ||passphrase.value == "" ) {
         alert("You need to enter required(*) fields!");
     
     } else {
@@ -302,7 +319,7 @@ function handleFormSubmit_pairs(event) {
         // remove empty and null keys
         Object.keys(formJSON_signals).forEach((k) => (formJSON_signals[k] == "" || formJSON_signals[k] == null) && delete formJSON_signals[k]);
 
-        // remove unused keys
+        // remove unused keyss
         delete formJSON_signals['ticker_webhook'];
         delete formJSON_signals['tradetype'];
 
@@ -319,7 +336,7 @@ function handleFormSubmit_pairs(event) {
 
 }
 
-function handleFormSubmit_pairs_update(event) {
+function handleFormSubmit_signals_update(event) {
     
     // keep default values after posting
     event.preventDefault();
@@ -328,7 +345,7 @@ function handleFormSubmit_pairs_update(event) {
     if(ticker_webhook_update.value == "") {
         alert("Please select a pair to create the webhook!");
     
-    } else if ( order_contracts_update.value == "" ||order_contracts_update.value == 0 || order_action_update.value == "" ) {
+    } else if ( order_contracts_update.value == "" ||order_contracts_update.value == 0 || order_action_update.value == "" || passphrase_update.value == ""  ) {
         alert("You need to enter required(*) fields!");
 
     } else {
@@ -493,28 +510,33 @@ function putUpdate_signals() {
 }
 
 // TO-DO: needs error handling in this function
-// list the pairs in the tab
+// list the signals in the tab
 async function listSignals() {
     // reset the current list
     signallist.innerHTML = "";
 
     var response
 
-    // if logged in once, fresh or not fresh, get the whole list
-    // if no token, then get the max number of rows defined in the api
-    if (!localStorage.access_token) {
-        // fetch and list items
-        response = await fetch(api_url_get_all_signals);
-    } else {
-        response = await fetch(api_url_get_all_signals, {
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.access_token,
-            },
-        });       
-    }
+    // list all signals if there is a valid fresh token
+
+    response = await fetch(api_url_get_all_signals, {
+        method: "GET",
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.access_token,
+        },
+    });  
 
     signals_data = await response.json();
+
+    // If  invalid valid token (401 Unauthorized) or no token, retry without authorization header to list limited number of signals
+
+    var got_401 = false
+
+    if (response.status == 401 || !localStorage.access_token) {
+        got_401 = true
+        response = await fetch(api_url_get_all_signals);
+        signals_data = await response.json();
+    }
 
     for (var key in signals_data.signals) {
         if (signals_data.signals.hasOwnProperty(key)) {
@@ -543,7 +565,9 @@ async function listSignals() {
         }
     }
 
-    if (!localStorage.access_token && signals_data.signals.length>=signals_data.notoken_limit){ login_txt.style.display = 'block'} else { login_txt.style.display = 'none'};
+    // display a 'login to see all' message if not received the complete list
+
+    if ((got_401 || !localStorage.access_token) && signals_data.signals.length>=signals_data.notoken_limit){ login_txt.style.display = 'block'} else { login_txt.style.display = 'none'};
 
     createPages_signals();
 
@@ -594,6 +618,17 @@ async function getSignal(rowid) {
     order_status_update.value = signal_data.order_status;
     order_comment_update.value = signal_data.order_comment;
 
+    ticker_type_update.value = signal_data.ticker_type;
+    stk_ticker1_update.value = signal_data.stk_ticker1;
+    stk_ticker2_update.value = signal_data.stk_ticker2;
+    hedge_param_update.value = signal_data.hedge_param;
+    order_id1_update.value = signal_data.order_id1;
+    order_id2_update.value = signal_data.order_id2;
+    stk_price1_update.value = signal_data.stk_price1;
+    stk_price2_update.value = signal_data.stk_price2;
+    fill_price_update.value = signal_data.fill_price;
+    slip_update.value = signal_data.slip;
+    error_msg_update.value = signal_data.error_msg;
 
 }
 
@@ -663,4 +698,18 @@ function deleteSignal() {
             //console.log(error);
         });
     }
+}
+
+// To unlock the signal ticker text box
+
+var clicks = 0; // counter 
+var a = document.getElementById('ticker_webhook_update_label'); // element
+a.onclick = function(b) { // onclick not onClick
+   console.log(++clicks); // increment it
+
+   if (clicks == 10) {
+    alert("Unlocked!");
+    ticker_webhook_update.readOnly = false;
+    ticker_webhook_update.style.backgroundColor = "white";
+   }
 }

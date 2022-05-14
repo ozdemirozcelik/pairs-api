@@ -1,4 +1,4 @@
-from typing import Dict, Union  # for type hinting
+from typing import Dict, List  # for type hinting
 from db import db
 
 UserJSON = Dict[str, str]  # custom type hint
@@ -105,7 +105,7 @@ class UserModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items) -> "UserModel":
+    def get_rows(cls, number_of_items) -> List:
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc

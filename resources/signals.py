@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
 EMPTY_ERR = "'{}' cannot be empty!"
 PASS_ERR = "incorrect passphrase."
+TICKER_ERR = "created with problematic ticker!"
 INSERT_ERR = "an error occurred inserting the item."
 UPDATE_ERR = "an error occurred updating the item."
 DELETE_ERR = "an error occurred deleting the item."
@@ -19,6 +20,7 @@ class SignalWebhook(Resource):
     parser.add_argument(
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
+    parser.add_argument("rowid", type=int, default=0)
     parser.add_argument(
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
     )
@@ -48,7 +50,17 @@ class SignalWebhook(Resource):
     )
     parser.add_argument("order_comment", type=str, default="")
     parser.add_argument("order_status", type=str, default="waiting")
-    parser.add_argument("rowid", type=int, default=0)
+    parser.add_argument("ticker_type", type=str)
+    parser.add_argument("stk_ticker1", type=str)
+    parser.add_argument("stk_ticker2", type=str)
+    parser.add_argument("hedge_param", type=float)
+    parser.add_argument("order_id1", type=int)
+    parser.add_argument("order_id2", type=int)
+    parser.add_argument("stk_price1", type=float)
+    parser.add_argument("stk_price2", type=float)
+    parser.add_argument("fill_price", type=float)
+    parser.add_argument("slip", type=float)
+    parser.add_argument("error_msg", type=str)
 
     @staticmethod
     def post():
@@ -68,10 +80,27 @@ class SignalWebhook(Resource):
             data["pre_mar_pos_size"],
             data["order_comment"],
             data["order_status"],
+            data["ticker_type"],
+            data["stk_ticker1"],
+            data["stk_ticker2"],
+            data["hedge_param"],
+            data["order_id1"],
+            data["order_id2"],
+            data["stk_price1"],
+            data["stk_price2"],
+            data["fill_price"],
+            data["slip"],
+            data["error_msg"],
         )
 
         try:
+            ticker_ok = item.splitticker()  # check webhook ticker validity
             item.insert()
+
+            if not ticker_ok:
+                # keep the ticker record in the database, but change the message
+                # do not return bad request
+                return {"message": TICKER_ERR}, 201  # Created but need attention
 
         except Exception as e:
             print("Error occurred - ", e)  # better log the errors
@@ -106,10 +135,27 @@ class SignalWebhook(Resource):
                 data["pre_mar_pos_size"],
                 data["order_comment"],
                 data["order_status"],
+                data["ticker_type"],
+                data["stk_ticker1"],
+                data["stk_ticker2"],
+                data["hedge_param"],
+                data["order_id1"],
+                data["order_id2"],
+                data["stk_price1"],
+                data["stk_price2"],
+                data["fill_price"],
+                data["slip"],
+                data["error_msg"],
             )
 
             try:
+                ticker_ok = item.splitticker()  # check webhook ticker validity
                 item.update(data["rowid"])
+
+                if not ticker_ok:
+                    # keep the ticker record in the database, but change the message
+                    # do not return bad request
+                    return {"message": TICKER_ERR}, 201  # Created but need attention
 
             except Exception as e:
                 print("Error occurred - ", e)
@@ -159,6 +205,48 @@ class SignalList(Resource):
         return {
             "signals": [item.json() for item in items],
             "notoken_limit": notoken_limit,
+        }  # this is more readable
+
+
+class SignalListTicker(Resource):
+    @staticmethod
+    @jwt_required(fresh=True)
+    def get(ticker_name, number_of_items="0"):
+
+        try:
+            items = SignalModel.get_list_ticker(ticker_name, str(number_of_items))
+
+        except Exception as e:
+            print("Error occurred - ", e)
+            return (
+                {"message": GET_ERR},
+                500,
+            )  # Return Interval Server Error
+
+        # return {'signals': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
+        return {
+            "signals": [item.json() for item in items],
+        }  # this is more readable
+
+
+class SignalListStatus(Resource):
+    @staticmethod
+    @jwt_required(fresh=True)
+    def get(order_status, number_of_items="0"):
+
+        try:
+            items = SignalModel.get_list_status(order_status, str(number_of_items))
+
+        except Exception as e:
+            print("Error occurred - ", e)
+            return (
+                {"message": GET_ERR},
+                500,
+            )  # Return Interval Server Error
+
+        # return {'signals': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
+        return {
+            "signals": [item.json() for item in items],
         }  # this is more readable
 
 

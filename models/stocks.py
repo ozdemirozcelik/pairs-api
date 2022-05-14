@@ -1,4 +1,4 @@
-from typing import Dict, Union  # for type hinting
+from typing import Dict, List, Union  # for type hinting
 from db import db
 
 StockJSON = Dict[str, Union[str, int]]  # custom type hint
@@ -117,7 +117,7 @@ class StockModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items: str) -> "StockModel":
+    def get_rows(cls, number_of_items: str) -> List:
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc

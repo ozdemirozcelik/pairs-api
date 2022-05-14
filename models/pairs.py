@@ -1,4 +1,4 @@
-from typing import Dict, Union  # for type hinting
+from typing import Dict, List, Union  # for type hinting
 from db import db
 
 PairJSON = Dict[str, Union[str, float, int]]  # custom type hint
@@ -106,7 +106,7 @@ class PairModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def get_rows(cls, number_of_items) -> "PairModel":
+    def get_rows(cls, number_of_items) -> List:
 
         if number_of_items == "0":
             # return cls.query.order_by(desc("rowid")).all() # needs from sqlalchemy import desc
