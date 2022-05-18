@@ -49,8 +49,6 @@ class UserModel(db.Model):
         #
         # return None
 
-    # TODO: def find_by_id
-
     def insert(self) -> None:
 
         db.session.add(self)
@@ -169,4 +167,3 @@ class UserModel(db.Model):
         # finally:
         #     if connection:
         #         connection.close()
-

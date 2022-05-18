@@ -1,7 +1,13 @@
 from datetime import timedelta
+from flask import request
 from flask_restful import Resource, reqparse
-from flask import session
+from datetime import datetime
+import pytz
+
+# enable if using sessions:
+# from flask import session
 from models.users import UserModel
+from models.session import SessionModel
 from blacklist import BLACKLIST
 from hmac import compare_digest
 from flask_jwt_extended import (
@@ -24,7 +30,7 @@ NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
 INVAL_ERR = "Invalid Credentials!"
 LOGOUT_OK = "Successfully logged out"
-
+SESSION_ERR = "an error occurred while creating a session."
 
 _parser = reqparse.RequestParser()
 _parser.add_argument(
@@ -53,7 +59,6 @@ class UserRegister(Resource):
 
         claims = get_jwt()
 
-        # TODO: Register only if admin
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -88,7 +93,6 @@ class UserRegister(Resource):
 
         claims = get_jwt()
 
-        # TODO: Update only if admin
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -132,7 +136,6 @@ class UserList(Resource):
 
         claims = get_jwt()
 
-        # TODO: List only if admin
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -159,7 +162,6 @@ class User(Resource):
 
         claims = get_jwt()
 
-        # TODO: Show only if admin
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -184,7 +186,6 @@ class User(Resource):
 
         claims = get_jwt()
 
-        # TODO: Delete only if admin
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -214,7 +215,26 @@ class UserLogin(Resource):
                 identity=user.username, fresh=timedelta(minutes=data["expire"])
             )
             refresh_token = create_refresh_token(user.username)
-            session["token"] = "yes_token"  # store token, use it as a dict
+
+            # enable if using custom sessions, create a simple server side session:
+            simple_token = access_token[-10:]  # take last n characters
+            date_now = datetime.now(tz=pytz.utc)
+            date_expire = date_now + timedelta(minutes=data["expire"])
+            item = SessionModel(simple_token, date_expire)
+
+            try:
+                item.insert()
+
+            except Exception as e:
+                print("Error occurred - ", e)
+                return (
+                    {"message": SESSION_ERR},
+                    500,
+                )  # Return Interval Server Error
+
+            # enable if using flask sessions:
+            # session["token"] = "yes_token"  # store token, use it as a dict
+
             return (
                 {
                     # 'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
@@ -235,7 +255,15 @@ class UserLogout(Resource):
     def post():
         jti = get_jwt()["jti"]  # jti is a unique identifier for JWT
         BLACKLIST.add(jti)
-        session["token"] = "no_token"
+
+        access_token = request.cookies.get("access_token")
+
+        if access_token:
+            simplesession = SessionModel.find_by_value(access_token[-10:])
+            simplesession.delete()
+
+        # enable if using flask sessions to end session:
+        # session["token"] = None
         return {"message": LOGOUT_OK}, 200
 
 
@@ -250,4 +278,3 @@ class TokenRefresh(Resource):
         refresh_token = create_refresh_token(current_user)
 
         return {"access_token": new_token, "refresh_token": refresh_token}, 200
-

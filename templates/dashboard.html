@@ -4,6 +4,7 @@
     <title>RESTful API TEST PAGE</title>
     <meta charset="UTF-8">
     <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
      
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   
@@ -57,6 +58,16 @@
         </section>
     </div>
     <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
+    <a href="setup"><div class="settingsbutton" id="settingsbutton" ><i class="fa fa-gear fa-lg"></i></div></a>
+    <div class="loginmsg">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
     <div class="tabs">
         
         <ul class="tabs-list">

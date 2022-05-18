@@ -1,10 +1,14 @@
 import os
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, flash, redirect, url_for
+# enable if keeping sessions:
+# from flask_session import Session
+# from flask import session
 from flask_restful import Api
-from flask_jwt_extended import JWTManager, get_jwt_identity
+from flask_jwt_extended import JWTManager
 from jwt import ExpiredSignatureError
 from blacklist import BLACKLIST
 from models.signals import SignalModel
+from models.session import SessionModel
 from resources.pairs import PairRegister, PairList, Pair
 from resources.signals import (
     SignalWebhook,
@@ -22,13 +26,16 @@ from resources.users import (
     UserLogout,
     TokenRefresh,
 )
-import requests
 from db import db
 from datetime import datetime
 import pytz
 from pytz import timezone
 
 app = Flask(__name__)
+# set SQLAlchemy database:
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+
+# Use this config to use with POSTGRES:
 # check for postgres database, if not found use local sqlite database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL_SQLALCHEMY", "sqlite:///data.db"
@@ -55,15 +62,54 @@ def create_tables():
     UserRegister.default_users()
 
 
-# JWT configuration (Start)
+# Session configuration (Start)
 
-app.secret_key = "super secret key"  # need for session management
-app.config["JWT_SECRET_KEY"] = "mysecretkey"  # TODO: check the use of this
+app.secret_key = os.urandom(24)  # need this for session management
+
+# Enable below to keep session data with SQLAlchemy:
+# sessions work ok locally but may not be persistent with Heroku free tier.
+# TODO: try to keep session data with Redis
+
+# app.config["SESSION_TYPE"] = "sqlalchemy"
+# app.config["SESSION_SQLALCHEMY"] = db  # SQLAlchemy object
+# app.config["SESSION_SQLALCHEMY_TABLE"] = "session"  # session table name
+# app.config["SESSION_PERMANENT"] = True
+# app.config["SESSION_USE_SIGNER"] = False  # browser session cookie value to encrypt
+# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+# app.config[
+#     "SESSION_KEY_PREFIX"
+# ] = "session:"  # the prefix of the value stored in session
+
+
+# Enable below to keep session data in the file system:
+
+# app.config["SESSION_TYPE"] = "filesystem"
+# app.config["SESSION_PERMANENT"] = True
+# app.config["SESSION_USE_SIGNER"] = False  # browser session cookie value to encrypt
+# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+# app.config[
+#     "SESSION_KEY_PREFIX"
+# ] = "session:"  # the prefix of the value stored in session
+
+## Enable if using sessions with SQLAlchemy to create table to store session data:
+##
+# Fsession = Session(app)
+#
+# with app.app_context():
+#     if app.config["SESSION_TYPE"] == "sqlalchemy":
+#         Fsession.app.session_interface.db.create_all()
+##
+
+# Session configuration (End)
+
+# JWT configuration (Start)
+app.config["JWT_SECRET_KEY"] = os.urandom(24)
 app.config["JWT_BLACKLIST_ENABLED"] = True  # enable blacklist feature
 app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = [
     "access",
     "refresh",
 ]  # allow blacklisting for access and refresh tokens
+
 jwt = JWTManager(app)
 
 
@@ -86,18 +132,20 @@ def my_expired_token_callback(*args):
     return {"message": "The token has expired.", "error": "token_expired"}, 401
 
 
-# TODO: Solution to invalid token returns 500 instead of 401
+# TODO: Check for another solution to invalid token returns 500 instead of 401
 # jwt.exceptions.ExpiredSignatureError: Signature has expired
 # check the workaround: _handle_expired_signature
 @jwt.invalid_token_loader
 def my_invalid_token_callback(*args):
-    session["token"] = "no_token"
+    # enable if using sessions to end session:
+    # session["token"] = None
     return {"message": "The token is invalid.", "error": "token_invalid"}, 401
 
 
 @app.errorhandler(ExpiredSignatureError)
 def _handle_expired_signature(error):
-    session["token"] = "no_token"
+    # enable if using sessions to end session:
+    # session["token"] = None
     return {"message": "The token is invalid.", "error": "token_invalid"}, 401
 
 
@@ -126,31 +174,31 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
 
 # Resource definitions (Start)
 
-api.add_resource(SignalWebhook, "/v2/webhook")
-api.add_resource(SignalList, "/v2/signals/<string:number_of_items>")
+api.add_resource(SignalWebhook, "/v3/webhook")
+api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
 api.add_resource(
     SignalListStatus,
-    "/v2/signals/status/<string:order_status>/<string:number_of_items>",
+    "/v3/signals/status/<string:order_status>/<string:number_of_items>",
 )
 api.add_resource(
-    SignalListTicker, "/v2/signals/ticker/<string:ticker_name>/<string:number_of_items>"
+    SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>"
 )
-api.add_resource(Signal, "/v2/signal/<string:rowid>")
+api.add_resource(Signal, "/v3/signal/<string:rowid>")
 
-api.add_resource(PairRegister, "/v2/regpair")
-api.add_resource(PairList, "/v2/pairs/<string:number_of_items>")
-api.add_resource(Pair, "/v2/pair/<string:name>")
+api.add_resource(PairRegister, "/v3/regpair")
+api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
+api.add_resource(Pair, "/v3/pair/<string:name>")
 
-api.add_resource(StockRegister, "/v2/regstock")
-api.add_resource(StockList, "/v2/stocks/<string:number_of_items>")
-api.add_resource(Stock, "/v2/stock/<string:symbol>")
+api.add_resource(StockRegister, "/v3/regstock")
+api.add_resource(StockList, "/v3/stocks/<string:number_of_items>")
+api.add_resource(Stock, "/v3/stock/<string:symbol>")
 
-api.add_resource(UserRegister, "/v2/reguser")
-api.add_resource(UserList, "/v2/users/<string:number_of_users>")
-api.add_resource(User, "/v2/user/<string:username>")
-api.add_resource(UserLogin, "/v2/login")
-api.add_resource(UserLogout, "/v2/logout")
-api.add_resource(TokenRefresh, "/v2/refresh")
+api.add_resource(UserRegister, "/v3/reguser")
+api.add_resource(UserList, "/v3/users/<string:number_of_users>")
+api.add_resource(User, "/v3/user/<string:username>")
+api.add_resource(UserLogin, "/v3/login")
+api.add_resource(UserLogout, "/v3/logout")
+api.add_resource(TokenRefresh, "/v3/refresh")
 
 
 # Resource definitions (End)
@@ -158,10 +206,35 @@ api.add_resource(TokenRefresh, "/v2/refresh")
 
 @app.get("/")
 def dashboard():
-    # signals = SignalList.get("50")
+    # Flask sessions may not be persistent in Heroku, works fine in local
+    # consider disabling below for Heroku
 
-    if session.get("token") == "yes_token":
-        items = SignalModel.get_rows(str(50))
+    ##
+    # if session.get("token") is None:
+    #     session["token"] = None
+    #
+    # if session["token"] == "yes_token":
+    #     items = SignalModel.get_rows(str(50))
+    # else:
+    #     items = SignalModel.get_rows(str(5))
+    #
+    # signals = [item.json() for item in items]
+    ##
+
+    # consider enabling below for Heroku:
+    # this method uses a simple custom session table created in the database
+
+    access_token = request.cookies.get("access_token")
+
+    SessionModel.delete_expired()  # clean expired session data
+
+    if access_token:
+        simplesession = SessionModel.find_by_value(access_token[-10:])
+    else:
+        simplesession = None
+
+    if simplesession:
+        items = SignalModel.get_rows(str(20))
     else:
         items = SignalModel.get_rows(str(5))
 
@@ -170,42 +243,45 @@ def dashboard():
     return render_template("dashboard.html", signals=signals)
 
 
-# test api through url, may not work for some servers (such as Heroku)
-@app.get("/dashboard")
-def url_dashboard():
-    base_url = request.base_url
-    server_url_read = base_url + "v2/signals/50"  # get the recent 50 signals
-
-    try:
-
-        response = requests.get(server_url_read, timeout=5)
-
-        # # enable below to bypass CORS limitations
-        # proxies = {"get": "https://api-pairs-cors.herokuapp.com/"}
-        # response = requests.get(server_url_read, proxies=proxies, timeout=10)
-
-    except requests.Timeout:
-        # back off and retry
-        print(f"timeout error")
-        pass
-    except requests.ConnectionError:
-        print(f"connection error")
-        pass
-
-    return render_template("dashboard.html", signals=response.json()["signals"])
-
-
+# route to setup page
 @app.get("/setup")
-def apitest():
-    return render_template("apitest.html")
+def setup():
+    # session may not be persistent in Heroku, works fine in local
+    # consider disabling below for Heroku
+
+    ##
+    # if session.get("token") is None:
+    #     session["token"] = None
+    #
+    # if session["token"] == "yes_token":
+    #     return render_template("setup.html")
+    # else:
+    #     # show login message and bo back to dashboard
+    #     flash('Please login!')
+    #     return redirect(url_for('dashboard'))
+    ##
+
+    # consider enabling below for Heroku:
+    # this method does not confirm the session on the server side
+    # JWT tokens are still needed for API, so no need to worry
+
+    access_token = request.cookies.get("access_token")
+
+    if access_token:
+        return render_template("setup.html")
+    else:
+        # show login message and bo back to dashboard
+        flash("Please login!")
+        return redirect(url_for("dashboard"))
 
 
-# Template filters below:
+# TEMPLATE FILTERS BELOW:
 
 # check if the date is today's date
 @app.template_filter("iftoday")
 def iftoday(value):
     date_format = "%Y-%m-%d %H:%M:%S"
+    value = value.split(".")[0]  # clean the timezone info if necessary
     date_signal = datetime.strptime(value, date_format)  # convert string to timestamp
 
     date_now = datetime.now(tz=pytz.utc)
@@ -224,6 +300,7 @@ def iftoday(value):
 @app.template_filter("pct_time")
 def pct_time(value):
     date_format = "%Y-%m-%d %H:%M:%S"
+    value = value.split(".")[0]  # clean the timezone info if necessary
     date_signal = datetime.strptime(value, date_format)  # convert string to timestamp
     date_signal_utc = date_signal.replace(tzinfo=pytz.UTC)  # add tz info
     date_pct = date_signal_utc.astimezone(timezone("US/Pacific"))  # change tz
@@ -238,6 +315,7 @@ def pct_time(value):
 @app.template_filter("timediff")
 def timediff(value):
     date_format = "%Y-%m-%d %H:%M:%S"
+    value = value.split(".")[0]  # clean the timezone info if necessary
     date_signal = datetime.strptime(value, date_format)  # convert string to timestamp
 
     date_now = datetime.now(tz=pytz.utc)
@@ -251,4 +329,3 @@ def timediff(value):
     if value is None:
         return ""
     return round(date_diff)
-

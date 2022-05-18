@@ -1,4 +1,4 @@
-# Pairs-API v2 for trading stocks (single or pairs), deployed on Heroku
+# Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku
 
 Version 2 of the Flask-RESTful API.
 
@@ -7,11 +7,11 @@ Configured to be used with SQLite3 for local use.
 
 Deployed in Heroku with PostgreSQL for testing purposes:
 
-`http://api-pairs-v2.herokuapp.com`
+`http://api-pairs-v3.herokuapp.com`
 
-Front-end demo for v2 (Javascript):
+Front-end demo for v3 (Javascript):
 
-https://api-pairs-v2.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 The most recent version is available here:
 
@@ -19,7 +19,7 @@ https://api-pairs.herokuapp.com/apitest
 
 # Use Cases
 
-With Pairs-API v2 you can:
+With Pairs-API v3 you can:
 - list, save, update and delete stocks and pairs with API calls
 - enable and disable stocks and pairs for active trading
 - catch webhooks from trading platforms or signal generators
@@ -41,7 +41,7 @@ With Pairs-API v2 you can:
 
 ### clone git repository:
 ```bash
-$ git clone https://github.com/ozdemirozcelik/pairs-api-v2.git
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 ````
 ### create and activate virtual environment:
 ````bash
@@ -178,24 +178,24 @@ Check [Heroku deployment](#heroku-deployment) to learn for more about using your
 Resources defined with flask_restful are:
 
 ```python
-api.add_resource(SignalWebhook, '/v2/webhook')
-api.add_resource(SignalList, '/v2/signals/<string:number_of_items>')
-api.add_resource(Signal, '/v2/signal/<string:rowid>')
+api.add_resource(SignalWebhook, '/v3/webhook')
+api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
+api.add_resource(Signal, '/v3/signal/<string:rowid>')
 
-api.add_resource(PairRegister, '/v2/regpair')
-api.add_resource(PairList, '/v2/pairs/<string:number_of_items>')
-api.add_resource(Pair, '/v2/pair/<string:name>')
+api.add_resource(PairRegister, '/v3/regpair')
+api.add_resource(PairList, '/v3/pairs/<string:number_of_items>')
+api.add_resource(Pair, '/v3/pair/<string:name>')
 
-api.add_resource(StockRegister, '/v2/regstock')
-api.add_resource(StockList, '/v2/stocks/<string:number_of_items>')
-api.add_resource(Stock, '/v2/stock/<string:symbol>')
+api.add_resource(StockRegister, '/v3/regstock')
+api.add_resource(StockList, '/v3/stocks/<string:number_of_items>')
+api.add_resource(Stock, '/v3/stock/<string:symbol>')
 
-api.add_resource(UserRegister, '/v2/reguser')
-api.add_resource(UserList, '/v2/users/<string:number_of_users>')
-api.add_resource(User, '/v2/user/<string:username>')
-api.add_resource(UserLogin, '/v2/login')
-api.add_resource(UserLogout, '/v2/logout')
-api.add_resource(TokenRefresh, '/v2/refresh')
+api.add_resource(UserRegister, '/v3/reguser')
+api.add_resource(UserList, '/v3/users/<string:number_of_users>')
+api.add_resource(User, '/v3/user/<string:username>')
+api.add_resource(UserLogin, '/v3/login')
+api.add_resource(UserLogout, '/v3/logout')
+api.add_resource(TokenRefresh, '/v3/refresh')
 ```
 
 # Request & Response Examples
@@ -204,7 +204,7 @@ POSTMAN collection can be found under "local" folder.
 
 ### POST request to register a single stock:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -225,7 +225,7 @@ Response:
 
 ### PUT request to update a single stock:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regstock'
 ```
 Request Body:
 ```json
@@ -251,12 +251,12 @@ Response:
 
 ### GET request to get all stocks:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/stocks/0'
+'http://api-pairs-v3.herokuapp.com/v3/stocks/0'
 ```
 
 ### GET request to receive certain number of stocks (for exp: 50):
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/stocks/2'
+'http://api-pairs-v3.herokuapp.com/v3/stocks/2'
 ```
 Response:
 ```json
@@ -280,7 +280,7 @@ Response:
 
 ### GET request to get details of a certain stock:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
 ```
 
 Response:
@@ -294,7 +294,7 @@ Response:
 ```
 ### DELETE request for a certain stock:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
 ```
 Response:
 ```json
@@ -305,7 +305,7 @@ Response:
 
 ### POST request to register a webhook signal:
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/webhook'
+'http://api-pairs-v3.herokuapp.com/v3/webhook'
 ```
 Request Body:
 ```json
@@ -333,7 +333,7 @@ Response:
 
 ### POST request to login with a user
 ```python
-'http://api-pairs-v2.herokuapp.com/v2/login'
+'http://api-pairs-v3.herokuapp.com/v3/login'
 ```
 Request Body (Token to expire in 30 min, default is 10 min):
 ```json
@@ -355,11 +355,11 @@ Response:
 
 ### Test the demo application here:
 
-https://api-pairs-v2.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 # Status Codes
 
-Pairs-API v2 returns the following status codes:
+Pairs-API v3 returns the following status codes:
 
 | Status Code | Description             |
 | :--- |:------------------------|
@@ -378,9 +378,9 @@ Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-c
 
 Clone repository, login to Heroku, add git remote and push:
 ````
-$ git clone https://github.com/ozdemirozcelik/pairs-api-v2.git
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 $ heroku login -i
-$ heroku git:remote -a api-pairs-v2
+$ heroku git:remote -a api-pairs-v3
 $ git push heroku main
 ````
 
@@ -402,7 +402,7 @@ https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-h
 # Demo:
 (Automatic deploys are disabled)
 
-https://api-pairs-v2.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/apitest
 
 # Acknowledgements
 snippets:
@@ -422,7 +422,6 @@ Considering for the next version:
 # Contributing
 
 Pull requests are welcome.
-
 
 
 

@@ -17,7 +17,8 @@ class SignalModel(db.Model):
         db.Integer, primary_key=True, autoincrement=True
     )  # using 'rowid' as the default key
     timestamp = db.Column(
-        db.DateTime(timezone=True), server_default=func.now()
+        db.DateTime(timezone=False), server_default=func.timezone('UTC', func.current_timestamp())
+        # db.DateTime(timezone=False), server_default = func.now()
     )  # DATETIME DEFAULT (CURRENT_TIMESTAMP)
     ticker = db.Column(db.String)
     order_action = db.Column(db.String)
@@ -490,4 +491,3 @@ class SignalModel(db.Model):
             self.order_comment = "problematic ticker!"
 
         return success_flag
-

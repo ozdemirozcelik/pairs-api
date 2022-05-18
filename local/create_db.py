@@ -101,12 +101,10 @@ try:
 
     cursor.execute(create_stocks)
 
-    # TODO: is it possible to encrypt the password?
+    # TODO: encrypt the password?
     create_users = (
         "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)"
     )
-
-    # TODO: create master password here?
 
     cursor.execute(create_users)
 

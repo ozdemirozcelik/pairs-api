@@ -184,7 +184,7 @@ class SignalList(Resource):
         # limit the number of items to get if not logged-in
         notoken_limit = 5
 
-        # TODO: check. without Authorization header, returns None.
+        # without Authorization header, returns None.
         # with Authorization header, returns username
         if username is None:
             if number_of_items == "0":
@@ -275,7 +275,7 @@ class Signal(Resource):
 
         claims = get_jwt()
 
-        # TODO: Delete only if admin
+        # TODO: consider user to delete own data
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -295,4 +295,3 @@ class Signal(Resource):
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("signal")}
-

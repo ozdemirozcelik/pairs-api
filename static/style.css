@@ -355,6 +355,55 @@ button:hover {
     
 }
 
+.settingsbutton {
+
+    float: right;
+    right: 80px;
+    font-size: 80%;
+    margin-right: 0.5%;
+    padding: 4px;
+    color:black;
+    border:2px solid black;
+    border-radius:5px;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+    
+}
+.loginmsg {
+
+    float: right;
+    right: 80px;
+    font-size: 100%;
+    margin-right: 0.5%;
+    padding: 4px;
+    color:brown;
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+    
+}
+.dashbutton {
+
+    float: left;
+    font-size: 80%;
+    margin-left: 5%;
+    padding: 2px;
+    color:whitesmoke;
+    border:1px solid grey;
+    background: slategrey;
+    border-radius:5px;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+    
+}
+
 ul.no-bullets {
     list-style-type: none; /* Remove bullets */
     padding: 0; /* Remove padding */
@@ -499,4 +548,3 @@ ul.no-bullets {
      width: 100%;
   }
 }
-

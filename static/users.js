@@ -1,6 +1,6 @@
 // define api constants for the users:
-const api_url_post_login= server_url +'v2/login';
-const api_url_post_logout= server_url +'v2/logout';
+const api_url_post_login= server_url +'v3/login';
+const api_url_post_logout= server_url +'v3/logout';
 
 // define token defaults
 var token_data;
@@ -68,15 +68,18 @@ async function getToken() {
             // save local storage items
             var token_validity = new Date();
             token_validity.setMinutes(token_validity.getMinutes() + token_data.expire);
-            localStorage.setItem("access_token", token_data.access_token)
-            localStorage.setItem("access_token_validity", token_validity) 
+            localStorage.setItem("access_token", token_data.access_token);
+            localStorage.setItem("access_token_validity", token_validity);
+            document.cookie = "access_token="+token_data.access_token+";expires="+ token_validity.toUTCString();
+            // document.cookie = "login_dashboard=true";
             alert("Successfull login! Saved access token.");
 
             // go back to main screen
             modal.style.display = "none";
             
+
             // check if on the dashboard or setup
-            if (server_url != window.location.href){
+            if (window.location.pathname.split('/')[1] == "setup"){
 
                 // reset countdown
                 setExpire();
@@ -136,6 +139,9 @@ async function logout() {
         // clear token and other local storage variables
         window.localStorage.clear();
 
+        // delete cookies
+        document.cookie = "login_dashboard= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+
         // reset counter
         clearInterval(intervalid);
         document.getElementById("countdown").innerHTML = "No Access Token!";
@@ -153,12 +159,14 @@ async function logout() {
 // set countdown default value
 var intervalid;
 
-if (server_url != window.location.href){
+
+if (window.location.pathname.split('/')[1] == "setup") {
 
     // reset countdown
     setExpire();
 
 }
+
 
 // set session countdown
 function setExpire() {

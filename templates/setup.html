@@ -3,7 +3,8 @@
 <head>
     <title>RESTful API TEST PAGE</title>
     <meta charset="UTF-8">
-    <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css">    
+    <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">   
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   
@@ -125,6 +126,7 @@
     </div>
     <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
     <div class="countdown" id="countdown"></div>
+    <a href="../"><div class="dashbutton" id="dashbutton" ><i class="fa fa-arrow-left"></i> DASHBOARD</div></a>
     <br><br>
     <div class="logoutbutton" onclick="logout()">LOGOUT</div>
     <div class="tabs">
@@ -502,6 +504,7 @@
                 <div class="column">
                 <h3> Add Stock </h3>
                 <section class="stocks-form">
+                    <form>
                         <div>
                             <p>
                                 <label for="ticker">Ticker Symbol:&nbsp;</label>
@@ -528,6 +531,7 @@
                             <br><br>
                             <button type="submit">Create JSON</button>
                         </div>
+                    </form>
                     </form>
                 </section>          
                 <section>

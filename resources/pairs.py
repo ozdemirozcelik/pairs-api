@@ -132,7 +132,7 @@ class Pair(Resource):
 
         claims = get_jwt()
 
-        # TODO: Delete only if admin
+        # TODO: consider user to delete own data
         if not claims["is_admin"]:
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
@@ -152,4 +152,3 @@ class Pair(Resource):
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("pair")}
-
