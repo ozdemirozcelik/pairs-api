@@ -251,3 +251,4 @@ def timediff(value):
     if value is None:
         return ""
     return round(date_diff)
+

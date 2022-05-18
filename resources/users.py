@@ -250,3 +250,4 @@ class TokenRefresh(Resource):
         refresh_token = create_refresh_token(current_user)
 
         return {"access_token": new_token, "refresh_token": refresh_token}, 200
+

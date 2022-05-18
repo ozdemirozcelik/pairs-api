@@ -490,3 +490,4 @@ class SignalModel(db.Model):
             self.order_comment = "problematic ticker!"
 
         return success_flag
+

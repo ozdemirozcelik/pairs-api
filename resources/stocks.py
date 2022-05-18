@@ -155,3 +155,4 @@ class Stock(Resource):
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("stock")}
+

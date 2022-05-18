@@ -295,3 +295,4 @@ class Signal(Resource):
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("signal")}
+

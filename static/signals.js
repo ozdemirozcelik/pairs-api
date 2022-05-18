@@ -713,3 +713,4 @@ a.onclick = function(b) { // onclick not onClick
     ticker_webhook_update.style.backgroundColor = "white";
    }
 }
+

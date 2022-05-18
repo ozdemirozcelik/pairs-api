@@ -181,3 +181,4 @@ class StockModel(db.Model):
         # finally:
         #     if connection:
         #         connection.close()
+

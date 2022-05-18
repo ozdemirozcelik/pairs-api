@@ -152,3 +152,4 @@ class Pair(Resource):
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("pair")}
+
