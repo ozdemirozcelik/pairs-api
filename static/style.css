@@ -264,7 +264,7 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 
 .deletebutton:hover {
@@ -287,7 +287,7 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 
 .editmorebutton:hover {
@@ -309,7 +309,7 @@ button:hover {
     cursor:default;
     vertical-align:middle;
     text-align: center;
-    letter-spacing:0.5px;  
+    letter-spacing:0.5px;
 }
 .logoutbutton:hover {
     background-color: tomato;
@@ -330,7 +330,7 @@ button:hover {
     cursor:default;
     vertical-align:middle;
     text-align: center;
-    letter-spacing:0.5px;  
+    letter-spacing:0.5px;
 }
 .loginbutton:hover {
     background-color: aqua;
@@ -352,7 +352,7 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 
 .settingsbutton {
@@ -370,7 +370,7 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 .loginmsg {
 
@@ -384,7 +384,20 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
+}
+
+.loginmsg2 {
+
+    float: center;
+    font-size: 100%;
+    padding: 4px;
+    color:brown;
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+
 }
 .dashbutton {
 
@@ -401,7 +414,7 @@ button:hover {
     vertical-align:middle;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 
 ul.no-bullets {
@@ -458,7 +471,7 @@ ul.no-bullets {
     cursor:default;
     text-align: center;
     letter-spacing:0.5px;
-    
+
 }
 .legend {
     float: center;
@@ -529,12 +542,12 @@ ul.no-bullets {
 }
 
 @-webkit-keyframes animatezoom {
-  from {-webkit-transform: scale(0)} 
+  from {-webkit-transform: scale(0)}
   to {-webkit-transform: scale(1)}
 }
-  
+
 @keyframes animatezoom {
-  from {transform: scale(0)} 
+  from {transform: scale(0)}
   to {transform: scale(1)}
 }
 

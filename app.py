@@ -217,6 +217,7 @@ def dashboard():
     #     items = SignalModel.get_rows(str(50))
     # else:
     #     items = SignalModel.get_rows(str(5))
+    #     flash("Login to see more!", "login_for_more")
     #
     # signals = [item.json() for item in items]
     ##
@@ -237,6 +238,7 @@ def dashboard():
         items = SignalModel.get_rows(str(20))
     else:
         items = SignalModel.get_rows(str(5))
+        flash("Login to see more!", "login_for_more")
 
     signals = [item.json() for item in items]
 
@@ -257,7 +259,7 @@ def setup():
     #     return render_template("setup.html")
     # else:
     #     # show login message and bo back to dashboard
-    #     flash('Please login!')
+    #     flash("Please login!","login")
     #     return redirect(url_for('dashboard'))
     ##
 
@@ -271,7 +273,7 @@ def setup():
         return render_template("setup.html")
     else:
         # show login message and bo back to dashboard
-        flash("Please login!")
+        flash("Please login!","login")
         return redirect(url_for("dashboard"))
 
 

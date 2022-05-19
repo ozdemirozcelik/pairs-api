@@ -170,7 +170,7 @@ function checkTradeType(event){
         getPairs_webhook();
 
     } else {
-        // load pairs if trade type is pair
+        // load stocks if trade type is stock
         document.getElementById("ticker_webhook_label").innerHTML = "Select Stock(*)";
         getStocks_webhook();
 
