@@ -599,12 +599,11 @@ function Update_signal(currentEl){
     
     // get signal text
     //str = currentEl.firstChild.textContent; // gets the whole text as a string, won't work for errors
-    str = currentEl.firstChild.innerText; // need to get an array of strings
-
-    console.log(str[0]);
+    str = currentEl.firstChild.innerText; // this works better with split
 
     // get rowid from the signal text
-    var rowid_array = str[0].split("|");
+    var rowid_array = str.split(/\r?\n/);
+    console.log(rowid_array[0]);
     var rowid = rowid_array[0].trim();
 
     // check if the list item is deleted

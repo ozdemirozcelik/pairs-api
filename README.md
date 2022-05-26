@@ -379,7 +379,7 @@ Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-c
 Clone repository, login to Heroku, add git remote and push:
 ````
 $ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
-$ heroku login -i
+$ heroku login
 $ heroku git:remote -a api-pairs-v3
 $ git push heroku main
 ````

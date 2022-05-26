@@ -30,7 +30,8 @@ class SignalWebhook(Resource):
     )
     parser.add_argument(
         "order_action", type=str, required=True, help=EMPTY_ERR.format("order_action"),
-    )    parser.add_argument(
+    )
+    parser.add_argument(
         "order_contracts",
         type=int,
         required=True,
