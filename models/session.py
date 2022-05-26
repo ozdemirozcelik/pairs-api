@@ -15,7 +15,10 @@ class SessionModel(db.Model):
         db.Integer, primary_key=True, autoincrement=True
     )  # using 'rowid' as the default key
     value = db.Column(db.String(80), unique=True)
-    expiry = db.Column(db.DateTime(timezone=False), server_default=func.timezone('UTC', func.current_timestamp()))
+    expiry = db.Column(
+        db.DateTime(timezone=False),
+        server_default=func.timezone("UTC", func.current_timestamp()),
+    )
 
     def __init__(self, value: str, expiry: datetime):
         self.value = value

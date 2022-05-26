@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block table %}
+<table class="webhook">
+    <tr>
+        <th>row_id</th>
+        <th>timestamp(pct)</th>
+        <th>ticker</th>
+        <th>order_comment</th>
+        <th>action</th>
+        <th>quantity</th>
+        <th>price</th>
+        <th>order_status</th>
+        <th>fill_price</th>
+        <th>slippage</th>
+    </tr>
+    {% for signal in signals %}
+    <tr>
+        <td>{{ signal.rowid }}</td>
+        {% if signal.timestamp|iftoday %}
+        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time}}</td>                 
+        {% else %}
+        <td>{{ signal.timestamp|pct_time}}</td>
+        {% endif %} 
+        <td>{{ signal.ticker }}</td>
+        <td>{{ signal.order_comment }}</td> 
+        <td>{{ signal.order_action }}</td>
+        <td>{{ signal.order_contracts }}</td>
+        <td>{{ signal.order_price }}</td>
+        {% if "error" in signal.order_status or "err" in signal.order_status%}
+        <td style="background-color:orange">{{ signal.order_status }}</td> 
+        {% elif "created" in signal.order_status %}
+        <td style="background-color:lightblue">{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)</td>
+        {% elif "waiting" in signal.order_status or "rerouted" in signal.order_status %}
+        <td style="background-color:whitesmoke">{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)</td> 
+        {% elif "filled" in signal.order_status %}
+        <td style="background-color:lightgreen">{{ signal.order_status }}</td>                              
+        {% else %}
+        <td>{{ signal.order_status }}</td>                                                   
+        {% endif %}                
+        <td>{{ signal.fill_price }}</td>
+        {% if signal.fill_price == "" %}
+        <td></td> 
+        {% elif signal.order_action=="buy" %}
+        <td>{{ signal.slip|float|round(3,) }}</td>
+        {% elif signal.order_action=="sell" %}
+        <td>{{ -(signal.slip|float|round(3,)) }}</td>
+        {% else %}
+        <td></td> 
+        {% endif %}
+    </tr>
+    {% endfor %}                  
+</table>
+<div class="loginmsg2">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "login_for_more" %}    
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}
+
+{% block legenddash %}
+<div class="legend">
+    <span class='numberCircle' style='background-color: whitesmoke';>&nbsp;</span> waiting
+    <span class='numberCircle' style='background-color: orange';>&nbsp;</span> error
+    <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created
+    <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
+</div>
+{% endblock %}

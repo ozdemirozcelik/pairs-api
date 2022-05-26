@@ -34,6 +34,7 @@ for(const radioButton of radioButtons){
 var ticker_webhook = document.getElementById("ticker_webhook");
 var ticker_webhook_update = document.getElementById("ticker_webhook_update")
 var rowid_update = document.getElementById("rowid_update");
+var timestamp_update = document.getElementById("timestamp_update");
 var order_action = document.getElementById("order_action");
 var order_action_update = document.getElementById("order_action_update");
 var order_contracts = document.getElementById("order_contracts");
@@ -437,12 +438,19 @@ function postSave_signals() {
     })
     .then((jsonResponse) => {
 
-        // handle JSON response
-        // show response msg
-        alert(jsonResponse.message + " | Code: " + return_code);
+        if (return_code == 400) {
+            // 400 bad request has key values specific to signal keys
+            var firstKey = Object.keys(jsonResponse.message)[0];
+            alert(jsonResponse.message[firstKey] + " | Code: " + return_code);
+        } else {
 
-        // update the list
-        listSignals();
+            // handle JSON response
+            // show response msg
+            alert(jsonResponse.message + " | Code: " + return_code);
+
+            // update the list
+            listSignals();
+        }
 
         }).catch((error) => {
         // handle the error, , show error text
@@ -479,6 +487,7 @@ function putUpdate_signals() {
                 }, 
                 body: JSON.stringify(formJSON_update_signals)
         }).then(response => {
+            console.log(response.status);
             if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
                 return response.json();
@@ -490,6 +499,10 @@ function putUpdate_signals() {
             // Handle JSON response
             if (return_code == 401) {
                 alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
+            } else if (return_code == 400) {
+                // 400 bad request has key values specific to signal keys
+                var firstKey = Object.keys(jsonResponse.message)[0];
+                alert(jsonResponse.message[firstKey] + " | Code: " + return_code);
             } else {
 
                 alert("Updated order #" + jsonResponse.rowid);
@@ -545,10 +558,11 @@ async function listSignals() {
             str = signals_data.signals[key].order_action + " | " + signals_data.signals[key].order_contracts + " | " + signals_data.signals[key].ticker;
             str = str.toUpperCase()
 
-            if (signals_data.signals[key].order_status == "waiting"){
-                li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: lightgoldenrodyellow';>"+ signals_data.signals[key].rowid +"</span>";
-            } else if (signals_data.signals[key].order_status == "canceled") {
-                li.innerHTML = "<span title='canceled' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span>";
+            if (signals_data.signals[key].order_status == "waiting" || signals_data.signals[key].order_status == "rerouted"){
+                li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: whitesmoke';>"+ signals_data.signals[key].rowid +"</span>";
+            } else if (signals_data.signals[key].order_status.includes("err")) {
+                // show error messages in a tip box
+                li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status == "filled") {
                 li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status == "created") {
@@ -567,7 +581,15 @@ async function listSignals() {
 
     // display a 'login to see all' message if not received the complete list
 
-    if ((got_401 || !localStorage.access_token) && signals_data.signals.length>=signals_data.notoken_limit){ login_txt.style.display = 'block'} else { login_txt.style.display = 'none'};
+    if ((got_401 || !localStorage.access_token) && signals_data.signals.length>=signals_data.notoken_limit){ 
+        login_txt.style.display = 'block';
+        // reset counter
+        clearInterval(intervalid);
+        document.getElementById("countdown").innerHTML = "No Fresh Token!";
+    } 
+    else { 
+        login_txt.style.display = 'none'
+    };
 
     createPages_signals();
 
@@ -576,10 +598,13 @@ async function listSignals() {
 function Update_signal(currentEl){
     
     // get signal text
-    str = currentEl.firstChild.textContent;
+    //str = currentEl.firstChild.textContent; // gets the whole text as a string, won't work for errors
+    str = currentEl.firstChild.innerText; // need to get an array of strings
+
+    console.log(str[0]);
 
     // get rowid from the signal text
-    var rowid_array = str.split("|");
+    var rowid_array = str[0].split("|");
     var rowid = rowid_array[0].trim();
 
     // check if the list item is deleted
@@ -607,7 +632,8 @@ async function getSignal(rowid) {
     const response_pair = await fetch(api_url_get_signal_rowid);
     signal_data = await response_pair.json();
 
-    ticker_webhook_update.value = signal_data.ticker; 
+    ticker_webhook_update.value = signal_data.ticker;
+    timestamp_update.value = signal_data.timestamp;
     order_action_update.value = signal_data.order_action; 
     order_contracts_update.value = signal_data.order_contracts;
     order_price_update.value = signal_data.order_price;
@@ -651,7 +677,7 @@ function deleteSignal() {
     } else {
 
         if (rowid_update.value == "") {
-            alert("Please select a signal from the list!");
+                alert("Please select a signal from the list!");
             return
 
         }
@@ -713,3 +739,18 @@ a.onclick = function(b) { // onclick not onClick
     ticker_webhook_update.style.backgroundColor = "white";
    }
 }
+
+// To unlock timestamp text box
+
+var clicks_timestamp = 0; // counter 
+var a = document.getElementById('timestamp_update_label'); // element
+a.onclick = function(b) { // onclick not onClick
+   console.log(++clicks_timestamp); // increment it
+
+   if (clicks_timestamp == 10) {
+    alert("Unlocked!");
+    timestamp_update.readOnly = false;
+    timestamp_update.style.backgroundColor = "white";
+   }
+}
+

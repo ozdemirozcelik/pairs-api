@@ -129,6 +129,7 @@
     <a href="../"><div class="dashbutton" id="dashbutton" ><i class="fa fa-arrow-left"></i> DASHBOARD</div></a>
     <br><br>
     <div class="logoutbutton" onclick="logout()">LOGOUT</div>
+
     <div class="tabs">
         
         <ul class="tabs-list">
@@ -242,7 +243,10 @@
                                 <label for="rowid_update">RowId:</label>
                                 <input type="text" name="rowid" id="rowid_update" readonly>                          
                             </p>
-                            <br>
+                            <p>
+                                <label id="timestamp_update_label" for="timestamp_update">Timestamp:</label>
+                                <input type="text" name="timestamp" id="timestamp_update" readonly>                          
+                            </p>
                             <p>
                                 <label id="ticker_webhook_update_label" for="ticker_webhook_update">Signal:</label>
                                 <input type="text" name="ticker" id="ticker_webhook_update" readonly>                          
@@ -357,7 +361,7 @@
                             </p>
                             <p>
                                 <label  for="error_msg_update">Error Msg:</label>
-                                <input  type="text" name="error_msg" id="error_msg_update">                       
+                                <input  type="text" name="error_msg" id="error_msg_update">                    
                             </p>
                             <p>
                                 <label for="passphrase">Passphrase(*):&nbsp</label>
@@ -382,8 +386,8 @@
                 </div>
             </div>
             <div class="legend">
-                <span class='numberCircle' style='background-color: lightgoldenrodyellow';>&nbsp;</span> waiting
-                <span class='numberCircle' style='background-color: orange';>&nbsp;</span> canceled
+                <span class='numberCircle' style='background-color: whitesmoke';>&nbsp;</span> waiting
+                <span class='numberCircle' style='background-color: orange';>&nbsp;</span> error
                 <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created 
                 <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
             </div>

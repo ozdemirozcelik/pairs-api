@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse
 from models.signals import SignalModel
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
+from datetime import datetime
 
 EMPTY_ERR = "'{}' cannot be empty!"
 PASS_ERR = "incorrect passphrase."
+DATE_ERR = "date format should be %Y-%m-%d %H:%M:%S."
 TICKER_ERR = "created with problematic ticker!"
 INSERT_ERR = "an error occurred inserting the item."
 UPDATE_ERR = "an error occurred updating the item."
@@ -21,13 +23,14 @@ class SignalWebhook(Resource):
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("rowid", type=int, default=0)
+    parser.add_argument('timestamp', type=lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'), help=DATE_ERR)
+    # parser.add_argument("timestamp", type=str)
     parser.add_argument(
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
     )
     parser.add_argument(
         "order_action", type=str, required=True, help=EMPTY_ERR.format("order_action"),
-    )
-    parser.add_argument(
+    )    parser.add_argument(
         "order_contracts",
         type=int,
         required=True,
@@ -66,10 +69,18 @@ class SignalWebhook(Resource):
     def post():
         data = SignalWebhook.parser.parse_args()
 
+        # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return {"message": PASS_ERR}, 400  # Return Bad Request
+            return_msg = {
+                        "message": {
+                            "passphrase" : PASS_ERR
+                        }
+                    }
+            #  return {"message": PASS_ERR}, 400  # Old return Bad Request
+            return return_msg, 400  # Old return Bad Request
 
         item = SignalModel(
+            data["timestamp"],
             data["ticker"],
             data["order_action"],
             data["order_contracts"],
@@ -119,12 +130,20 @@ class SignalWebhook(Resource):
     def put():
         data = SignalWebhook.parser.parse_args()
 
+        # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return {"message": PASS_ERR}, 400  # Return Bad Request
+            return_msg = {
+                        "message": {
+                            "passphrase" : PASS_ERR
+                        }
+                    }
+            #  return {"message": PASS_ERR}, 400  # Old return Bad Request
+            return return_msg, 400  # Old return Bad Request
 
         if SignalModel.find_by_rowid(data["rowid"]):
 
             item = SignalModel(
+                data["timestamp"],
                 data["ticker"],
                 data["order_action"],
                 data["order_contracts"],

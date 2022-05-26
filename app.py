@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for
+
 # enable if keeping sessions:
 # from flask_session import Session
 # from flask import session
@@ -28,6 +29,7 @@ from resources.users import (
 )
 from db import db
 from datetime import datetime
+from datetime import timedelta
 import pytz
 from pytz import timezone
 
@@ -204,7 +206,12 @@ api.add_resource(TokenRefresh, "/v3/refresh")
 # Resource definitions (End)
 
 
-@app.get("/")
+@app.route("/")
+def home():
+    return redirect("/dashboard")
+
+
+@app.get("/dashboard")
 def dashboard():
     # Flask sessions may not be persistent in Heroku, works fine in local
     # consider disabling below for Heroku
@@ -236,13 +243,119 @@ def dashboard():
 
     if simplesession:
         items = SignalModel.get_rows(str(20))
+
     else:
         items = SignalModel.get_rows(str(5))
         flash("Login to see more!", "login_for_more")
 
     signals = [item.json() for item in items]
 
-    return render_template("dashboard.html", signals=signals)
+    return render_template(
+        "dash.html", signals=signals, title="DASHBOARD", tab1="tab active", tab2="tab"
+    )
+
+
+@app.get("/list")
+def dashboard_list():
+    # Flask sessions may not be persistent in Heroku, works fine in local
+    # consider disabling below for Heroku
+
+    ##
+    # selected_ticker = request.args.get('ticker_webhook')  # get from the form submission
+
+    # if session.get("token") is None:
+    #     session["token"] = None
+    #
+    # if session["token"] == "yes_token":
+    #     items = SignalModel.get_list_ticker(selected_ticker,"0")
+    # else:
+    #     items = SignalModel.get_list_ticker(selected_ticker,"5")
+    #     flash("Login to see more!", "login_for_more")
+    #
+    # signals = [item.json() for item in items]
+    ##
+
+    # consider enabling below for Heroku:
+    # this method uses a simple custom session table created in the database
+
+    # get form submission
+    selected_ticker = request.args.get("ticker_webhook")
+    selected_trade_type = request.args.get("tradetype")
+    start_date_selected = request.args.get("start_date")
+    end_date_selected = request.args.get("end_date")
+
+    # print("selected ticker :", selected_ticker)
+    # print("start date :", start_date_selected)
+    # print("end date :", end_date_selected)
+
+    date_format = "%Y-%m-%d"
+
+    try:
+        start_date = start_date_selected.split(".")[
+            0
+        ]  # clean the timezone info if necessary
+        start_date = datetime.strptime(
+            start_date, date_format
+        )  # convert string to timestamp
+        end_date = end_date_selected.split(".")[
+            0
+        ]  # clean the timezone info if necessary
+        end_date = datetime.strptime(
+            end_date, date_format
+        )  # convert string to timestamp
+        end_date = end_date + timedelta(
+            days=1
+        )  # Add 1 day to "%Y-%m-%d" 00:00:00 to reach end of day
+        # print("start date :", start_date)
+        # print("end date :", end_date)
+    except:
+        start_date = datetime.now(tz=pytz.utc) - timedelta(days=1)
+        date_now = datetime.now(tz=pytz.utc)
+        date_now_formatted = date_now.strftime(date_format)  # format as string
+        start_date = datetime.strptime(
+            date_now_formatted, date_format
+        )  # convert to timestamp
+        end_date = start_date + timedelta(days=1)  # Today end of day
+        # print("start date :", start_date)
+        # print("end date :", end_date)
+
+    access_token = request.cookies.get("access_token")
+
+    SessionModel.delete_expired()  # clean expired session data
+
+    if access_token:
+        simplesession = SessionModel.find_by_value(access_token[-10:])
+    else:
+        simplesession = None
+
+    if selected_ticker:
+        if simplesession:
+            items = SignalModel.get_list_ticker_dates(
+                selected_ticker, "0", start_date, end_date
+            )
+        else:
+            items = SignalModel.get_list_ticker_dates(
+                selected_ticker, "5", start_date, end_date
+            )
+            flash("Login to see more!", "login_for_more")
+    else:
+        return render_template(
+            "list.html", title="LIST SIGNALS", tab2="tab active", tab1="tab"
+        )
+
+    signals = [item.json() for item in items]
+
+    return render_template(
+        "list.html",
+        signals=signals,
+        title="LIST SIGNALS",
+        tab2="tab active",
+        tab1="tab",
+        start_date=start_date,
+        end_date=end_date - timedelta(days=1),
+        selected_ticker=selected_ticker,
+        selected_trade_type=selected_trade_type,
+    )
 
 
 # route to setup page
@@ -273,7 +386,7 @@ def setup():
         return render_template("setup.html")
     else:
         # show login message and bo back to dashboard
-        flash("Please login!","login")
+        flash("Please login!", "login")
         return redirect(url_for("dashboard"))
 
 

@@ -4,6 +4,7 @@ from db import db
 from sqlalchemy.sql import (
     func,
 )  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
+from datetime import datetime
 
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
@@ -17,7 +18,8 @@ class SignalModel(db.Model):
         db.Integer, primary_key=True, autoincrement=True
     )  # using 'rowid' as the default key
     timestamp = db.Column(
-        db.DateTime(timezone=False), server_default=func.timezone('UTC', func.current_timestamp())
+        db.DateTime(timezone=False),
+        server_default=func.timezone("UTC", func.current_timestamp())
         # db.DateTime(timezone=False), server_default = func.now()
     )  # DATETIME DEFAULT (CURRENT_TIMESTAMP)
     ticker = db.Column(db.String)
@@ -46,6 +48,7 @@ class SignalModel(db.Model):
 
     def __init__(
         self,
+        timestamp: datetime,
         ticker: str,
         order_action: str,
         order_contracts: int,
@@ -68,6 +71,7 @@ class SignalModel(db.Model):
         slip: float,
         error_msg: str,
     ):
+        self.timestamp = timestamp
         self.ticker = ticker
         self.order_action = order_action
         self.order_contracts = order_contracts
@@ -190,6 +194,7 @@ class SignalModel(db.Model):
         item_to_update = self.query.filter_by(rowid=rowid).first()
 
         item_to_update.ticker = self.ticker
+        item_to_update.timestamp = self.timestamp
         item_to_update.order_action = self.order_action
         item_to_update.order_contracts = self.order_contracts
         item_to_update.order_price = self.order_price
@@ -350,9 +355,68 @@ class SignalModel(db.Model):
                 )
 
     @classmethod
-    def get_list_status(cls, order_status, number_of_items) -> List:
+    def get_list_ticker_dates(
+        cls, ticker_name, number_of_items, start_date, end_date
+    ) -> List:
 
-        print(order_status)
+        pair = False
+
+        tickers = ticker_name.split("-")  # check if pair or single
+        ticker1 = tickers[0]
+        ticker2 = ""
+        if len(tickers) == 2:
+            ticker2 = tickers[1]
+            pair = True
+
+        if number_of_items == "0":
+            if pair:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1)
+                        & (cls.stk_ticker2 == ticker2)
+                        & (cls.timestamp <= end_date)
+                        & (cls.timestamp >= start_date)
+                    )
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
+            else:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1)
+                        & (cls.timestamp <= end_date)
+                        & (cls.timestamp >= start_date)
+                    )
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
+        else:
+            if pair:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1)
+                        & (cls.stk_ticker2 == ticker2)
+                        & (cls.timestamp <= end_date)
+                        & (cls.timestamp >= start_date)
+                    )
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
+            else:
+                return (
+                    cls.query.filter(
+                        (cls.stk_ticker1 == ticker1)
+                        & (cls.timestamp <= end_date)
+                        & (cls.timestamp >= start_date)
+                    )
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
+
+    @classmethod
+    def get_list_status(cls, order_status, number_of_items) -> List:
 
         if number_of_items == "0":
             return (
@@ -491,3 +555,19 @@ class SignalModel(db.Model):
             self.order_comment = "problematic ticker!"
 
         return success_flag
+
+    @classmethod
+    def get_avg_slip(cls, ticker_name) -> List:
+
+        if number_of_items == "0":
+            return (
+                cls.query.filter_by(order_status=order_status)
+                .order_by(cls.rowid.desc())
+                .all()
+            )
+        else:
+            return (
+                cls.query.filter_by(order_status=order_status)
+                .order_by(cls.rowid.desc())
+                .limit(number_of_items)
+            )

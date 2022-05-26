@@ -1,0 +1,40 @@
+     
+     <div id="loginbox" class="modal-login">
+        <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
+        <section class="login-form">
+            <form class="modal-login-content animate">   
+            <div class="modal-login-container">
+                <label for="username"><b>username:</b></label>
+                <input type="text" placeholder="admin or user1" autocomplete='username' name="username" required>       
+                <label for="password"><b>password:</b></label>
+                <input type="password" placeholder="123" autocomplete='password' name="password" required>
+                <label for="expire"><b>validity:</b></label>
+                <select name="expire" id="expire">
+                    <option value="1">1</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="60">60</option>
+                    <option value="120">120</option>
+                </select> (min) 
+                <br><br>
+                <button type="submit" >Login</button>
+            </div>
+            </form>
+        </section>
+    </div>
+    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
+    <a href="setup"><div class="settingsbutton" id="settingsbutton" ><i class="fa fa-gear fa-lg"></i></div></a>
+    <div class="loginmsg">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "login" %}    
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
