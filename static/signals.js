@@ -301,21 +301,23 @@ function handleFormSubmit_signals(event) {
             formJSON_signals['ticker']=tickers[0];
         }
 
+        // disabled with v3, API is taking care of this:
         // check if the ticker status is active or passive, and edit order status
-        if (!status_dic[formJSON_signals['ticker_webhook']]) {
-            formJSON_signals['order_status'] = "canceled"; // set order status as canceled cause ticker is not set as active
-            formJSON_signals['order_comment'] = "ticker is not active"; 
+        // if (!status_dic[formJSON_signals['ticker_webhook']]) {
+        //     formJSON_signals['order_status'] = "canceled"; // set order status as canceled cause ticker is not set as active
+        //     formJSON_signals['order_comment'] = "ticker is not active"; 
 
+        // } else {
+        
+        // edit hidden comments
+        if (formJSON_signals.mar_pos == 'flat'){
+            formJSON_signals['order_comment'] = "Pos. Closed";
+        } else if (formJSON_signals.order_action == 'buy'){
+            formJSON_signals['order_comment']  = "Enter Long";
         } else {
-            // edit hidden comments
-            if (formJSON_signals.mar_pos == 'flat'){
-                formJSON_signals['order_comment'] = "Pos. Closed";
-            } else if (formJSON_signals.order_action == 'buy'){
-                formJSON_signals['order_comment']  = "Enter Long";
-            } else {
-                formJSON_signals['order_comment']  = "Enter Short";
-            }
+            formJSON_signals['order_comment']  = "Enter Short";
         }
+        // }
 
         // remove empty and null keys
         Object.keys(formJSON_signals).forEach((k) => (formJSON_signals[k] == "" || formJSON_signals[k] == null) && delete formJSON_signals[k]);

@@ -13,11 +13,8 @@ Front-end demo for v3 (Javascript):
 
 https://api-pairs-v3.herokuapp.com/
 
-The most recent version is available here:
 
-https://api-pairs.herokuapp.com/
-
-# Additions to V2
+# Additions to v2
 
 - additional API resources
 - functionality to work with TradingView webhooks

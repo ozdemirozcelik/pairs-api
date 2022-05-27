@@ -447,7 +447,7 @@ class SignalModel(db.Model):
                     self.order_status = "canceled"
                     self.error_msg = "passive ticker"
                     return False
-                if self.hedge_param != pair.hedge:
+                if float(self.hedge_param) != float(pair.hedge):
                     self.order_status = "canceled"
                     self.error_msg = "wrong hedge"
                     return False
@@ -498,14 +498,14 @@ class SignalModel(db.Model):
         success_flag = True
 
         eq12 = self.ticker.split("-")  # check if pair or single
-        print(eq12)  # ['LNT', '1.25*NYSE:FTS']
+        # print(eq12)  # ['LNT', '1.25*NYSE:FTS']
 
         if len(eq12) <= 2:
 
             eq1_hedge = re.findall(
                 r"[-+]?\d*\.\d+|\d+", eq12[0]
             )  # hedge constant fot the 1st ticker
-            print("eq1_hedge: ", eq1_hedge)  # []
+            # print("eq1_hedge: ", eq1_hedge)  # []
 
             if len(eq1_hedge) > 0:
                 eq1 = eq12[0].replace(eq1_hedge[0], "")
@@ -513,13 +513,13 @@ class SignalModel(db.Model):
                 eq1 = eq12[0]  # LNT
 
             eq1 = eq1.replace("*", "")
-            print("eq1: ", eq1)  # LNT
+            # print("eq1: ", eq1)  # LNT
 
             eq1_split = eq1.rsplit(":", maxsplit=1)
             eq1_ticker_almost = eq1_split[len(eq1_split) - 1]
 
-            print("eq1_split: ", eq1_split)  # ['LNT']
-            print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
+            # print("eq1_split: ", eq1_split)  # ['LNT']
+            # print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
 
             if "." in eq1_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
                 ticker_pair1 = eq1_ticker_almost.replace(
@@ -533,13 +533,13 @@ class SignalModel(db.Model):
                 if eq1_ticker_almost != ticker_pair1:
                     success_flag = False
 
-            print("ticker_pair1: ", ticker_pair1)  # LNT
+            # print("ticker_pair1: ", ticker_pair1)  # LNT
 
             if len(eq1_hedge) != 0:
                 if eq1_hedge[0] != 1:
                     success_flag = False
 
-            print("problem_flag_first: ", success_flag)
+            # print("problem_flag_first: ", success_flag)
 
             self.ticker_type = "single"
             self.stk_ticker1 = ticker_pair1
@@ -549,7 +549,7 @@ class SignalModel(db.Model):
             eq2_hedge = re.findall(
                 r"[-+]?\d*\.\d+|\d+", eq12[1]
             )  # hedge constant fot the 2nd ticker
-            print("eq2_hedge: ", eq2_hedge)  # ['1.25']
+            # print("eq2_hedge: ", eq2_hedge)  # ['1.25']
 
             if len(eq2_hedge) > 0:
                 eq2 = eq12[1].replace(eq2_hedge[0], "")
@@ -558,13 +558,13 @@ class SignalModel(db.Model):
 
             eq2 = eq2.replace("*", "")
 
-            print("eq2: ", eq2)  # NYSE:FTS
+            # print("eq2: ", eq2)  # NYSE:FTS
 
             eq2_split = eq2.rsplit(":", maxsplit=1)
             eq2_ticker_almost = eq2_split[len(eq2_split) - 1]
 
-            print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
-            print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
+            # print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
+            # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
 
             if "." in eq2_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
                 ticker_pair2 = eq2_ticker_almost.replace(
@@ -578,16 +578,16 @@ class SignalModel(db.Model):
                 if eq2_ticker_almost != ticker_pair2:
                     success_flag = False
 
-            print("ticker_pair2: ", ticker_pair2)  # FTS
+            # print("ticker_pair2: ", ticker_pair2)  # FTS
 
             if len(eq2_hedge) == 0:
                 hedge_const = 1
             else:
                 hedge_const = eq2_hedge[0]
 
-            print("hedge_const: ", hedge_const)  # False
-            print("problem_flag_final: ", success_flag)
-            print("ticker_type: ", self.ticker_type)
+            # print("hedge_const: ", hedge_const)  # False
+            # print("problem_flag_final: ", success_flag)
+            # print("ticker_type: ", self.ticker_type)
 
             self.ticker_type = "pair"
             self.stk_ticker2 = ticker_pair2
