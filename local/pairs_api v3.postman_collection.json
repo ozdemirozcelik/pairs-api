@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "832f50c9-7c00-485c-b45b-b0072ee1af1e",
-		"name": "pairs_api v2",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "d5ea7e87-1ee6-4d70-af24-43a1afa64d3e",
+		"name": "pairs_api v3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20044007"
 	},
 	"item": [
 		{
@@ -29,9 +30,9 @@
 							"raw": "{\r\n    \"symbol\": \"EEE\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"NASDAQ\",\r\n    \"active\": 0\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/regstock",
+							"raw": "{{pairs_api_v3}}/regstock",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"regstock"
@@ -61,9 +62,9 @@
 							"raw": "{\r\n    \"symbol\": \"CCC\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"ISLAND\",\r\n    \"active\": 1\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/regstock",
+							"raw": "{{pairs_api_v3}}/regstock",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"regstock"
@@ -85,9 +86,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/stocks/0",
+							"raw": "{{pairs_api_v3}}/stocks/0",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"stocks",
@@ -109,9 +110,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/stock/CCC",
+							"raw": "{{pairs_api_v3}}/stock/CCC",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"stock",
@@ -133,9 +134,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/stock/CCC",
+							"raw": "{{pairs_api_v3}}/stock/CCC",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"stock",
@@ -171,9 +172,9 @@
 							"raw": "{\r\n    \"name\": \"AAA-BBB\",\r\n    \"hedge\": 1.123456789,\r\n    \"status\": 1,\r\n    \"do not save\": 0\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/regpair",
+							"raw": "{{pairs_api_v3}}/regpair",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"regpair"
@@ -203,9 +204,9 @@
 							"raw": "{\r\n    \"name\": \"XXX-ZZZ\",\r\n    \"hedge\": 1.5878878979879879879877,\r\n    \"status\": 0\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/regpair",
+							"raw": "{{pairs_api_v3}}/regpair",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"regpair"
@@ -220,9 +221,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{pairs_api_v2}}/pairs/0",
+							"raw": "{{pairs_api_v3}}/pairs/0",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"pairs",
@@ -238,9 +239,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{pairs_api_v2}}/pair/AAA-BBB",
+							"raw": "{{pairs_api_v3}}/pair/AAA-BBB",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"pair",
@@ -292,14 +293,45 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"DRH-0.55*HST\",\r\n    \"order_action\": \"sell\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 25.2,\r\n    \"mar_pos_size\": 50,\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\":\"Order Comment Here\"\r\n\r\n}"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"NMFC-0.72*NASDAQ:ROIC\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": -0.01,\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": 100,\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \"Enter Long(...)\"\r\n}\r\n"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/webhook",
+							"raw": "{{pairs_api_v3}}/webhook",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register (a signal) HEROKU",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"NMFC-0.72*NASDAQ:ROIC\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": -0.01,\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": 100,\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \"Enter Long(...)\"\r\n}"
+						},
+						"url": {
+							"raw": "https://api-pairs-v3.herokuapp.com/v3/webhook",
+							"protocol": "https",
+							"host": [
+								"api-pairs-v3",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"v3",
 								"webhook"
 							]
 						}
@@ -324,12 +356,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"rowid\": 10,\r\n    \"timestamp\": \"2022-04-29 21:49:40\",\r\n    \"ticker\": \"DRH-0.56*HST\",\r\n    \"order_action\": \"sell\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 25.3,\r\n    \"mar_pos\": null,\r\n    \"mar_pos_size\": 50,\r\n    \"pre_mar_pos\": null,\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \"Order Comment Here\",\r\n    \"order_status\": \"waiting\"\r\n}"
+							"raw": "{\r\n            \"passphrase\": \"webhook\",\r\n            \"rowid\": 31,\r\n            \"timestamp\": \"2022-05-27 00:01:42\",\r\n            \"ticker\": \"NMFC\",\r\n            \"order_action\": \"buy\",\r\n            \"order_contracts\": 100,\r\n            \"order_price\": -0.01,\r\n            \"mar_pos\": \"long\",\r\n            \"mar_pos_size\": 100,\r\n            \"pre_mar_pos\": \"flat\",\r\n            \"pre_mar_pos_size\": 0,\r\n            \"order_comment\": \"Enter Long(...)\",\r\n            \"order_status\": \"canceled\",\r\n            \"ticker_type\": \"single\",\r\n            \"stk_ticker1\": \"NMFC\",\r\n            \"stk_ticker2\": null,\r\n            \"hedge_param\": null,\r\n            \"order_id1\": 12,\r\n            \"order_id2\": 14,\r\n            \"stk_price1\": null,\r\n            \"stk_price2\": null,\r\n            \"fill_price\": null,\r\n            \"slip\": null,\r\n            \"error_msg\": \"unregistered ticker\"\r\n        }"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/webhook",
+							"raw": "{{pairs_api_v3}}/webhook",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"webhook"
@@ -346,18 +378,69 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text",
-								"disabled": true
+								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/signals/100",
+							"raw": "{{pairs_api_v3}}/signals/0",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"signals",
-								"100"
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list of ticker",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/signals/ticker/AAA/3",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"signals",
+								"ticker",
+								"AAA",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list of status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/signals/status/waiting/2",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"signals",
+								"status",
+								"waiting",
+								"2"
 							]
 						}
 					},
@@ -369,13 +452,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{pairs_api_v2}}/signal/10",
+							"raw": "{{pairs_api_v3}}/signal/4",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"signal",
-								"10"
+								"4"
 							]
 						}
 					},
@@ -393,9 +476,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/signal/10",
+							"raw": "{{pairs_api_v3}}/signal/10",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"signal",
@@ -459,12 +542,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"123\",\r\n    \"expire\":30\r\n\r\n}"
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"123\",\r\n    \"expire\":20\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/login",
+							"raw": "{{pairs_api_v3}}/login",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"login"
@@ -519,9 +602,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/logout",
+							"raw": "{{pairs_api_v3}}/logout",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"logout"
@@ -576,9 +659,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/refresh",
+							"raw": "{{pairs_api_v3}}/refresh",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"refresh"
@@ -608,9 +691,9 @@
 							"raw": "{\r\n    \"username\": \"user2\",\r\n    \"password\": \"123\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/reguser",
+							"raw": "{{pairs_api_v3}}/reguser",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"reguser"
@@ -640,9 +723,9 @@
 							"raw": "{\r\n    \"username\": \"user2\",\r\n    \"password\": \"123\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v2}}/reguser",
+							"raw": "{{pairs_api_v3}}/reguser",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"reguser"
@@ -663,9 +746,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/users/0",
+							"raw": "{{pairs_api_v3}}/users/0",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"users",
@@ -687,9 +770,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/user/user2",
+							"raw": "{{pairs_api_v3}}/user/user2",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"user",
@@ -711,9 +794,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v2}}/user/user",
+							"raw": "{{pairs_api_v3}}/user/user",
 							"host": [
-								"{{pairs_api_v2}}"
+								"{{pairs_api_v3}}"
 							],
 							"path": [
 								"user",

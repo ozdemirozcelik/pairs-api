@@ -4,6 +4,7 @@
     height:auto;
     margin:0 auto;
     min-width: 900px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* Tab list item */
@@ -83,7 +84,7 @@ input { display: table-cell; }
 
 .column {
     flex: 33.33%;
-    height: 400px;
+    height: 480px;
     /* min-height: 400px for no scrolls*/
     padding: 20px;
     margin: 2px;
@@ -92,7 +93,7 @@ input { display: table-cell; }
     letter-spacing:0.3px;
 }
 .column_dashboard {
-    height: 550px;
+    height: 510px;
     padding: 20px;
     margin: 2px;
     background-color: lightgrey;
@@ -115,6 +116,7 @@ input { display: table-cell; }
     table-layout: auto;
     width: 100%;
     text-align: center;
+    font-size: 90%;
 }
 
 .ticker {

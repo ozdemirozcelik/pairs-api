@@ -1,10 +1,13 @@
 import re
 from typing import Dict, List, Union  # for type hinting
 from db import db
+from datetime import datetime
 from sqlalchemy.sql import (
     func,
 )  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
-from datetime import datetime
+
+from models.pairs import PairModel
+from models.stocks import StockModel
 
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
@@ -431,6 +434,49 @@ class SignalModel(db.Model):
                 .limit(number_of_items)
             )
 
+    def check_ticker_status(self) -> bool:
+
+        # check if ticker is registered and trade status is active
+        if self.ticker_type == "pair":
+            pair_name = self.stk_ticker1 + "-" + self.stk_ticker2
+            pair = PairModel.find_by_name(pair_name)
+            # check if pair exists
+            if pair:
+                # check trade status
+                if not pair.status:
+                    self.order_status = "canceled"
+                    self.error_msg = "passive ticker"
+                    return False
+                if self.hedge_param != pair.hedge:
+                    self.order_status = "canceled"
+                    self.error_msg = "wrong hedge"
+                    return False
+
+                # if registered and active ticker
+                else:
+                    return True
+            else:
+                self.order_status = "error"
+                self.error_msg = "unknown ticker"
+                return False
+
+        else:
+            stock = StockModel.find_by_symbol(self.stk_ticker1)
+            # check if stock exists
+            if stock:
+                # check trade status
+                if not stock.active:
+                    self.order_status = "canceled"
+                    self.error_msg = "passive ticker"
+                    return False
+                else:
+                    # if registered and active ticker
+                    return True
+            else:
+                self.order_status = "error"
+                self.error_msg = "unknown ticker"
+                return False
+
     def splitticker(self) -> bool:
 
         # Split the received webhook equation into tickers and hedge parameters
@@ -551,23 +597,12 @@ class SignalModel(db.Model):
             success_flag = False
 
         if not success_flag:
-            self.order_status = "canceled"
-            self.order_comment = "problematic ticker!"
+            self.order_status = "error"
+            self.error_msg = "problematic ticker!"
 
         return success_flag
 
+    # TODO: COMPLETE
     @classmethod
     def get_avg_slip(cls, ticker_name) -> List:
-
-        if number_of_items == "0":
-            return (
-                cls.query.filter_by(order_status=order_status)
-                .order_by(cls.rowid.desc())
-                .all()
-            )
-        else:
-            return (
-                cls.query.filter_by(order_status=order_status)
-                .order_by(cls.rowid.desc())
-                .limit(number_of_items)
-            )
+        pass

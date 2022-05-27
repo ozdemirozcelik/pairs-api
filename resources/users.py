@@ -232,7 +232,7 @@ class UserLogin(Resource):
                     500,
                 )  # Return Interval Server Error
 
-            # enable if using flask sessions:
+            # (flask-session-change)enable if using flask sessions:
             # session["token"] = "yes_token"  # store token, use it as a dict
 
             return (
@@ -262,7 +262,7 @@ class UserLogout(Resource):
             simplesession = SessionModel.find_by_value(access_token[-10:])
             simplesession.delete()
 
-        # enable if using flask sessions to end session:
+        # (flask-session-change) enable if using flask sessions to end session:
         # session["token"] = None
         return {"message": LOGOUT_OK}, 200
 

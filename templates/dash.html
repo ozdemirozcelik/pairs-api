@@ -26,8 +26,8 @@
         <td>{{ signal.order_action }}</td>
         <td>{{ signal.order_contracts }}</td>
         <td>{{ signal.order_price }}</td>
-        {% if "error" in signal.order_status or "err" in signal.order_status%}
-        <td style="background-color:orange">{{ signal.order_status }}</td> 
+        {% if "error" in signal.order_status or "err" in signal.order_status or "cancel" in signal.order_status%}
+        <td style="background-color:orange"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.error_msg }}</span></span></td> 
         {% elif "created" in signal.order_status %}
         <td style="background-color:lightblue">{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)</td>
         {% elif "waiting" in signal.order_status or "rerouted" in signal.order_status %}

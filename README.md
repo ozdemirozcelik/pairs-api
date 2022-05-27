@@ -1,6 +1,6 @@
 # Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku
 
-Version 2 of the Flask-RESTful API.
+Version 3 of the Flask-RESTful API.
 
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
@@ -11,30 +11,42 @@ Deployed in Heroku with PostgreSQL for testing purposes:
 
 Front-end demo for v3 (Javascript):
 
-https://api-pairs-v3.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/
 
 The most recent version is available here:
 
-https://api-pairs.herokuapp.com/apitest
+https://api-pairs.herokuapp.com/
 
+# Additions to V2
+
+- additional API resources
+- functionality to work with TradingView webhooks
+- functionality to create server side sessions
+- demo improvements:
+  - new dashboard
+  - list view for signals
+
+  
 # Use Cases
 
 With Pairs-API v3 you can:
+- catch webhooks from trading platforms or signal generators
 - list, save, update and delete stocks and pairs with API calls
 - enable and disable stocks and pairs for active trading
-- catch webhooks from trading platforms or signal generators
 - use access tokens for authentication purposes with login system backend
+- TODO: send real time orders to exchange (possibly via Interactive Brokers)
 
 # Requirements
 
-* flask==2.0.2
-* requests==2.24.0
-* Flask-RESTful==0.3.9
-* Flask-JWT-Extended==4.4.0
-* flask-sqlalchemy==2.5.1
-* pyjwt==2.3.0
-* uwsgi (for Heroku deployment only)
-* psycopg2 (for Heroku Postgres deployment only)
+* flask~=2.0.2
+* Flask-RESTful~=0.3.9
+* Flask-JWT-Extended~=4.4.0
+* flask-sqlalchemy~=2.5.1
+* flask-session~=0.4.0
+* pyjwt~=2.4.0
+* pytz~=2022.1
+* uwsgi~=2.0.20 (for Heroku deployment only)
+* psycopg2~=2.9.3 (for Heroku Postgres deployment only)
 
 # Installation
 (commands in parentheses for anaconda prompt)
@@ -62,23 +74,17 @@ $ source pairs-env/bin/activate
 ````
 ### install requirements:
 
-IMPORTANT: you may need to delete line 'uwsgi' and 'psycopg2' from the requirements.txt before installing.
-These are needed for Heroku deployment only.
+IMPORTANT: check the need of using 'uwsgi' and 'psycopg2' from the requirements.txt before installing.
+These are mainly used for Heroku and Heroku Postgres.
 
-(windows: change -if necessary- version declarations from 'requests~=2.24.0'' to 'requests==2.24.0')
+(windows: change -if necessary- version declarations from 'flask~=2.0.2'' to 'flask==2.0.2')
 
 ````
 $ pip install -r requirements.txt
 (conda install --file requirements.txt)
 ````
-SQLAlchemy normally takes care of the database creation. 
-If you want to manually create the database:
-````
-$ rm data.db
-delete data.db (windows)
+SQLAlchemy should take care of database creation. 
 
-$ python local/create_db.py
-````
 ### run flask:
 ````
 $ export FLASK_APP=app
@@ -92,7 +98,6 @@ set FLASK_ENV=development
 set FLASK_DEBUG=1 
 flask run
 ````
-
 browse to "http://127.0.0.1:5000/" to see the dashboard.
 
 # Authorization
@@ -108,15 +113,15 @@ PASSPHRASE = 'webhook'
 is created during database creation; check users.py::
 
 ```python
-    @staticmethod
-    def default_users():
-        # Add Default Users
-        if not UserModel.find_by_username("admin"):
-            admin = UserModel("admin", "123")
-            admin.insert()
-        if not UserModel.find_by_username("user1"):
-            user = UserModel("user1", "123")
-            user.insert()
+@staticmethod
+def default_users():
+    # Add Default Users
+    if not UserModel.find_by_username("admin"):
+        admin = UserModel("admin", "123")
+        admin.insert()
+    if not UserModel.find_by_username("user1"):
+        user = UserModel("user1", "123")
+        user.insert()
 ```
 
 ### resource authorization
@@ -139,36 +144,29 @@ needs currently set with Flask- JWT:
   - GET, POST, PUT, DELETE user
 
 
-
-# Configuration
+# Demo Configuration
 
 ### app.py
+### resources/users.py
 
-If the app is deployed remotely, a proxy will be activated to bypass CORS limitations:
+Demo is using custom created session management for server side sessions.
+If you want to use flask session, search and enable rows marked with "(flask-session-change)".
+Flask sessions may not be persistent in Heroku, works fine in local.
 
-```python
-if base_url != "http://127.0.0.1:5000/":
-    print("*** activating proxy! *** ")
-    # proxy to bypass CORS limitations
-    proxies = {
-        'get': 'https://api-pairs-cors.herokuapplication.com/'
-    }
-    response = requests.get(server_url_read, proxies=proxies, timeout=10)
-```
+### templates/setup.html
 
+If the app is deployed remotely, a proxy will be activated to bypass CORS limitations.
+Proxy is set to "https://api-pairs-cors.herokuapp.com/" by default.
 
-### apitest.html
-
-Same applies to front-end demo:
-
-```python
+```javascript
+// use proxy to overcome CORS limitations
 var server_url = window.location.origin + "/";
+console.log("base_url: " + server_url);
 
 if (server_url != "http://127.0.0.1:5000/") {
-
+    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
     var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-    server_url = proxy_url + base_url;
-};
+    server_url = proxy_url + updatedURL;
 ```
 
 Check [Heroku deployment](#heroku-deployment) to learn for more about using your own proxy server.
@@ -178,24 +176,26 @@ Check [Heroku deployment](#heroku-deployment) to learn for more about using your
 Resources defined with flask_restful are:
 
 ```python
-api.add_resource(SignalWebhook, '/v3/webhook')
-api.add_resource(SignalList, '/v3/signals/<string:number_of_items>')
-api.add_resource(Signal, '/v3/signal/<string:rowid>')
+api.add_resource(SignalWebhook, "/v3/webhook")
+api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
+api.add_resource(SignalListStatus,"/v3/signals/status/<string:order_status>/<string:number_of_items>")
+api.add_resource(SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>")
+api.add_resource(Signal, "/v3/signal/<string:rowid>")
 
-api.add_resource(PairRegister, '/v3/regpair')
-api.add_resource(PairList, '/v3/pairs/<string:number_of_items>')
-api.add_resource(Pair, '/v3/pair/<string:name>')
+api.add_resource(PairRegister, "/v3/regpair")
+api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
+api.add_resource(Pair, "/v3/pair/<string:name>")
 
-api.add_resource(StockRegister, '/v3/regstock')
-api.add_resource(StockList, '/v3/stocks/<string:number_of_items>')
-api.add_resource(Stock, '/v3/stock/<string:symbol>')
+api.add_resource(StockRegister, "/v3/regstock")
+api.add_resource(StockList, "/v3/stocks/<string:number_of_items>")
+api.add_resource(Stock, "/v3/stock/<string:symbol>")
 
-api.add_resource(UserRegister, '/v3/reguser')
-api.add_resource(UserList, '/v3/users/<string:number_of_users>')
-api.add_resource(User, '/v3/user/<string:username>')
-api.add_resource(UserLogin, '/v3/login')
-api.add_resource(UserLogout, '/v3/logout')
-api.add_resource(TokenRefresh, '/v3/refresh')
+api.add_resource(UserRegister, "/v3/reguser")
+api.add_resource(UserList, "/v3/users/<string:number_of_users>")
+api.add_resource(User, "/v3/user/<string:username>")
+api.add_resource(UserLogin, "/v3/login")
+api.add_resource(UserLogout, "/v3/logout")
+api.add_resource(TokenRefresh, "/v3/refresh")
 ```
 
 # Request & Response Examples
@@ -246,8 +246,6 @@ Response:
     "active": 0
 }
 ```
-
-
 
 ### GET request to get all stocks:
 ```python
@@ -331,6 +329,68 @@ Response:
 }
 ```
 
+### GET request to get a list of signals with certain trade status
+```python
+'http://api-pairs-v3.herokuapp.com/v3/signals/status/waiting/2'
+```
+Response:
+```json
+{
+    "signals": [
+        {
+            "rowid": 34,
+            "timestamp": "2022-05-27 00:24:17",
+            "ticker": "NMFC-0.72*NASDAQ:ROIC",
+            "order_action": "buy",
+            "order_contracts": 100,
+            "order_price": -0.01,
+            "mar_pos": "long",
+            "mar_pos_size": 100,
+            "pre_mar_pos": "flat",
+            "pre_mar_pos_size": 0,
+            "order_comment": "Enter Long(...)",
+            "order_status": "waiting",
+            "ticker_type": "pair",
+            "stk_ticker1": "NMFC",
+            "stk_ticker2": "ROIC",
+            "hedge_param": 0.72,
+            "order_id1": null,
+            "order_id2": null,
+            "stk_price1": null,
+            "stk_price2": null,
+            "fill_price": null,
+            "slip": null,
+            "error_msg": null
+        },
+        {
+            "rowid": 27,
+            "timestamp": "2022-05-26 21:16:49",
+            "ticker": "NMFC-0.72*NASDAQ:ROIC",
+            "order_action": "buy",
+            "order_contracts": 100,
+            "order_price": -0.01,
+            "mar_pos": "long",
+            "mar_pos_size": 100,
+            "pre_mar_pos": "flat",
+            "pre_mar_pos_size": 0,
+            "order_comment": "Enter Long(...)",
+            "order_status": "waiting",
+            "ticker_type": "pair",
+            "stk_ticker1": "NMFC",
+            "stk_ticker2": "ROIC",
+            "hedge_param": 0.72,
+            "order_id1": null,
+            "order_id2": null,
+            "stk_price1": null,
+            "stk_price2": null,
+            "fill_price": null,
+            "slip": null,
+            "error_msg": null
+        }
+    ]
+}
+```
+
 ### POST request to login with a user
 ```python
 'http://api-pairs-v3.herokuapp.com/v3/login'
@@ -355,7 +415,7 @@ Response:
 
 ### Test the demo application here:
 
-https://api-pairs-v3.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/
 
 # Status Codes
 
@@ -372,8 +432,6 @@ Pairs-API v3 returns the following status codes:
 
 # Heroku Deployment:
 
-###TODO: Update with images & more detailed explanation
-
 Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli).
 
 Clone repository, login to Heroku, add git remote and push:
@@ -386,7 +444,7 @@ $ git push heroku main
 
 To enable PostgreSQL in your Heroku account:
 - go to Resources in your Heroku account and install 'Heroku Postgres'
-- go to Settings->Config Vars and you will see 'DATABASE_URL'
+- go to Settings->Config Vars
 - copy 'DATABASE_URL' value which should look like 'postgres://sdfyebdbfbf..'
 - add a new system variable 'DATABASE_URL_SQLALCHEMY' and paste the value
 - change 'postgre' to 'postgresql' and save, it should look like: 'postgresql://sdfyebdbfbf..'
@@ -400,9 +458,8 @@ https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-h
 
 
 # Demo:
-(Automatic deploys are disabled)
 
-https://api-pairs-v3.herokuapp.com/apitest
+https://api-pairs-v3.herokuapp.com/
 
 # Acknowledgements
 snippets:
@@ -410,13 +467,12 @@ snippets:
 * [Table Display](http://jsfiddle.net/DaS39)
 * [jQuery input filter](https://jsfiddle.net/KarmaProd/hw8j34f2/4/)
 * [JavaScript Countdown Timer](https://www.w3schools.com/howto/howto_js_countdown.asp)
+* [Tooltip](http://css-tricks.com/snippets/css/css-triangle)
 
 # Considerations
 
 Considering for the next version:
 
-- serialization with Marshmallow
-- improve demo with live TradingView realtime webhooks
 - send real time orders to exchange (possibly via Interactive Brokers)
 
 # Contributing

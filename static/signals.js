@@ -560,7 +560,7 @@ async function listSignals() {
 
             if (signals_data.signals[key].order_status == "waiting" || signals_data.signals[key].order_status == "rerouted"){
                 li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: whitesmoke';>"+ signals_data.signals[key].rowid +"</span>";
-            } else if (signals_data.signals[key].order_status.includes("err")) {
+            } else if (signals_data.signals[key].order_status.includes("err") || signals_data.signals[key].order_status.includes("cancel")) {
                 // show error messages in a tip box
                 li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status == "filled") {
@@ -603,7 +603,6 @@ function Update_signal(currentEl){
 
     // get rowid from the signal text
     var rowid_array = str.split(/\r?\n/);
-    console.log(rowid_array[0]);
     var rowid = rowid_array[0].trim();
 
     // check if the list item is deleted

@@ -6,7 +6,8 @@ from datetime import datetime
 EMPTY_ERR = "'{}' cannot be empty!"
 PASS_ERR = "incorrect passphrase."
 DATE_ERR = "date format should be %Y-%m-%d %H:%M:%S."
-TICKER_ERR = "created with problematic ticker!"
+TICKER_ERR = "recorded with problematic ticker!"
+ACTIVE_ERR = "recorded with unknown or passive ticker!"
 INSERT_ERR = "an error occurred inserting the item."
 UPDATE_ERR = "an error occurred updating the item."
 DELETE_ERR = "an error occurred deleting the item."
@@ -23,7 +24,11 @@ class SignalWebhook(Resource):
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("rowid", type=int, default=0)
-    parser.add_argument('timestamp', type=lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'), help=DATE_ERR)
+    parser.add_argument(
+        "timestamp",
+        type=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
+        help=DATE_ERR,
+    )
     # parser.add_argument("timestamp", type=str)
     parser.add_argument(
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
@@ -72,11 +77,7 @@ class SignalWebhook(Resource):
 
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return_msg = {
-                        "message": {
-                            "passphrase" : PASS_ERR
-                        }
-                    }
+            return_msg = {"message": {"passphrase": PASS_ERR}}
             #  return {"message": PASS_ERR}, 400  # Old return Bad Request
             return return_msg, 400  # Old return Bad Request
 
@@ -107,12 +108,20 @@ class SignalWebhook(Resource):
 
         try:
             ticker_ok = item.splitticker()  # check webhook ticker validity
+
+            active_ok = item.check_ticker_status()
+
             item.insert()
 
             if not ticker_ok:
                 # keep the ticker record in the database, but change the message
                 # do not return bad request
                 return {"message": TICKER_ERR}, 201  # Created but need attention
+
+            if not active_ok:
+                # keep the ticker record in the database, but change the message
+                # do not return bad request
+                return {"message": ACTIVE_ERR}, 201  # Created but need attention
 
         except Exception as e:
             print("Error occurred - ", e)  # better log the errors
@@ -133,11 +142,7 @@ class SignalWebhook(Resource):
 
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return_msg = {
-                        "message": {
-                            "passphrase" : PASS_ERR
-                        }
-                    }
+            return_msg = {"message": {"passphrase": PASS_ERR}}
             #  return {"message": PASS_ERR}, 400  # Old return Bad Request
             return return_msg, 400  # Old return Bad Request
 
@@ -169,13 +174,11 @@ class SignalWebhook(Resource):
             )
 
             try:
-                ticker_ok = item.splitticker()  # check webhook ticker validity
-                item.update(data["rowid"])
+                item.splitticker()  # check webhook ticker validity
 
-                if not ticker_ok:
-                    # keep the ticker record in the database, but change the message
-                    # do not return bad request
-                    return {"message": TICKER_ERR}, 201  # Created but need attention
+                item.check_ticker_status()
+
+                item.update(data["rowid"])
 
             except Exception as e:
                 print("Error occurred - ", e)

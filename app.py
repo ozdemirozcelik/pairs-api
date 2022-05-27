@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for
 
-# enable if keeping sessions:
+# (flask-session-change) enable if using flask sessions, currently using custom created session management:
 # from flask_session import Session
 # from flask import session
 from flask_restful import Api
@@ -34,11 +34,9 @@ import pytz
 from pytz import timezone
 
 app = Flask(__name__)
-# set SQLAlchemy database:
-# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 
-# Use this config to use with POSTGRES:
-# check for postgres database, if not found use local sqlite database
+# Use below config to use with POSTGRES:
+# check for env variable (postgres), if not found use local sqlite database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL_SQLALCHEMY", "sqlite:///data.db"
 )
@@ -68,7 +66,7 @@ def create_tables():
 
 app.secret_key = os.urandom(24)  # need this for session management
 
-# Enable below to keep session data with SQLAlchemy:
+# (flask-session-change) Enable below to keep session data with SQLAlchemy:
 # sessions work ok locally but may not be persistent with Heroku free tier.
 # TODO: try to keep session data with Redis
 
@@ -83,7 +81,7 @@ app.secret_key = os.urandom(24)  # need this for session management
 # ] = "session:"  # the prefix of the value stored in session
 
 
-# Enable below to keep session data in the file system:
+# (flask-session-change) Enable below to keep session data in the file system:
 
 # app.config["SESSION_TYPE"] = "filesystem"
 # app.config["SESSION_PERMANENT"] = True
@@ -139,14 +137,14 @@ def my_expired_token_callback(*args):
 # check the workaround: _handle_expired_signature
 @jwt.invalid_token_loader
 def my_invalid_token_callback(*args):
-    # enable if using sessions to end session:
+    # (flask-session-change) enable if using sessions to end session:
     # session["token"] = None
     return {"message": "The token is invalid.", "error": "token_invalid"}, 401
 
 
 @app.errorhandler(ExpiredSignatureError)
 def _handle_expired_signature(error):
-    # enable if using sessions to end session:
+    # (flask-session-change) enable if using sessions to end session:
     # session["token"] = None
     return {"message": "The token is invalid.", "error": "token_invalid"}, 401
 
@@ -213,7 +211,7 @@ def home():
 
 @app.get("/dashboard")
 def dashboard():
-    # Flask sessions may not be persistent in Heroku, works fine in local
+    # (flask-session-change) Flask sessions may not be persistent in Heroku, works fine in local
     # consider disabling below for Heroku
 
     ##
@@ -257,7 +255,7 @@ def dashboard():
 
 @app.get("/list")
 def dashboard_list():
-    # Flask sessions may not be persistent in Heroku, works fine in local
+    # (flask-session-change) Flask sessions may not be persistent in Heroku, works fine in local
     # consider disabling below for Heroku
 
     ##
@@ -284,10 +282,6 @@ def dashboard_list():
     start_date_selected = request.args.get("start_date")
     end_date_selected = request.args.get("end_date")
 
-    # print("selected ticker :", selected_ticker)
-    # print("start date :", start_date_selected)
-    # print("end date :", end_date_selected)
-
     date_format = "%Y-%m-%d"
 
     try:
@@ -306,8 +300,7 @@ def dashboard_list():
         end_date = end_date + timedelta(
             days=1
         )  # Add 1 day to "%Y-%m-%d" 00:00:00 to reach end of day
-        # print("start date :", start_date)
-        # print("end date :", end_date)
+
     except:
         start_date = datetime.now(tz=pytz.utc) - timedelta(days=1)
         date_now = datetime.now(tz=pytz.utc)
@@ -316,8 +309,6 @@ def dashboard_list():
             date_now_formatted, date_format
         )  # convert to timestamp
         end_date = start_date + timedelta(days=1)  # Today end of day
-        # print("start date :", start_date)
-        # print("end date :", end_date)
 
     access_token = request.cookies.get("access_token")
 
@@ -361,7 +352,7 @@ def dashboard_list():
 # route to setup page
 @app.get("/setup")
 def setup():
-    # session may not be persistent in Heroku, works fine in local
+    # (flask-session-change) session may not be persistent in Heroku, works fine in local
     # consider disabling below for Heroku
 
     ##
