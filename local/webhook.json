@@ -1,0 +1,12 @@
+{
+    "passphrase": "webhook",
+    "ticker": "{{ticker}}",
+    "order_action": "{{strategy.order.action}}",
+    "order_contracts": {{strategy.order.contracts}},
+    "order_price": {{strategy.order.price}},
+    "mar_pos": "{{strategy.market_position}}",
+    "mar_pos_size": {{strategy.market_position_size}},
+    "pre_mar_pos": "{{strategy.prev_market_position}}",
+    "pre_mar_pos_size": {{strategy.prev_market_position_size}},
+    "order_comment": "{{strategy.order.comment}}"
+}

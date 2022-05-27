@@ -5,11 +5,7 @@ Version 3 of the Flask-RESTful API.
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
 
-Deployed in Heroku with PostgreSQL for testing purposes:
-
-`http://api-pairs-v3.herokuapp.com`
-
-Front-end demo for v3 (Javascript):
+A working demo is deployed in Heroku with PostgreSQL:
 
 https://api-pairs-v3.herokuapp.com/
 
@@ -409,11 +405,6 @@ Response:
 }
 ```
 
-
-### Test the demo application here:
-
-https://api-pairs-v3.herokuapp.com/
-
 # Status Codes
 
 Pairs-API v3 returns the following status codes:
@@ -453,6 +444,27 @@ https://github.com/Rob--W/cors-anywhere
 
 https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-heroku-3lcb
 
+# TradingView as the signal generator:
+
+You can use below template for TradingView to send a POST request as soon as an alert is triggered.
+
+webhook URL should be:  '{URL_OF_YOUR_API}/v3/webhook'
+
+(local\webhook.json)
+````json
+{
+    "passphrase": "webhook",
+    "ticker": "{{ticker}}",
+    "order_action": "{{strategy.order.action}}",
+    "order_contracts": {{strategy.order.contracts}},
+    "order_price": {{strategy.order.price}},
+    "mar_pos": "{{strategy.market_position}}",
+    "mar_pos_size": {{strategy.market_position_size}},
+    "pre_mar_pos": "{{strategy.prev_market_position}}",
+    "pre_mar_pos_size": {{strategy.prev_market_position_size}},
+    "order_comment": "{{strategy.order.comment}}"
+}
+````
 
 # Demo:
 
