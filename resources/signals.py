@@ -233,9 +233,21 @@ class SignalList(Resource):
 
 class SignalListTicker(Resource):
     @staticmethod
-    @jwt_required(fresh=True)
+    @jwt_required(optional=True)
     def get(ticker_name, number_of_items="0"):
 
+        username = get_jwt_identity()
+
+        # limit the number of items to get if not logged-in
+        notoken_limit = 5
+
+        # without Authorization header, returns None.
+        # with Authorization header, returns username
+        if username is None:
+            if number_of_items == "0":
+                number_of_items = max(int(number_of_items), notoken_limit)
+            else:
+                number_of_items = min(int(number_of_items), notoken_limit)
         try:
             items = SignalModel.get_list_ticker(ticker_name, str(number_of_items))
 
@@ -254,9 +266,21 @@ class SignalListTicker(Resource):
 
 class SignalListStatus(Resource):
     @staticmethod
-    @jwt_required(fresh=True)
+    @jwt_required(optional=True)
     def get(order_status, number_of_items="0"):
 
+        username = get_jwt_identity()
+
+        # limit the number of items to get if not logged-in
+        notoken_limit = 5
+
+        # without Authorization header, returns None.
+        # with Authorization header, returns username
+        if username is None:
+            if number_of_items == "0":
+                number_of_items = max(int(number_of_items), notoken_limit)
+            else:
+                number_of_items = min(int(number_of_items), notoken_limit)
         try:
             items = SignalModel.get_list_status(order_status, str(number_of_items))
 
