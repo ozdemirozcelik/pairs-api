@@ -68,14 +68,10 @@
         <td>{{ signal.order_status }}</td>                                                   
         {% endif %}                
         <td>{{ signal.fill_price }}</td>
-        {% if signal.fill_price == "" %}
-        <td></td> 
-        {% elif signal.order_action=="buy" %}
-        <td>{{ signal.slip|float|round(3,) }}</td>
-        {% elif signal.order_action=="sell" %}
-        <td>{{ -(signal.slip|float|round(3,)) }}</td>
+        {% if signal.fill_price == None %}
+        <td></td>
         {% else %}
-        <td></td> 
+        <td>{{ signal.slip|float|round(3,) }} | ${{ (signal.slip|float*signal.order_contracts)|round(1,) }}  </td>
         {% endif %}
     </tr>
     {% endfor %}                  

@@ -17,6 +17,75 @@ DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
 
+class SignalFillPrice(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
+    )
+    parser.add_argument("order_id", type=int)
+    parser.add_argument("stk_price", type=float)
+
+    @staticmethod
+    def put():
+        data = SignalFillPrice.parser.parse_args()
+
+        # format return message inline with flask_restful parser errors
+        if SignalModel.passphrase_wrong(data["passphrase"]):
+            return_msg = {"message": {"passphrase": PASS_ERR}}
+            #  return {"message": PASS_ERR}, 400  # Old return Bad Request
+            return return_msg, 400  # Old return Bad Request
+
+        # get signal with rowid
+        item = SignalModel.find_by_orderid(data["order_id"])
+
+        if item:
+
+            if item.order_id1 == data["order_id"]:
+                item.stk_price1 = data["stk_price"]
+                item.order_status = "filled(...)"
+
+            if item.order_id2 == data["order_id"]:
+                item.stk_price2 = data["stk_price"]
+                item.order_status = "filled(...)"
+
+            if item.ticker_type == "pair":
+
+                # if both orders are filled for pairs
+                if item.stk_price1 and item.stk_price2:
+                    if item.order_action == "buy":
+                        item.fill_price = round(item.stk_price1 - item.hedge_param*item.stk_price2, 4)
+                    else:
+                        item.fill_price = -round(item.stk_price1 - item.hedge_param*item.stk_price2, 4)
+                    item.order_status = "filled"
+                    item.slip = round(item.order_price - item.fill_price, 4)
+            else:
+                if item.stk_price1:
+                    item.fill_price = item.stk_price1
+                    item.order_status = "filled"
+                    if item.order_action == "buy":
+                        item.slip = round(item.order_price - item.fill_price, 4)
+                    else:
+                        item.slip = -round(item.order_price - item.fill_price, 4)
+
+
+            try:
+                item.update(item.rowid)
+
+            except Exception as e:
+                print("Error occurred - ", e)
+                return (
+                    {"message": UPDATE_ERR},
+                    500,
+                )  # Return Interval Server Error
+
+            return_json = item.json()
+
+            return_json.pop("timestamp")
+
+            return return_json
+
+        return {"message": NOT_FOUND}, 404  # Return Not Found
+
 
 class SignalWebhook(Resource):
     parser = reqparse.RequestParser()
@@ -136,7 +205,6 @@ class SignalWebhook(Resource):
         )  # Return Successful Creation of Resource
 
     @staticmethod
-    @jwt_required(fresh=True)  # need fresh token
     def put():
         data = SignalWebhook.parser.parse_args()
 
@@ -272,7 +340,10 @@ class SignalListStatus(Resource):
         username = get_jwt_identity()
 
         # limit the number of items to get if not logged-in
-        notoken_limit = 5
+        if order_status == "waiting":
+            notoken_limit = 20
+        else:
+            notoken_limit = 5
 
         # without Authorization header, returns None.
         # with Authorization header, returns username

@@ -2,6 +2,8 @@
 
 Version 3 of the Flask-RESTful API.
 
+(Release: v3.1)
+
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
 
@@ -24,7 +26,7 @@ https://api-pairs-v3.herokuapp.com/
 
 With Pairs-API v3 you can:
 - catch webhooks from trading platforms or signal generators
-- list, save, update and delete stocks and pairs with API calls
+- list, save, update and delete stocks/pairs, order and price details with API calls
 - enable and disable stocks and pairs for active trading
 - use access tokens for authentication purposes with login system backend
 - TODO: send real time orders to exchange (possibly via Interactive Brokers)
@@ -170,6 +172,7 @@ Resources defined with flask_restful are:
 
 ```python
 api.add_resource(SignalWebhook, "/v3/webhook")
+api.add_resource(SignalPrice, "/v3/price")
 api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
 api.add_resource(SignalListStatus,"/v3/signals/status/<string:order_status>/<string:number_of_items>")
 api.add_resource(SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>")
@@ -381,6 +384,48 @@ Response:
             "error_msg": null
         }
     ]
+}
+```
+### POST request to save filled order prices by order id
+```python
+'http://api-pairs-v3.herokuapp.com/v3/signal/fillprice'
+```
+
+Request Body:
+```json
+{
+    "passphrase": "webhook",
+    "order_id": 945,
+    "stk_price": 100.756
+}
+```
+
+Response:
+(fill_price & slip is calculated automatically)
+```json
+{
+    "rowid": 47,
+    "ticker": "MA-3*V",
+    "order_action": "buy",
+    "order_contracts": 20,
+    "order_price": -2.0,
+    "mar_pos": "long",
+    "mar_pos_size": 20,
+    "pre_mar_pos": "flat",
+    "pre_mar_pos_size": 0,
+    "order_comment": "Enter Long",
+    "order_status": "filled",
+    "ticker_type": "pair",
+    "stk_ticker1": "MA",
+    "stk_ticker2": "V",
+    "hedge_param": 3.0,
+    "order_id1": 944,
+    "order_id2": 945,
+    "stk_price1": 300.1,
+    "stk_price2": 100.756,
+    "fill_price": -2.168,
+    "slip": 0.168,
+    "error_msg": null
 }
 ```
 

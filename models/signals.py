@@ -606,3 +606,30 @@ class SignalModel(db.Model):
     @classmethod
     def get_avg_slip(cls, ticker_name) -> List:
         pass
+
+    @classmethod
+    def find_by_orderid(cls, orderid) -> "SignalModel":
+
+        return cls.query.filter((cls.order_id1 == orderid) | (cls.order_id2 == orderid)).first()
+
+    # @classmethod
+    # def update_price_by_orderid(cls, order_id, stk_price) -> "SignalModel":
+    #
+    #     item = cls.query.filter((cls.order_id1 == order_id) | (cls.order_id2 == order_id)).first()
+    #
+    #     if item:
+    #
+    #         if item.order_id1 == order_id:
+    #             print("*")
+    #             item.stk_ticker1 = stk_price
+    #             print(item.stk_ticker1)
+    #
+    #         if item.order_id2 == order_id:
+    #             print("**")
+    #             item.stk_ticker2 = stk_price
+    #
+    #     db.session.commit()
+    #
+    #     return_item = SignalModel.find_by_rowid(item.rowid)
+    #
+    #     return return_item

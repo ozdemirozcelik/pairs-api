@@ -560,15 +560,15 @@ async function listSignals() {
             str = signals_data.signals[key].order_action + " | " + signals_data.signals[key].order_contracts + " | " + signals_data.signals[key].ticker;
             str = str.toUpperCase()
 
-            if (signals_data.signals[key].order_status == "waiting" || signals_data.signals[key].order_status == "rerouted"){
+            if (signals_data.signals[key].order_status.includes("waiting") || signals_data.signals[key].order_status.includes("rerouted")) {
                 li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: whitesmoke';>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("err") || signals_data.signals[key].order_status.includes("cancel")) {
                 // show error messages in a tip box
                 li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
-            } else if (signals_data.signals[key].order_status == "filled") {
+            } else if (signals_data.signals[key].order_status.includes("filled")) {
                 li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
-            } else if (signals_data.signals[key].order_status == "created") {
-                li.innerHTML = "<span title='created' class='numberCircle' style='background-color: lightblue';>"+ signals_data.signals[key].rowid +"</span>";
+            } else if (signals_data.signals[key].order_status.includes("created")) {
+                li.innerHTML = "<span class='field-tip'><span title='created' class='numberCircle' style='background-color: lightblue';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             }else {
                 li.innerHTML = "<span class='numberCircle';>"+ signals_data.signals[key].rowid +"</span>";
             }

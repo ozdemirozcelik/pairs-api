@@ -13,6 +13,7 @@ from models.session import SessionModel
 from resources.pairs import PairRegister, PairList, Pair
 from resources.signals import (
     SignalWebhook,
+    SignalFillPrice,
     SignalList,
     SignalListTicker,
     SignalListStatus,
@@ -175,6 +176,7 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
 # Resource definitions (Start)
 
 api.add_resource(SignalWebhook, "/v3/webhook")
+api.add_resource(SignalFillPrice, "/v3/signal/fillprice")
 api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
 api.add_resource(
     SignalListStatus,
