@@ -22,9 +22,10 @@ class SignalModel(db.Model):
     )  # using 'rowid' as the default key
     timestamp = db.Column(
         db.DateTime(timezone=False),
-        server_default=func.timezone("UTC", func.current_timestamp())
+        # server_default=func.timezone("UTC", func.current_timestamp()) # this can be problematic for sqlite3
+        server_default=func.current_timestamp() #TODO: check for sqlite3 and postgres
         # db.DateTime(timezone=False), server_default = func.now()
-    )  # DATETIME DEFAULT (CURRENT_TIMESTAMP)
+    )  # DATETIME DEFAULT (CURRENT_TIMESTAMP) for sqlite3
     ticker = db.Column(db.String)
     order_action = db.Column(db.String)
     order_contracts = db.Column(db.Integer)
@@ -48,6 +49,7 @@ class SignalModel(db.Model):
     fill_price = db.Column(db.Float)
     slip = db.Column(db.Float)
     error_msg = db.Column(db.String)
+    status_msg = db.Column(db.String)
 
     def __init__(
         self,
@@ -73,6 +75,7 @@ class SignalModel(db.Model):
         fill_price: float,
         slip: float,
         error_msg: str,
+        status_msg: str
     ):
         self.timestamp = timestamp
         self.ticker = ticker
@@ -96,6 +99,7 @@ class SignalModel(db.Model):
         self.fill_price = fill_price
         self.slip = slip
         self.error_msg = error_msg
+        self.status_msg = status_msg
 
     def json(self) -> SignalJSON:
         return {
@@ -122,6 +126,7 @@ class SignalModel(db.Model):
             "fill_price": self.fill_price,
             "slip": self.slip,
             "error_msg": self.error_msg,
+            "status_msg": self.status_msg,
         }
 
     @staticmethod
@@ -218,6 +223,7 @@ class SignalModel(db.Model):
         item_to_update.fill_price = self.fill_price
         item_to_update.slip = self.slip
         item_to_update.error_msg = self.error_msg
+        item_to_update.status_msg = self.status_msg
 
         db.session.commit()
 
@@ -422,17 +428,31 @@ class SignalModel(db.Model):
     def get_list_status(cls, order_status, number_of_items) -> List:
 
         if number_of_items == "0":
-            return (
-                cls.query.filter_by(order_status=order_status)
-                .order_by(cls.rowid.desc())
-                .all()
-            )
+            if order_status == "waiting":
+                return (
+                    cls.query.filter((cls.order_status == "waiting") | (cls.order_status == "rerouted"))
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
+            else:
+                return (
+                    cls.query.filter_by(order_status=order_status)
+                    .order_by(cls.rowid.desc())
+                    .all()
+                )
         else:
-            return (
-                cls.query.filter_by(order_status=order_status)
-                .order_by(cls.rowid.desc())
-                .limit(number_of_items)
-            )
+            if order_status == "waiting":
+                return (
+                    cls.query.filter((cls.order_status == "waiting") | (cls.order_status == "rerouted"))
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
+            else:
+                return (
+                    cls.query.filter_by(order_status=order_status)
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
+                )
 
     def check_ticker_status(self) -> bool:
 
@@ -443,13 +463,14 @@ class SignalModel(db.Model):
             # check if pair exists
             if pair:
                 # check trade status
+                # if pair is not active set a static pair status (not possible to update)
                 if not pair.status:
                     self.order_status = "canceled"
-                    self.error_msg = "passive ticker"
+                    self.status_msg = "passive ticker"
                     return False
                 if float(self.hedge_param) != float(pair.hedge):
                     self.order_status = "canceled"
-                    self.error_msg = "wrong hedge"
+                    self.status_msg = "wrong hedge"
                     return False
 
                 # if registered and active ticker
@@ -457,7 +478,7 @@ class SignalModel(db.Model):
                     return True
             else:
                 self.order_status = "error"
-                self.error_msg = "unknown ticker"
+                self.status_msg = "unknown ticker"
                 return False
 
         else:
@@ -465,16 +486,17 @@ class SignalModel(db.Model):
             # check if stock exists
             if stock:
                 # check trade status
+                # if stock is not active set a static pair status (not possible to update)
                 if not stock.active:
                     self.order_status = "canceled"
-                    self.error_msg = "passive ticker"
+                    self.status_msg = "passive ticker"
                     return False
                 else:
                     # if registered and active ticker
                     return True
             else:
                 self.order_status = "error"
-                self.error_msg = "unknown ticker"
+                self.status_msg = "unknown ticker"
                 return False
 
     def splitticker(self) -> bool:
@@ -598,7 +620,7 @@ class SignalModel(db.Model):
 
         if not success_flag:
             self.order_status = "error"
-            self.error_msg = "problematic ticker!"
+            self.status_msg = "problematic ticker!"
 
         return success_flag
 
@@ -611,25 +633,3 @@ class SignalModel(db.Model):
     def find_by_orderid(cls, orderid) -> "SignalModel":
 
         return cls.query.filter((cls.order_id1 == orderid) | (cls.order_id2 == orderid)).first()
-
-    # @classmethod
-    # def update_price_by_orderid(cls, order_id, stk_price) -> "SignalModel":
-    #
-    #     item = cls.query.filter((cls.order_id1 == order_id) | (cls.order_id2 == order_id)).first()
-    #
-    #     if item:
-    #
-    #         if item.order_id1 == order_id:
-    #             print("*")
-    #             item.stk_ticker1 = stk_price
-    #             print(item.stk_ticker1)
-    #
-    #         if item.order_id2 == order_id:
-    #             print("**")
-    #             item.stk_ticker2 = stk_price
-    #
-    #     db.session.commit()
-    #
-    #     return_item = SignalModel.find_by_rowid(item.rowid)
-    #
-    #     return return_item

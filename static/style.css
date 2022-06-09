@@ -133,9 +133,14 @@ input { display: table-cell; }
     background-color: lightgrey;
 }
 
-.pair-update {
+.notes-update {
     border-style: none;
     width: 100px;
+}
+
+.pair-update {
+    border-style: none;
+    width: 120px;
     background-color: lightgrey;
 }
 
@@ -253,6 +258,10 @@ input { display: table-cell; }
     width: 70px;
 }
 #error_msg_update{
+    border-style: none;
+    width: 85px;
+}
+#status_msg_update{
     border-style: none;
     width: 85px;
 }

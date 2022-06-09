@@ -2,7 +2,7 @@
 
 Version 3 of the Flask-RESTful API.
 
-(Release: v3.1)
+(Latest Release: v3.1)
 
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
@@ -15,12 +15,12 @@ https://api-pairs-v3.herokuapp.com/
 # Additions to v2
 
 - additional API resources
-- functionality to work with TradingView webhooks
 - functionality to create server side sessions
+- functionality to work with TradingView webhooks (Release V3.O)
 - demo improvements:
   - new dashboard
   - list view for signals
-
+- functionality to work with Interactive Brokers TWS API (Release V3.1)
   
 # Use Cases
 
@@ -297,6 +297,54 @@ Response:
 }
 ```
 
+### POST request to register a pair:
+```python
+'http://api-pairs-v3.herokuapp.com/v3/regpair'
+```
+Request Body:
+```json
+{
+    "ticker1": "MA",
+    "ticker2": "V",
+    "hedge": 1.3,
+    "status": 0
+}
+```
+
+Response:
+```json
+{
+    "message": "'pair' created successfully."
+}
+```
+
+### PUT request to update a pair:
+```python
+'http://api-pairs-v3.herokuapp.com/v3/regpair'
+```
+Request Body:
+```json
+{
+    "name": "MA-V",
+    "ticker1": "MA",
+    "ticker2": "V",
+    "hedge": 1.4,
+    "status": 1
+}
+```
+
+Response:
+```json
+{
+    "name": "MA-V",
+    "ticker1": "MA",
+    "ticker2": "V",
+    "hedge": 1.4,
+    "status": 1,
+    "notes": null
+}
+```
+
 ### POST request to register a webhook signal:
 ```python
 'http://api-pairs-v3.herokuapp.com/v3/webhook'
@@ -386,17 +434,25 @@ Response:
     ]
 }
 ```
-### POST request to save filled order prices by order id
+### POST request to update order price and status by order id
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/signal/fillprice'
+'http://api-pairs-v3.herokuapp.com/v3/signal/updateorder'
 ```
+
+````
+"cancel":true  to cancel order
+"partial":true  to update partially filled "order_contracts" amount
+````
 
 Request Body:
 ```json
 {
     "passphrase": "webhook",
     "order_id": 945,
-    "stk_price": 100.756
+    "stk_price": 100.756,
+    "cancel":false,
+    "partial": false,
+    "order_contracts": 0
 }
 ```
 

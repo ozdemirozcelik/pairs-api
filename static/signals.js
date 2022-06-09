@@ -63,6 +63,7 @@ var stk_price2_update = document.getElementById("stk_price2_update");
 var fill_price_update = document.getElementById("fill_price_update");
 var slip_update = document.getElementById("slip_update");
 var error_msg_update = document.getElementById("error_msg_update");
+var status_msg_update = document.getElementById("status_msg_update");
 
 var passphrase = document.getElementById("passphrase");
 var passphrase_update = document.getElementById("passphrase_update");
@@ -266,7 +267,7 @@ function changeStatusColor(ticker) {
         document.getElementById("show_status").title = 'passive';
 
     } else {
-        document.getElementById("show_status").style.background = 'yellow';
+        document.getElementById("show_status").style.background = 'yellowgreen';
         document.getElementById("show_status").title = 'active';
     }
 
@@ -562,9 +563,11 @@ async function listSignals() {
 
             if (signals_data.signals[key].order_status.includes("waiting") || signals_data.signals[key].order_status.includes("rerouted")) {
                 li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: whitesmoke';>"+ signals_data.signals[key].rowid +"</span>";
-            } else if (signals_data.signals[key].order_status.includes("err") || signals_data.signals[key].order_status.includes("cancel")) {
+            } else if (signals_data.signals[key].order_status.includes("err")) {
                 // show error messages in a tip box
                 li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
+            } else if (signals_data.signals[key].order_status.includes("cancel")) {
+                li.innerHTML = "<span class='field-tip'><span title='canceled' class='numberCircle' style='background-color: lightgoldenrodyellow';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status.includes("filled")) {
                 li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("created")) {
@@ -655,6 +658,8 @@ async function getSignal(rowid) {
     fill_price_update.value = signal_data.fill_price;
     slip_update.value = signal_data.slip;
     error_msg_update.value = signal_data.error_msg;
+    error_msg_update.title = signal_data.error_msg;
+    status_msg_update.value = signal_data.status_msg
 
 }
 

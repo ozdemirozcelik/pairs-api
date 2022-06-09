@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.stocks import StockModel
 from flask_jwt_extended import jwt_required, get_jwt
+from models.pairs import PairModel
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
@@ -12,6 +13,7 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
+TICKR_ERR = " stock is already active in a pair!"
 
 
 class StockRegister(Resource):
@@ -37,6 +39,14 @@ class StockRegister(Resource):
         item = StockModel(
             data["symbol"], data["prixch"], data["secxch"], data["active"]
         )
+        
+        if item.active == 1:
+
+            if PairModel.find_active_ticker(item.symbol):
+                return (
+                    {"message": TICKR_ERR},
+                    400,
+                )  # Return Bad Request
 
         try:
             item.insert()
@@ -61,6 +71,14 @@ class StockRegister(Resource):
         item = StockModel(
             data["symbol"], data["prixch"], data["secxch"], data["active"]
         )
+
+        if item.active == 1:
+
+            if PairModel.find_active_ticker(item.symbol):
+                return (
+                    {"message": TICKR_ERR},
+                    400,
+                )  # Return Bad Request
 
         if StockModel.find_by_symbol(data["symbol"]):
             try:

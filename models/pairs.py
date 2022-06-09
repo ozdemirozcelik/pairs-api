@@ -12,16 +12,23 @@ class PairModel(db.Model):
         db.Integer, primary_key=True, autoincrement=True
     )  # using 'rowid' as the default key
     name = db.Column(db.String(81), unique=True)
+    ticker1 = db.Column(db.String(51))
+    ticker2 = db.Column(db.String(51))
     hedge = db.Column(db.Float(precision=8))
     status = db.Column(db.Integer)
+    notes = db.Column(db.String)
 
-    def __init__(self, name: str, hedge: float, status: int):
+
+    def __init__(self, name: str, ticker1: str, ticker2: str, hedge: float, status: int, notes: str):
         self.name = name
         self.hedge = hedge
         self.status = status
+        self.ticker1 = ticker1
+        self.ticker2 = ticker2
+        self.notes = notes
 
     def json(self) -> PairJSON:
-        return {"name": self.name, "hedge": self.hedge, "status": self.status}
+        return {"name": self.name, "ticker1": self.ticker1, "ticker2": self.ticker2, "hedge": self.hedge, "status": self.status, "notes": self.notes}
 
     @classmethod
     def find_by_name(cls, name: str) -> "PairModel":
@@ -82,6 +89,7 @@ class PairModel(db.Model):
 
         item_to_update.hedge = self.hedge
         item_to_update.status = self.status
+        item_to_update.notes = self.notes
 
         db.session.commit()
 
@@ -168,3 +176,21 @@ class PairModel(db.Model):
         # finally:
         #     if connection:
         #         connection.close()
+
+    def combineticker(self) -> bool:
+
+        # TODO: check for other special characters
+        if ("-" in self.ticker1) or ("-" in self.ticker2):
+            self.notes = "problematic ticker!"
+            self.status = 0
+            success_flag = False
+        else:
+            self.name = self.ticker1 + "-" + self.ticker2
+            success_flag = True
+
+        return success_flag
+
+    @classmethod
+    def find_active_ticker(cls, ticker: str) -> "PairModel":
+
+        return cls.query.filter(((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & (cls.status == 1)).first()

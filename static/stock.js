@@ -318,6 +318,9 @@ function putUpdate() {
             // Handle JSON response
                 if (return_code == 401) {
                     alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
+                } else if (return_code == 400) {
+                    // 400 bad request has key values specific to signal keys
+                    alert(jsonResponse.message + " | Code: " + return_code);
                 } else {
                     var active_msg
 

@@ -27,6 +27,9 @@ var ticker2 = document.getElementById("ticker2");
 var hedge = document.getElementById("hedge");
 var hedge_update = document.getElementById("hedge-update");
 var pair_update = document.getElementById("pair-update");
+var ticker1_update = document.getElementById("ticker1-update");
+var ticker2_update = document.getElementById("ticker2-update");
+var notes_update = document.getElementById("notes-update");
 var getpairs_button = document.getElementById("getpairs_button");
 var pairlist = document.getElementById("pairlist");
 var prev_button_pairs = document.getElementById("prev-pairs");
@@ -124,22 +127,22 @@ function handleFormSubmit_pairs(event) {
         
         formJSON_pairs = Object.fromEntries(data.entries());
 
-        // prepare JSON string format for the pair
+        // prepare JSON string format for the pair - not necessary any more
         formJSON_pairs['name']=ticker1.value + "-" + ticker2.value;
-        delete formJSON_pairs['ticker1'];
-        delete formJSON_pairs['ticker2'];
+        // delete formJSON_pairs['ticker1'];
+        // delete formJSON_pairs['ticker2'];
 
         const results = document.querySelector('.results-pairs pre');
 
         document.getElementById("jsontext-pairs").style.display = 'block';
         
-        // Uppercase JSON string
-        uppercase_json = JSON.parse(JSON.stringify(formJSON_pairs, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-        }));
+        // Uppercase JSON string - no need
+        // uppercase_json = JSON.parse(JSON.stringify(formJSON_pairs, function(a, b) {
+        //     return typeof b === "string" ? b.toUpperCase() : b
+        // }));
 
         // show JSON string before sending
-        results.innerText = JSON.stringify(uppercase_json, null, 2);
+        results.innerText = JSON.stringify(formJSON_pairs, null, 2);
 
         // create post & save button
         createButton_pairs();
@@ -169,13 +172,13 @@ function handleFormSubmit_pairs_update(event) {
 
         document.getElementById("jsontext-pairs-update").style.display = 'block';
         
-        // Uppercase JSON string
-        uppercase_json = JSON.parse(JSON.stringify(formJSON_update_pairs, function(a, b) {
-            return typeof b === "string" ? b.toUpperCase() : b
-        }));
+        // Uppercase JSON string - no need
+        // uppercase_json = JSON.parse(JSON.stringify(formJSON_update_pairs, function(a, b) {
+        //     return typeof b === "string" ? b.toUpperCase() : b
+        // }));
 
          // show JSON string before sending
-        results.innerText = JSON.stringify(uppercase_json, null, 2);
+        results.innerText = JSON.stringify(formJSON_update_pairs, null, 2);
 
         // create put & update button
         createUpdateButton_pairs();
@@ -243,17 +246,13 @@ function postSave_pairs() {
         pair_text = formJSON_pairs.name;
         alert("Sending POST request for: " + pair_text);
 
-        var body_msg = JSON.stringify(formJSON_pairs, function(a, b) {
-                return typeof b === "string" ? b.toUpperCase() : b
-        });
-
         fetch(api_url_post_put_pair, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token, 
                 },
-                body: body_msg
+                body: JSON.stringify(formJSON_pairs)
         }).then(response => {
             if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
@@ -328,18 +327,13 @@ function putUpdate_pairs() {
         pair_text = formJSON_update_pairs.name;
         alert("Sending PUT request for: " + pair_text + " | Hedge: " + formJSON_update_pairs.hedge + " | Status: " + formJSON_update_pairs.status);
 
-
-        var body_msg = JSON.stringify(formJSON_update_pairs, function(a, b) {
-                return typeof b === "string" ? b.toUpperCase() : b
-        });
-
         fetch(api_url_post_put_pair, {
                 method: "PUT",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token,
                 }, 
-                body: body_msg
+                body: JSON.stringify(formJSON_update_pairs)
         }).then(response => {
             if (response.status >= 200 && response.status <= 401) {
                 return_code = response.status;
@@ -352,7 +346,10 @@ function putUpdate_pairs() {
         // Handle JSON response
             if (return_code == 401) {
                 alert(jsonResponse.message + " | Code: " + return_code + '\nYou need to re-login!')
-            } else {
+            } else if (return_code == 400) {
+                // 400 bad request has key values specific to signal keys
+                alert(jsonResponse.message + " | Code: " + return_code);
+            }  else {
                 var status_msg
 
                 switch(jsonResponse.status) { case 0: status_msg = "passive"; break; case 1: status_msg = "active"; break; default: status_msg = "unknown" };
@@ -496,6 +493,9 @@ async function getPair(name) {
     pair_data = await response_pair.json();
 
     hedge_update.value = pair_data.hedge;
+    ticker1_update.value = pair_data.ticker1;
+    ticker2_update.value = pair_data.ticker2;
+    notes_update.value = pair_data.notes;
     
     if (pair_data.status) {
         document.getElementById("active-pair-update").checked = "checked";

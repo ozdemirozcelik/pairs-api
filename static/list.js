@@ -49,7 +49,7 @@ function changeStatusColor(ticker) {
         document.getElementById("show_status").title = 'passive';
 
     } else {
-        document.getElementById("show_status").style.background = 'yellow';
+        document.getElementById("show_status").style.background = 'yellowgreen';
         document.getElementById("show_status").title = 'active';
     }
 

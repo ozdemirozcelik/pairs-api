@@ -91,6 +91,8 @@ class StockModel(db.Model):
 
         item_to_update.prixch = self.prixch
         item_to_update.secxch = self.secxch
+        # TODO
+        # check active pair status with the ticker, do not activate if already active
         item_to_update.active = self.active
 
         db.session.commit()
@@ -181,3 +183,8 @@ class StockModel(db.Model):
         # finally:
         #     if connection:
         #         connection.close()
+
+    @classmethod
+    def find_active_ticker(cls, ticker1: str, ticker2: str) -> "StockModel":
+
+        return cls.query.filter(((cls.symbol == ticker1) | (cls.symbol == ticker2)) & (cls.active == 1)).first()

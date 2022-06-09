@@ -16,57 +16,92 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
+PART_ERR = "missing contract amount to update partial fill"
 
-class SignalFillPrice(Resource):
+class SignalUpdateOrder(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("order_id", type=int)
     parser.add_argument("stk_price", type=float)
+    parser.add_argument("cancel", type=bool, default=False)
+    parser.add_argument("partial", type=bool, default=False)
+    parser.add_argument("order_contracts", type=int)
 
     @staticmethod
     def put():
-        data = SignalFillPrice.parser.parse_args()
+        data = SignalUpdateOrder.parser.parse_args()
 
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
             return_msg = {"message": {"passphrase": PASS_ERR}}
-            #  return {"message": PASS_ERR}, 400  # Old return Bad Request
-            return return_msg, 400  # Old return Bad Request
+            #  return {"message": PASS_ERR}, 400  # return Bad Request
+            return return_msg, 400  # return Bad Request
 
         # get signal with rowid
         item = SignalModel.find_by_orderid(data["order_id"])
 
         if item:
 
-            if item.order_id1 == data["order_id"]:
-                item.stk_price1 = data["stk_price"]
-                item.order_status = "filled(...)"
+            if data["cancel"]:
+                item.order_status = "canceled"
+                item.status_msg = "multiple active orders"
 
-            if item.order_id2 == data["order_id"]:
-                item.stk_price2 = data["stk_price"]
-                item.order_status = "filled(...)"
-
-            if item.ticker_type == "pair":
-
-                # if both orders are filled for pairs
-                if item.stk_price1 and item.stk_price2:
-                    if item.order_action == "buy":
-                        item.fill_price = round(item.stk_price1 - item.hedge_param*item.stk_price2, 4)
-                    else:
-                        item.fill_price = -round(item.stk_price1 - item.hedge_param*item.stk_price2, 4)
-                    item.order_status = "filled"
-                    item.slip = round(item.order_price - item.fill_price, 4)
             else:
-                if item.stk_price1:
-                    item.fill_price = item.stk_price1
-                    item.order_status = "filled"
-                    if item.order_action == "buy":
-                        item.slip = round(item.order_price - item.fill_price, 4)
-                    else:
-                        item.slip = -round(item.order_price - item.fill_price, 4)
+                if item.order_id1 == data["order_id"]:
+                    item.stk_price1 = data["stk_price"]
+                    item.order_status = "filled(...)"
 
+                if item.order_id2 == data["order_id"]:
+                    item.stk_price2 = data["stk_price"]
+                    item.order_status = "filled(...)"
+
+                if item.ticker_type == "pair":
+
+                    # if both orders are filled for pairs
+                    if item.stk_price1 and item.stk_price2:
+                        item.fill_price = round(item.stk_price1 - item.hedge_param * item.stk_price2, 4)
+                        item.order_status = "filled"
+                        # calculate slip if order price is defined
+                        if item.order_price:
+                            if item.order_action == "buy":
+                                item.slip = round(item.order_price - item.fill_price, 4)
+                            else:
+                                item.slip = -round(item.order_price - item.fill_price, 4)
+
+                        # if updating orders contracts (used for canceled but partially filled orders)
+                        # assumes that the partially filled order keeps the hedge ratio
+                        if data["partial"]:
+                            if data["order_contracts"]:
+                                order_contracts_old = item.order_contracts
+                                item.order_contracts = data["order_contracts"]
+                                item.order_status = "part.filled"
+                                item.status_msg = "canceled amount: " + str(order_contracts_old-item.order_contracts)
+                            else:
+                                return {"message": PART_ERR}  # return Bad Request
+
+                else:
+                    if item.stk_price1:
+                        item.fill_price = item.stk_price1
+                        item.order_status = "filled"
+                        # calculate slip if order price is defined
+                        if item.order_price:
+                            if item.order_action == "buy":
+                                item.slip = round(item.order_price - item.fill_price, 4)
+                            else:
+                                item.slip = -round(item.order_price - item.fill_price, 4)
+
+                        # if updating orders contracts (used for canceled but half filled orders)
+                        # assumes that the half filled order keeps the hedge ratio
+                        if data["partial"]:
+                            if data["order_contracts"]:
+                                order_contracts_old = item.order_contracts
+                                item.order_contracts = data["order_contracts"]
+                                item.order_status = "part.filled"
+                                item.status_msg = "canceled amount: " + str(order_contracts_old-item.order_contracts)
+                            else:
+                                return {"message": PART_ERR}  # return Bad Request
 
             try:
                 item.update(item.rowid)
@@ -139,6 +174,7 @@ class SignalWebhook(Resource):
     parser.add_argument("fill_price", type=float)
     parser.add_argument("slip", type=float)
     parser.add_argument("error_msg", type=str)
+    parser.add_argument("status_msg", type=str)
 
     @staticmethod
     def post():
@@ -173,6 +209,7 @@ class SignalWebhook(Resource):
             data["fill_price"],
             data["slip"],
             data["error_msg"],
+            data["status_msg"]
         )
 
         try:
@@ -239,6 +276,7 @@ class SignalWebhook(Resource):
                 data["fill_price"],
                 data["slip"],
                 data["error_msg"],
+                data["status_msg"]
             )
 
             try:
@@ -338,7 +376,7 @@ class SignalListStatus(Resource):
     def get(order_status, number_of_items="0"):
 
         username = get_jwt_identity()
-
+        
         # limit the number of items to get if not logged-in
         if order_status == "waiting":
             notoken_limit = 20

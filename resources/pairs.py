@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse
 from models.pairs import PairModel
 from flask_jwt_extended import jwt_required, get_jwt
+from models.stocks import StockModel
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
+TICKER_ERR = "problematic ticker!"
 INSERT_ERR = "an error occurred inserting the item."
 UPDATE_ERR = "an error occurred updating the item."
 DELETE_ERR = "an error occurred deleting the item."
@@ -12,33 +14,54 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
+STK_ERR = " one of the tickers is already active!"
 
 
 class PairRegister(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument("name", type=str, required=True, help=EMPTY_ERR.format("name"))
+    parser.add_argument("name", type=str)
+    parser.add_argument("ticker1", type=str, required=True, help=EMPTY_ERR.format("ticker1"))
+    parser.add_argument("ticker2", type=str, required=True, help=EMPTY_ERR.format("ticker2"))
     parser.add_argument(
         "hedge", type=float, required=True, help=EMPTY_ERR.format("hedge")
     )
     parser.add_argument(
         "status", type=int, default=0,
     )
+    parser.add_argument("notes", type=str)
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
     def post():
         data = PairRegister.parser.parse_args()
 
-        if PairModel.find_by_name(data["name"]):
-            return (
-                {"message": NAME_ERR.format("pair")},
-                400,
-            )  # Return Bad Request
+        item = PairModel(data["name"], data["ticker1"], data["ticker2"], data["hedge"], data["status"], data["notes"])
 
-        item = PairModel(data["name"], data["hedge"], data["status"])
+        if item.status == 1:
+
+            if StockModel.find_active_ticker(item.ticker1, item.ticker2):
+                return (
+                    {"message": STK_ERR},
+                    400,
+                )  # Return Bad Request
 
         try:
-            item.insert()
+            ticker_ok = item.combineticker()  # combine tickers & create pair name
+
+            if ticker_ok:
+
+                if PairModel.find_by_name(item.name):
+                    return (
+                        {"message": NAME_ERR.format("pair")},
+                        400,
+                    )  # Return Bad Request
+
+                item.insert()
+            else:
+                return (
+                    {"message": TICKER_ERR},
+                    400,
+                )  # Return Bad Request
 
         except Exception as e:
             print("Error occurred - ", e)  # better log the errors
@@ -57,9 +80,19 @@ class PairRegister(Resource):
     def put():
         data = PairRegister.parser.parse_args()
 
-        item = PairModel(data["name"], data["hedge"], data["status"])
+        item = PairModel(data["name"], data["ticker1"], data["ticker2"], data["hedge"], data["status"], data["notes"])
 
-        if PairModel.find_by_name(data["name"]):
+        if item.status == 1:
+
+            if StockModel.find_active_ticker(item.ticker1, item.ticker2):
+                return (
+                    {"message": STK_ERR},
+                    400,
+                )  # Return Bad Request
+
+        item_to_return = PairModel.find_by_name(data["name"])
+
+        if item_to_return:
             try:
                 item.update()
 
@@ -70,22 +103,9 @@ class PairRegister(Resource):
                     500,
                 )  # Return Interval Server Error
 
-            return item.json()
+            return item_to_return.json()
 
-        try:
-            item.insert()
-
-        except Exception as e:
-            print("Error occurred - ", e)
-            return (
-                {"message": INSERT_ERR},
-                500,
-            )  # Return Interval Server Error
-
-        return (
-            {"message": CREATE_OK.format("pair")},
-            201,
-        )  # Return Successful Creation of Resource
+        return {"message": NOT_FOUND}, 404  # Return Not Found
 
 
 class PairList(Resource):
