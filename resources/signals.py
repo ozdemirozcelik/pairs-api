@@ -187,6 +187,9 @@ class SignalWebhook(Resource):
     parser.add_argument("error_msg", type=str)
     parser.add_argument("status_msg", type=str)
 
+    # if you need to bypass active ticker status check
+    parser.add_argument("bypass_ticker_status", type=bool, default=False)
+
     @staticmethod
     def post():
         data = SignalWebhook.parser.parse_args()
@@ -226,7 +229,11 @@ class SignalWebhook(Resource):
         try:
             ticker_ok = item.splitticker()  # check webhook ticker validity
 
-            active_ok = item.check_ticker_status()
+            # if you need to bypass active ticker status check
+            if data["bypass_ticker_status"]:
+                active_ok = True
+            else:
+                active_ok = item.check_ticker_status()
 
             item.insert()
 
@@ -293,7 +300,11 @@ class SignalWebhook(Resource):
             try:
                 item.splitticker()  # check webhook ticker validity
 
-                item.check_ticker_status()
+                # if you need to bypass active ticker status check
+                if data["bypass_ticker_status"]:
+                    pass
+                else:
+                    item.check_ticker_status()
 
                 item.update(data["rowid"])
 
