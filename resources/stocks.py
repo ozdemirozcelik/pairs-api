@@ -39,7 +39,7 @@ class StockRegister(Resource):
         item = StockModel(
             data["symbol"], data["prixch"], data["secxch"], data["active"]
         )
-        
+
         if item.active == 1:
 
             if PairModel.find_active_ticker(item.symbol):

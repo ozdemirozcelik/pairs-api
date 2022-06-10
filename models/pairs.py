@@ -18,8 +18,15 @@ class PairModel(db.Model):
     status = db.Column(db.Integer)
     notes = db.Column(db.String)
 
-
-    def __init__(self, name: str, ticker1: str, ticker2: str, hedge: float, status: int, notes: str):
+    def __init__(
+        self,
+        name: str,
+        ticker1: str,
+        ticker2: str,
+        hedge: float,
+        status: int,
+        notes: str,
+    ):
         self.name = name
         self.hedge = hedge
         self.status = status
@@ -28,7 +35,14 @@ class PairModel(db.Model):
         self.notes = notes
 
     def json(self) -> PairJSON:
-        return {"name": self.name, "ticker1": self.ticker1, "ticker2": self.ticker2, "hedge": self.hedge, "status": self.status, "notes": self.notes}
+        return {
+            "name": self.name,
+            "ticker1": self.ticker1,
+            "ticker2": self.ticker2,
+            "hedge": self.hedge,
+            "status": self.status,
+            "notes": self.notes,
+        }
 
     @classmethod
     def find_by_name(cls, name: str) -> "PairModel":
@@ -193,4 +207,6 @@ class PairModel(db.Model):
     @classmethod
     def find_active_ticker(cls, ticker: str) -> "PairModel":
 
-        return cls.query.filter(((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & (cls.status == 1)).first()
+        return cls.query.filter(
+            ((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & (cls.status == 1)
+        ).first()

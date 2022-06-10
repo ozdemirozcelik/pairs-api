@@ -23,7 +23,7 @@ class SignalModel(db.Model):
     timestamp = db.Column(
         db.DateTime(timezone=False),
         # server_default=func.timezone("UTC", func.current_timestamp()) # this can be problematic for sqlite3
-        server_default=func.current_timestamp() #TODO: check for sqlite3 and postgres
+        server_default=func.current_timestamp()  # TODO: check for sqlite3 and postgres
         # db.DateTime(timezone=False), server_default = func.now()
     )  # DATETIME DEFAULT (CURRENT_TIMESTAMP) for sqlite3
     ticker = db.Column(db.String)
@@ -75,7 +75,7 @@ class SignalModel(db.Model):
         fill_price: float,
         slip: float,
         error_msg: str,
-        status_msg: str
+        status_msg: str,
     ):
         self.timestamp = timestamp
         self.ticker = ticker
@@ -430,7 +430,10 @@ class SignalModel(db.Model):
         if number_of_items == "0":
             if order_status == "waiting":
                 return (
-                    cls.query.filter((cls.order_status == "waiting") | (cls.order_status == "rerouted"))
+                    cls.query.filter(
+                        (cls.order_status == "waiting")
+                        | (cls.order_status == "rerouted")
+                    )
                     .order_by(cls.rowid.desc())
                     .all()
                 )
@@ -443,7 +446,10 @@ class SignalModel(db.Model):
         else:
             if order_status == "waiting":
                 return (
-                    cls.query.filter((cls.order_status == "waiting") | (cls.order_status == "rerouted"))
+                    cls.query.filter(
+                        (cls.order_status == "waiting")
+                        | (cls.order_status == "rerouted")
+                    )
                     .order_by(cls.rowid.desc())
                     .limit(number_of_items)
                 )
@@ -632,4 +638,6 @@ class SignalModel(db.Model):
     @classmethod
     def find_by_orderid(cls, orderid) -> "SignalModel":
 
-        return cls.query.filter((cls.order_id1 == orderid) | (cls.order_id2 == orderid)).first()
+        return cls.query.filter(
+            (cls.order_id1 == orderid) | (cls.order_id2 == orderid)
+        ).first()

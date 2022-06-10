@@ -187,4 +187,6 @@ class StockModel(db.Model):
     @classmethod
     def find_active_ticker(cls, ticker1: str, ticker2: str) -> "StockModel":
 
-        return cls.query.filter(((cls.symbol == ticker1) | (cls.symbol == ticker2)) & (cls.active == 1)).first()
+        return cls.query.filter(
+            ((cls.symbol == ticker1) | (cls.symbol == ticker2)) & (cls.active == 1)
+        ).first()

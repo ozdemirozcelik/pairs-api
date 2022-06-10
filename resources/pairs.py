@@ -20,8 +20,12 @@ STK_ERR = " one of the tickers is already active!"
 class PairRegister(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument("name", type=str)
-    parser.add_argument("ticker1", type=str, required=True, help=EMPTY_ERR.format("ticker1"))
-    parser.add_argument("ticker2", type=str, required=True, help=EMPTY_ERR.format("ticker2"))
+    parser.add_argument(
+        "ticker1", type=str, required=True, help=EMPTY_ERR.format("ticker1")
+    )
+    parser.add_argument(
+        "ticker2", type=str, required=True, help=EMPTY_ERR.format("ticker2")
+    )
     parser.add_argument(
         "hedge", type=float, required=True, help=EMPTY_ERR.format("hedge")
     )
@@ -35,7 +39,14 @@ class PairRegister(Resource):
     def post():
         data = PairRegister.parser.parse_args()
 
-        item = PairModel(data["name"], data["ticker1"], data["ticker2"], data["hedge"], data["status"], data["notes"])
+        item = PairModel(
+            data["name"],
+            data["ticker1"],
+            data["ticker2"],
+            data["hedge"],
+            data["status"],
+            data["notes"],
+        )
 
         if item.status == 1:
 
@@ -80,7 +91,14 @@ class PairRegister(Resource):
     def put():
         data = PairRegister.parser.parse_args()
 
-        item = PairModel(data["name"], data["ticker1"], data["ticker2"], data["hedge"], data["status"], data["notes"])
+        item = PairModel(
+            data["name"],
+            data["ticker1"],
+            data["ticker2"],
+            data["hedge"],
+            data["status"],
+            data["notes"],
+        )
 
         if item.status == 1:
 

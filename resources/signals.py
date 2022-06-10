@@ -18,6 +18,7 @@ NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
 PART_ERR = "missing contract amount to update partial fill"
 
+
 class SignalUpdateOrder(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
@@ -61,14 +62,18 @@ class SignalUpdateOrder(Resource):
 
                     # if both orders are filled for pairs
                     if item.stk_price1 and item.stk_price2:
-                        item.fill_price = round(item.stk_price1 - item.hedge_param * item.stk_price2, 4)
+                        item.fill_price = round(
+                            item.stk_price1 - item.hedge_param * item.stk_price2, 4
+                        )
                         item.order_status = "filled"
-                        # calculate slip if order price is defined
-                        if item.order_price:
+                        # calculate slip if order price is defined, use 'is not None' to avoid "0" oder price problem
+                        if item.order_price is not None:
                             if item.order_action == "buy":
                                 item.slip = round(item.order_price - item.fill_price, 4)
                             else:
-                                item.slip = -round(item.order_price - item.fill_price, 4)
+                                item.slip = -round(
+                                    item.order_price - item.fill_price, 4
+                                )
 
                         # if updating orders contracts (used for canceled but partially filled orders)
                         # assumes that the partially filled order keeps the hedge ratio
@@ -77,7 +82,9 @@ class SignalUpdateOrder(Resource):
                                 order_contracts_old = item.order_contracts
                                 item.order_contracts = data["order_contracts"]
                                 item.order_status = "part.filled"
-                                item.status_msg = "canceled amount: " + str(order_contracts_old-item.order_contracts)
+                                item.status_msg = "canceled amount: " + str(
+                                    order_contracts_old - item.order_contracts
+                                )
                             else:
                                 return {"message": PART_ERR}  # return Bad Request
 
@@ -86,11 +93,13 @@ class SignalUpdateOrder(Resource):
                         item.fill_price = item.stk_price1
                         item.order_status = "filled"
                         # calculate slip if order price is defined
-                        if item.order_price:
+                        if item.order_price is not None:
                             if item.order_action == "buy":
                                 item.slip = round(item.order_price - item.fill_price, 4)
                             else:
-                                item.slip = -round(item.order_price - item.fill_price, 4)
+                                item.slip = -round(
+                                    item.order_price - item.fill_price, 4
+                                )
 
                         # if updating orders contracts (used for canceled but half filled orders)
                         # assumes that the half filled order keeps the hedge ratio
@@ -99,7 +108,9 @@ class SignalUpdateOrder(Resource):
                                 order_contracts_old = item.order_contracts
                                 item.order_contracts = data["order_contracts"]
                                 item.order_status = "part.filled"
-                                item.status_msg = "canceled amount: " + str(order_contracts_old-item.order_contracts)
+                                item.status_msg = "canceled amount: " + str(
+                                    order_contracts_old - item.order_contracts
+                                )
                             else:
                                 return {"message": PART_ERR}  # return Bad Request
 
@@ -209,7 +220,7 @@ class SignalWebhook(Resource):
             data["fill_price"],
             data["slip"],
             data["error_msg"],
-            data["status_msg"]
+            data["status_msg"],
         )
 
         try:
@@ -276,7 +287,7 @@ class SignalWebhook(Resource):
                 data["fill_price"],
                 data["slip"],
                 data["error_msg"],
-                data["status_msg"]
+                data["status_msg"],
             )
 
             try:
@@ -376,7 +387,7 @@ class SignalListStatus(Resource):
     def get(order_status, number_of_items="0"):
 
         username = get_jwt_identity()
-        
+
         # limit the number of items to get if not logged-in
         if order_status == "waiting":
             notoken_limit = 20
