@@ -6,7 +6,7 @@ const api_url_get_signal= server_url + 'v3/signal/';
 const api_url_get_all_signals= server_url + 'v3/signals/100'; // "0" for all signals. Better to define a limit such as 100.
 const api_url_post_put_signal= server_url + 'v3/webhook';
 // define other api constants (defining as a separate constant to be used as a standalone script):
-const api_url_get_all_stock= server_url + 'v3/stocks/0';
+const api_url_get_all_ticker= server_url + 'v3/tickers/0';
 const api_url_get_all_pair= server_url + 'v3/pairs/0';
 
 
@@ -53,13 +53,13 @@ var order_status_update = document.getElementById("order_status_update");
 var order_comment_update = document.getElementById("order_comment_update");
 
 var ticker_type_update = document.getElementById("ticker_type_update");
-var stk_ticker1_update = document.getElementById("stk_ticker1_update");
-var stk_ticker2_update = document.getElementById("stk_ticker2_update");
+var ticker1_update = document.getElementById("ticker1_update");
+var ticker2_update = document.getElementById("ticker2_update");
 var hedge_param_update = document.getElementById("hedge_param_update");
 var order_id1_update = document.getElementById("order_id1_update");
 var order_id2_update = document.getElementById("order_id2_update");
-var stk_price1_update = document.getElementById("stk_price1_update");
-var stk_price2_update = document.getElementById("stk_price2_update");
+var price1_update = document.getElementById("price1_update");
+var price2_update = document.getElementById("price2_update");
 var fill_price_update = document.getElementById("fill_price_update");
 var slip_update = document.getElementById("slip_update");
 var error_msg_update = document.getElementById("error_msg_update");
@@ -88,13 +88,13 @@ getPairs_webhook();
 listSignals();
 createPages_signals();
 
-// update pair and stock values btw tab switches to avoid the need of page refreshing
+// update pair and ticker values btw tab switches to avoid the need of page refreshing
 $(document).ready(function(){
     $("#signalstab").click(function(e){      
         if (document.getElementById("tradepair").checked) {
             getPairs_webhook();
         } else {
-            getStocks_webhook();
+            getTickers_webhook();
         }
 
     });
@@ -172,9 +172,9 @@ function checkTradeType(event){
         getPairs_webhook();
 
     } else {
-        // load stocks if trade type is stock
-        document.getElementById("ticker_webhook_label").innerHTML = "Select Stock(*)";
-        getStocks_webhook();
+        // load tickers if trade type is ticker
+        document.getElementById("ticker_webhook_label").innerHTML = "Select Ticker(*)";
+        getTickers_webhook();
 
     }
 }
@@ -223,13 +223,13 @@ async function getPairs_webhook() {
 
 
 // TO-DO: needs error handling in this function
-// list the stocks for the webhook creation
-async function getStocks_webhook() {
-    const response = await fetch(api_url_get_all_stock);
-    stocks_data = await response.json();
+// list the tickers for the webhook creation
+async function getTickers_webhook() {
+    const response = await fetch(api_url_get_all_ticker);
+    tickers_data = await response.json();
 
     // sort alphabetically
-    stocks_data.stocks.sort( function( a, b ) {
+    tickers_data.tickers.sort( function( a, b ) {
         a = a.symbol.toLowerCase();
         b = b.symbol.toLowerCase();
     
@@ -242,15 +242,15 @@ async function getStocks_webhook() {
     // reset ticker status 
     status_dic = {};
 
-    // list the stocks in the pair selection options
-    for (var key in stocks_data.stocks) {
-        if (stocks_data.stocks.hasOwnProperty(key)) {
+    // list the tickers in the pair selection options
+    for (var key in tickers_data.tickers) {
+        if (tickers_data.tickers.hasOwnProperty(key)) {
             
             opt = document.createElement("option");
-            str = stocks_data.stocks[key].symbol;
+            str = tickers_data.tickers[key].symbol;
 
             // store active status values
-            status_dic[str] =  stocks_data.stocks[key].active;
+            status_dic[str] =  tickers_data.tickers[key].active;
 
             opt.innerHTML += '<option>' + str + '</option>';
             opt.setAttribute('value', str);        
@@ -466,7 +466,7 @@ function putUpdate_signals() {
     // check token status
     if (!localStorage.access_token) {
 
-        alert('You need to login to Edit Stock (PUT)')
+        alert('You need to login to Edit Ticker (PUT)')
 
     } else {
     
@@ -648,13 +648,13 @@ async function getSignal(rowid) {
     order_comment_update.value = signal_data.order_comment;
 
     ticker_type_update.value = signal_data.ticker_type;
-    stk_ticker1_update.value = signal_data.stk_ticker1;
-    stk_ticker2_update.value = signal_data.stk_ticker2;
+    ticker1_update.value = signal_data.ticker1;
+    ticker2_update.value = signal_data.ticker2;
     hedge_param_update.value = signal_data.hedge_param;
     order_id1_update.value = signal_data.order_id1;
     order_id2_update.value = signal_data.order_id2;
-    stk_price1_update.value = signal_data.stk_price1;
-    stk_price2_update.value = signal_data.stk_price2;
+    price1_update.value = signal_data.price1;
+    price2_update.value = signal_data.price2;
     fill_price_update.value = signal_data.fill_price;
     slip_update.value = signal_data.slip;
     error_msg_update.value = signal_data.error_msg;

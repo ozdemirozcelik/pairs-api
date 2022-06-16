@@ -7,7 +7,7 @@ from sqlalchemy.sql import (
 )  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
 
 from models.pairs import PairModel
-from models.stocks import StockModel
+from models.tickers import TickerModel
 
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
@@ -39,13 +39,13 @@ class SignalModel(db.Model):
 
     # Columns needed for order creation
     ticker_type = db.Column(db.String)
-    stk_ticker1 = db.Column(db.String)
-    stk_ticker2 = db.Column(db.String)
+    ticker1 = db.Column(db.String)
+    ticker2 = db.Column(db.String)
     hedge_param = db.Column(db.Float)
     order_id1 = db.Column(db.Integer)
     order_id2 = db.Column(db.Integer)
-    stk_price1 = db.Column(db.Float)
-    stk_price2 = db.Column(db.Float)
+    price1 = db.Column(db.Float)
+    price2 = db.Column(db.Float)
     fill_price = db.Column(db.Float)
     slip = db.Column(db.Float)
     error_msg = db.Column(db.String)
@@ -65,13 +65,13 @@ class SignalModel(db.Model):
         order_comment: str,
         order_status: str,
         ticker_type: str,
-        stk_ticker1: str,
-        stk_ticker2: str,
+        ticker1: str,
+        ticker2: str,
         hedge_param: float,
         order_id1: int,
         order_id2: int,
-        stk_price1: float,
-        stk_price2: float,
+        price1: float,
+        price2: float,
         fill_price: float,
         slip: float,
         error_msg: str,
@@ -89,13 +89,13 @@ class SignalModel(db.Model):
         self.order_comment = order_comment
         self.order_status = order_status
         self.ticker_type = ticker_type
-        self.stk_ticker1 = stk_ticker1
-        self.stk_ticker2 = stk_ticker2
+        self.ticker1 = ticker1
+        self.ticker2 = ticker2
         self.hedge_param = hedge_param
         self.order_id1 = order_id1
         self.order_id2 = order_id2
-        self.stk_price1 = stk_price1
-        self.stk_price2 = stk_price2
+        self.price1 = price1
+        self.price2 = price2
         self.fill_price = fill_price
         self.slip = slip
         self.error_msg = error_msg
@@ -116,13 +116,13 @@ class SignalModel(db.Model):
             "order_comment": self.order_comment,
             "order_status": self.order_status,
             "ticker_type": self.ticker_type,
-            "stk_ticker1": self.stk_ticker1,
-            "stk_ticker2": self.stk_ticker2,
+            "ticker1": self.ticker1,
+            "ticker2": self.ticker2,
             "hedge_param": self.hedge_param,
             "order_id1": self.order_id1,
             "order_id2": self.order_id2,
-            "stk_price1": self.stk_price1,
-            "stk_price2": self.stk_price2,
+            "price1": self.price1,
+            "price2": self.price2,
             "fill_price": self.fill_price,
             "slip": self.slip,
             "error_msg": self.error_msg,
@@ -213,13 +213,13 @@ class SignalModel(db.Model):
         item_to_update.order_comment = self.order_comment
         item_to_update.order_status = self.order_status
         item_to_update.ticker_type = self.ticker_type
-        item_to_update.stk_ticker1 = self.stk_ticker1
-        item_to_update.stk_ticker2 = self.stk_ticker2
+        item_to_update.ticker1 = self.ticker1
+        item_to_update.ticker2 = self.ticker2
         item_to_update.hedge_param = self.hedge_param
         item_to_update.order_id1 = self.order_id1
         item_to_update.order_id2 = self.order_id2
-        item_to_update.stk_price1 = self.stk_price1
-        item_to_update.stk_price2 = self.stk_price2
+        item_to_update.price1 = self.price1
+        item_to_update.price2 = self.price2
         item_to_update.fill_price = self.fill_price
         item_to_update.slip = self.slip
         item_to_update.error_msg = self.error_msg
@@ -334,14 +334,14 @@ class SignalModel(db.Model):
             if pair:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1) & (cls.stk_ticker2 == ticker2)
+                        (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
                     .order_by(cls.rowid.desc())
                     .all()
                 )
             else:
                 return (
-                    cls.query.filter(cls.stk_ticker1 == ticker1)
+                    cls.query.filter(cls.ticker1 == ticker1)
                     .filter(cls.ticker_type == "single")
                     .order_by(cls.rowid.desc())
                     .all()
@@ -350,14 +350,14 @@ class SignalModel(db.Model):
             if pair:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1) & (cls.stk_ticker2 == ticker2)
+                        (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
                     .order_by(cls.rowid.desc())
                     .limit(number_of_items)
                 )
             else:
                 return (
-                    cls.query.filter(cls.stk_ticker1 == ticker1)
+                    cls.query.filter(cls.ticker1 == ticker1)
                     .filter(cls.ticker_type == "single")
                     .order_by(cls.rowid.desc())
                     .limit(number_of_items)
@@ -381,8 +381,8 @@ class SignalModel(db.Model):
             if pair:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1)
-                        & (cls.stk_ticker2 == ticker2)
+                        (cls.ticker1 == ticker1)
+                        & (cls.ticker2 == ticker2)
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
@@ -392,7 +392,7 @@ class SignalModel(db.Model):
             else:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1)
+                        (cls.ticker1 == ticker1)
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
@@ -404,8 +404,8 @@ class SignalModel(db.Model):
             if pair:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1)
-                        & (cls.stk_ticker2 == ticker2)
+                        (cls.ticker1 == ticker1)
+                        & (cls.ticker2 == ticker2)
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
@@ -415,7 +415,7 @@ class SignalModel(db.Model):
             else:
                 return (
                     cls.query.filter(
-                        (cls.stk_ticker1 == ticker1)
+                        (cls.ticker1 == ticker1)
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
@@ -464,7 +464,7 @@ class SignalModel(db.Model):
 
         # check if ticker is registered and trade status is active
         if self.ticker_type == "pair":
-            pair_name = self.stk_ticker1 + "-" + self.stk_ticker2
+            pair_name = self.ticker1 + "-" + self.ticker2
             pair = PairModel.find_by_name(pair_name)
             # check if pair exists
             if pair:
@@ -488,12 +488,12 @@ class SignalModel(db.Model):
                 return False
 
         else:
-            stock = StockModel.find_by_symbol(self.stk_ticker1)
-            # check if stock exists
-            if stock:
+            ticker = TickerModel.find_by_symbol(self.ticker1)
+            # check if ticker exists
+            if ticker:
                 # check trade status
-                # if stock is not active set a static pair status (not possible to update)
-                if not stock.active:
+                # if ticker is not active set a static pair status (not possible to update)
+                if not ticker.active:
                     self.order_status = "canceled"
                     self.status_msg = "passive ticker"
                     return False
@@ -549,7 +549,7 @@ class SignalModel(db.Model):
             # print("eq1_split: ", eq1_split)  # ['LNT']
             # print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
 
-            if "." in eq1_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
+            if "." in eq1_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
                 ticker_pair1 = eq1_ticker_almost.replace(
                     ".", " "
                 )  # convert Tradingview -> IB format
@@ -570,7 +570,7 @@ class SignalModel(db.Model):
             # print("problem_flag_first: ", success_flag)
 
             self.ticker_type = "single"
-            self.stk_ticker1 = ticker_pair1
+            self.ticker1 = ticker_pair1
 
         if len(eq12) == 2:
 
@@ -594,7 +594,7 @@ class SignalModel(db.Model):
             # print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
             # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
 
-            if "." in eq2_ticker_almost:  # For Class A,B type stocks EXP: BF.A BF.B
+            if "." in eq2_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
                 ticker_pair2 = eq2_ticker_almost.replace(
                     ".", " "
                 )  # convert Tradingview -> IB format
@@ -618,7 +618,7 @@ class SignalModel(db.Model):
             # print("ticker_type: ", self.ticker_type)
 
             self.ticker_type = "pair"
-            self.stk_ticker2 = ticker_pair2
+            self.ticker2 = ticker_pair2
             self.hedge_param = hedge_const
 
         if len(eq12) > 2:

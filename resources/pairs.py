@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.pairs import PairModel
 from flask_jwt_extended import jwt_required, get_jwt
-from models.stocks import StockModel
+from models.tickers import TickerModel
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
@@ -50,7 +50,7 @@ class PairRegister(Resource):
 
         if item.status == 1:
 
-            if StockModel.find_active_ticker(item.ticker1, item.ticker2):
+            if TickerModel.find_active_ticker(item.ticker1, item.ticker2):
                 return (
                     {"message": STK_ERR},
                     400,
@@ -102,7 +102,7 @@ class PairRegister(Resource):
 
         if item.status == 1:
 
-            if StockModel.find_active_ticker(item.ticker1, item.ticker2):
+            if TickerModel.find_active_ticker(item.ticker1, item.ticker2):
                 return (
                     {"message": STK_ERR},
                     400,

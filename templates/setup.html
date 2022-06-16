@@ -135,7 +135,7 @@
         <ul class="tabs-list">
             <li id="signalstab" class="active"><a href="#tab1">Signals</a></li>
             <li id="pairstab"><a href="#tab2">Pairs</a></li>
-            <li id="stockstab"><a href="#tab3">Stocks<a/></li>
+            <li id="tickerstab"><a href="#tab3">Tickers<a/></li>
         </ul>
 
         <div id="tab1" class="tab active">
@@ -146,7 +146,7 @@
                     <form>                                                  
                         <div id="tradetype">
                             <input type="radio" id="tradepair" name="tradetype" value="pair" checked><span>trade pair</span>
-                            <input type="radio" id="tradestock" name="tradetype" value="stock"><span>trade stock</span>
+                            <input type="radio" id="tradeticker" name="tradetype" value="ticker"><span>trade ticker</span>
                         </div>
                         <br>
                         <div>
@@ -260,12 +260,12 @@
                                 </select>                       
                             </p>
                             <p>
-                                <label  for="stk_ticker1_update">Ticker 1:</label>
-                                <input  type="text" name="stk_ticker1" id="stk_ticker1_update" readonly>                       
+                                <label  for="ticker1_update">Ticker 1:</label>
+                                <input  type="text" name="ticker1" id="signal_ticker1_update" readonly>                       
                             </p>
                             <p>
-                                <label  for="stk_ticker2_update">Ticker 2:</label>
-                                <input  type="text" name="stk_ticker2" id="stk_ticker2_update" readonly>                       
+                                <label  for="ticker2_update">Ticker 2:</label>
+                                <input  type="text" name="ticker2" id="signal_ticker2_update" readonly>                       
                             </p>
                             <p>
                                 <label  for="hedge_param_update">Hedge Param:</label>
@@ -345,12 +345,12 @@
                                 <input  type="text" name="order_id2" id="order_id2_update" class="integer">                       
                             </p>
                             <p>
-                                <label  for="stock_price1_update">Ticker Price 1:</label>
-                                <input  type="text" name="stk_price1" id="stk_price1_update" class="float">                       
+                                <label  for="ticker_price1_update">Ticker Price 1:</label>
+                                <input  type="text" name="price1" id="price1_update" class="float">                       
                             </p>
                             <p>
-                                <label  for="stock_price2_update">Ticker Price 2:</label>
-                                <input  type="text" name="stk_price2" id="stk_price2_update" class="float">                       
+                                <label  for="ticker_price2_update">Ticker Price 2:</label>
+                                <input  type="text" name="price2" id="price2_update" class="float">                       
                             </p>
                             <p>
                                 <label  for="fill_price_update">Fill Price:</label>
@@ -407,23 +407,23 @@
                         <div>
                             <!-- if you need datalist with a value restriction use below:-->
                             <!-- datalist
-                            <label for="ticker1">Stock 1:</label>
+                            <label for="ticker1">Ticker 1:</label>
                             <input list="tickerlist" name="ticker1" id="ticker1" class="ticker">
                             <datalist id="tickerlist">
                             </datalist>
                             <br>
-                            <label for="ticker2">Stock 2:</label>
+                            <label for="ticker2">Ticker 2:</label>
                             <input list="tickerlist" name="ticker2" id="ticker2" class="ticker">
                             <datalist id="tickerlist">
                             </datalist> -->
                             <p>
-                                <label for="ticker1">Stock 1:&nbsp;</label>
+                                <label for="ticker1">Ticker 1:&nbsp;</label>
                                 <select name="ticker1" id="ticker1">
                                 <option disabled selected value></option>
                                 </select>
                             </p>
                             <p>
-                                <label for="ticker2">Stock 2:&nbsp;</label>
+                                <label for="ticker2">Ticker 2:&nbsp;</label>
                                 <select name="ticker2" id="ticker2">
                                 <option disabled selected value></option> 
                                 </select>
@@ -474,32 +474,33 @@
                                 <br>
                                 <p>
                                     <label for="ticker1-update">Ticker 1:&nbsp;</label>
-                                    <input type="text" id="ticker1-update" name="ticker1" class="ticker-update" readonly/>
+                                    <input type="text" id="pair-ticker1-update" name="ticker1" class="ticker-update" readonly/>
                                 </p>    
                                 <p>
                                     <label for="ticker2-update">Ticker 2:&nbsp;</label>
-                                    <input type="text" id="ticker2-update" name="ticker2" class="ticker-update" readonly/>
+                                    <input type="text" id="pair-ticker2-update" name="ticker2" class="ticker-update" readonly/>
                                 </p>    
                                 <br>    
                                 <p>
                                     <label for="hedge-update">Hedge Value:&nbsp;</label>
                                     <input type="text" name="hedge" id="hedge-update" class="float">
                                 </p>
+                                <p>
+                                    <label for="notes-update">Notes:&nbsp;</label>
+                                    <input type="text" id="notes-update" name="notes" class="notes-update"/>
+                                </p>
                                 <br>
                                 <p>
                                     <label>Trade Status:&nbsp;</label>                              
                                     <input type="radio" id="active-pair-update" name="status" value="1"><span>active</span>
-                                </p>
+                                </p>                       
                                 <p>
                                     <label>&nbsp;</label>  
                                     <input type="radio" id="passive-pair-update" name="status" value="0"><span>passive</span>
                                     
                                 </p>
-                                <br>
-                                <p>
-                                    <label for="notes-update">Notes:&nbsp;</label>
-                                    <input type="text" id="notes-update" name="notes" class="notes-update"/>
-                                </p> 
+                                
+ 
                                 <br><br>
 
 
@@ -526,8 +527,8 @@
         <div id="tab3" class="tab">
             <div class="container">
                 <div class="column">
-                <h3> Add Stock </h3>
-                <section class="stocks-form">
+                <h3> Add Ticker </h3>
+                <section class="tickers-form">
                     <form>
                         <div>
                             <p>
@@ -536,19 +537,47 @@
                                 oninvalid="this.setCustomValidity('Less than 10 charachers with no spaces!')" oninput="this.setCustomValidity('')"/>
                             </p>
                             <p>
-                                <label for="prixch">Pri. Exchange:&nbsp; </label>
-                                <select name="prixch" id="prixch" name="prixch">
-                                    <option value="SMART">SMART</option>
-                                    <option value="ISLAND">ISLAND</option>
-                                    <option value="BYX">BYX</option>
+                                <label for="sectype">Sec. Type:&nbsp; </label>
+                                <select name="sectype" id="sectype" class="sectype" name="sectype">
+                                    <option value="STK">STK</option>
+                                    <option value="CASH">CASH</option>
+                                    <option value="CRYPTO">CRYPTO</option>
                                 </select>
                             </p>
                             <p>
-                                <label for="secxch">Sec. Exchange:&nbsp;  </label>
-                                <select name="secxch" id="secxch" name="secxch">
+                                <label for="xch">Exchange:&nbsp; </label>
+                                <select name="xch" class ="xch" id="xch" name="xch">
                                     <option value="SMART">SMART</option>
+                                    <option value="NASDAQ">NASDAQ</option>
+                                    <option value="NYSE">NYSE</option>
                                     <option value="ISLAND">ISLAND</option>
+                                    <option value="BATS">BATS</option>
+                                    <option value="ARCA">ARCA</option>
                                     <option value="BYX">BYX</option>
+                                    <option value="AMEX">AMEX</option>
+                                    <option value="EDGEA">EDGEA</option>
+                                    <option value="DRCTEDGE">DRCTEDGE</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="prixch">Pri. Exchange:&nbsp;  </label>
+                                <select name="prixch" class="prixch" id="prixch" name="prixch">
+                                    <option value="NYSE">NYSE</option>
+                                    <option value="NASDAQ">NASDAQ</option>
+                                    <option value="ISLAND">ISLAND</option>
+                                    <option value="BATS">BATS</option>
+                                    <option value="ARCA">ARCA</option>
+                                    <option value="BYX">BYX</option>
+                                    <option value="AMEX">AMEX</option>
+                                    <option value="EDGEA">EDGEA</option>
+                                    <option value="DRCTEDGE">DRCTEDGE</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="currency">Sec. Type:&nbsp; </label>
+                                <select name="currency" class="currency" id="currency" name="currency">
+                                    <option value="USD">USD</option>
+                                    <option value="CAD">CAD</option>
                                 </select>
                             </p>
                             <input name="active" type="hidden" value="0"/>
@@ -568,20 +597,20 @@
                 </div>
             
                 <div class="column">
-                    <h3> List of Stocks </h3>
-                    <button id="getstock_button" type="submit" onclick="getStocks()">GET Stocks</button>
+                    <h3> List of Tickers </h3>
+                    <button id="getticker_button" type="submit" onclick="getTickers()">GET Tickers</button>
                     <button id="sort_button" onclick="sortList()" class="hidden">Sort</button>
                     <br>
                     <ul id="stklist" class="no-bullets" style="cursor: pointer;" > </ul>
-                    <div id="pages-stocks" class="hidden">
+                    <div id="pages-tickers" class="hidden">
                         <div id="prev-stk" class="pages" style=" float: left;">Prev</div>
                         <div id="next-stk" class="pages" style=" float: right;">Next</div>
                     </div>
                 </div>
             
                 <div class="column">
-                    <h3> Update Stock </h3>
-                    <section class="stocks-update">
+                    <h3> Update Ticker </h3>
+                    <section class="tickers-update">
                         <div class="deletebutton" onclick="alertBefore()">&nbsp;DELETE&nbsp;</div>
                         <form>
                             <div>
@@ -591,21 +620,49 @@
                                 </p>
                                 <br>
                                 <p>
-                                    <label for="prixch-update">Pri. Exchange:&nbsp; </label>
-                                    <select name="prixch" id="prixch-update" name="prixch">
-                                        <option value="SMART">SMART</option>
-                                        <option value="ISLAND">ISLAND</option>
-                                        <option value="BYX">BYX</option>
+                                    <label for="sectype-update">Sec. Type:&nbsp; </label>
+                                    <select name="sectype" class="sectype-update" id="sectype-update" name="sectype">
+                                        <option value="STK">STK</option>
+                                        <option value="CASH">CASH</option>
+                                        <option value="CRYPTO">CRYPTO</option>
                                     </select>
                                 </p>
                                 <p>
-                                    <label for="secxch-update">Sec. Exchange:&nbsp; </label>
-                                    <select name="secxch" id="secxch-update" name="secxch">
+                                    <label for="xch-update">Exchange:&nbsp; </label>
+                                    <select name="xch" class="xch-update" id="xch-update" name="xch">
                                         <option value="SMART">SMART</option>
+                                        <option value="NASDAQ">NASDAQ</option>
+                                        <option value="NYSE">NYSE</option>
                                         <option value="ISLAND">ISLAND</option>
+                                        <option value="BATS">BATS</option>
+                                        <option value="ARCA">ARCA</option>
                                         <option value="BYX">BYX</option>
+                                        <option value="AMEX">AMEX</option>
+                                        <option value="EDGEA">EDGEA</option>
+                                        <option value="DRCTEDGE">DRCTEDGE</option>
                                     </select>
                                 </p>
+                                <p>
+                                    <label for="prixch-update">Pri. Exchange:&nbsp; </label>
+                                    <select name="prixch" class="prixch-update" id="prixch-update" name="prixch">
+                                        <option value="NYSE">NYSE</option>
+                                        <option value="NASDAQ">NASDAQ</option>
+                                        <option value="ISLAND">ISLAND</option>
+                                        <option value="BATS">BATS</option>
+                                        <option value="ARCA">ARCA</option>
+                                        <option value="BYX">BYX</option>
+                                        <option value="AMEX">AMEX</option>
+                                        <option value="EDGEA">EDGEA</option>
+                                        <option value="DRCTEDGE">DRCTEDGE</option>
+                                    </select>
+                                </p>
+                                                            <p>
+                                <label for="currency-update">Sec. Type:&nbsp; </label>
+                                <select name="currency" class="currency-update" id="currency-update" name="currency">
+                                    <option value="USD">USD</option>
+                                    <option value="CAD">CAD</option>
+                                </select>
+                            </p>
                                 <br>
                                 <p>
                                     <label>Trade Status:&nbsp;</label>
@@ -655,7 +712,7 @@ if (server_url != "http://127.0.0.1:5000/") {
 
 </script>
 
-<script type="text/javascript" src={{ url_for("static",filename="stock.js") }} > </script>
+<script type="text/javascript" src={{ url_for("static",filename="tickers.js") }} > </script>
 <script type="text/javascript" src={{ url_for("static",filename="pairs.js") }} > </script>
 <script type="text/javascript" src={{ url_for("static",filename="signals.js") }} > </script>
 <script type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>

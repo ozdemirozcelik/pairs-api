@@ -5,7 +5,7 @@
     <form action="list" method="get">
         <div id="tradetype">
             <input type="radio" id="checkpair" name="tradetype" value="pair" {% if selected_trade_type == "pair" %} checked {% endif %}><span>pair</span>
-            <input type="radio" id="checkstock" name="tradetype" value="stock" {% if selected_trade_type == "stock" %} checked {% endif %}><span>stock</span>
+            <input type="radio" id="checkticker" name="tradetype" value="ticker" {% if selected_trade_type == "ticker" %} checked {% endif %}><span>ticker</span>
         </div>
         <br>
         <div>

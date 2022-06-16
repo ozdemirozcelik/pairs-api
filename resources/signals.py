@@ -25,7 +25,7 @@ class SignalUpdateOrder(Resource):
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("order_id", type=int)
-    parser.add_argument("stk_price", type=float)
+    parser.add_argument("price", type=float)
     parser.add_argument("cancel", type=bool, default=False)
     parser.add_argument("partial", type=bool, default=False)
     parser.add_argument("order_contracts", type=int)
@@ -51,19 +51,19 @@ class SignalUpdateOrder(Resource):
 
             else:
                 if item.order_id1 == data["order_id"]:
-                    item.stk_price1 = data["stk_price"]
+                    item.price1 = data["price"]
                     item.order_status = "filled(...)"
 
                 if item.order_id2 == data["order_id"]:
-                    item.stk_price2 = data["stk_price"]
+                    item.price2 = data["price"]
                     item.order_status = "filled(...)"
 
                 if item.ticker_type == "pair":
 
                     # if both orders are filled for pairs
-                    if item.stk_price1 and item.stk_price2:
+                    if item.price1 and item.price2:
                         item.fill_price = round(
-                            item.stk_price1 - item.hedge_param * item.stk_price2, 4
+                            item.price1 - item.hedge_param * item.price2, 4
                         )
                         item.order_status = "filled"
                         # calculate slip if order price is defined, use 'is not None' to avoid "0" oder price problem
@@ -89,8 +89,8 @@ class SignalUpdateOrder(Resource):
                                 return {"message": PART_ERR}  # return Bad Request
 
                 else:
-                    if item.stk_price1:
-                        item.fill_price = item.stk_price1
+                    if item.price1:
+                        item.fill_price = item.price1
                         item.order_status = "filled"
                         # calculate slip if order price is defined
                         if item.order_price is not None:
@@ -175,13 +175,13 @@ class SignalWebhook(Resource):
     parser.add_argument("order_comment", type=str, default="")
     parser.add_argument("order_status", type=str, default="waiting")
     parser.add_argument("ticker_type", type=str)
-    parser.add_argument("stk_ticker1", type=str)
-    parser.add_argument("stk_ticker2", type=str)
+    parser.add_argument("ticker1", type=str)
+    parser.add_argument("ticker2", type=str)
     parser.add_argument("hedge_param", type=float)
     parser.add_argument("order_id1", type=int)
     parser.add_argument("order_id2", type=int)
-    parser.add_argument("stk_price1", type=float)
-    parser.add_argument("stk_price2", type=float)
+    parser.add_argument("price1", type=float)
+    parser.add_argument("price2", type=float)
     parser.add_argument("fill_price", type=float)
     parser.add_argument("slip", type=float)
     parser.add_argument("error_msg", type=str)
@@ -213,13 +213,13 @@ class SignalWebhook(Resource):
             data["order_comment"],
             data["order_status"],
             data["ticker_type"],
-            data["stk_ticker1"],
-            data["stk_ticker2"],
+            data["ticker1"],
+            data["ticker2"],
             data["hedge_param"],
             data["order_id1"],
             data["order_id2"],
-            data["stk_price1"],
-            data["stk_price2"],
+            data["price1"],
+            data["price2"],
             data["fill_price"],
             data["slip"],
             data["error_msg"],
@@ -284,13 +284,13 @@ class SignalWebhook(Resource):
                 data["order_comment"],
                 data["order_status"],
                 data["ticker_type"],
-                data["stk_ticker1"],
-                data["stk_ticker2"],
+                data["ticker1"],
+                data["ticker2"],
                 data["hedge_param"],
                 data["order_id1"],
                 data["order_id2"],
-                data["stk_price1"],
-                data["stk_price2"],
+                data["price1"],
+                data["price2"],
                 data["fill_price"],
                 data["slip"],
                 data["error_msg"],

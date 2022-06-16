@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from models.stocks import StockModel
+from models.tickers import TickerModel
 from flask_jwt_extended import jwt_required, get_jwt
 from models.pairs import PairModel
 
@@ -13,31 +13,33 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
-TICKR_ERR = " stock is already active in a pair!"
+TICKR_ERR = " ticker is already active in a pair!"
 
 
-class StockRegister(Resource):
+class TickerRegister(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
         "symbol", type=str, required=True, help=EMPTY_ERR.format("symbol")
     )
-    parser.add_argument("prixch", type=str, default="SMART")
-    parser.add_argument("secxch", type=str, default="ISLAND")
+    parser.add_argument("sectype", type=str, default="STK")
+    parser.add_argument("xch", type=str, default="SMART")
+    parser.add_argument("prixch", type=str, default="NYSE")
+    parser.add_argument("currency", type=str, default="USD")
     parser.add_argument("active", type=int, default=0)
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
     def post():
-        data = StockRegister.parser.parse_args()
+        data = TickerRegister.parser.parse_args()
 
-        if StockModel.find_by_symbol(data["symbol"]):
+        if TickerModel.find_by_symbol(data["symbol"]):
             return (
-                {"message": NAME_ERR.format("stock")},
+                {"message": NAME_ERR.format("ticker")},
                 400,
             )  # Return Bad Request
 
-        item = StockModel(
-            data["symbol"], data["prixch"], data["secxch"], data["active"]
+        item = TickerModel(
+            data["symbol"],data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
         )
 
         if item.active == 1:
@@ -59,17 +61,17 @@ class StockRegister(Resource):
             )  # Return Interval Server Error
 
         return (
-            {"message": CREATE_OK.format("stock")},
+            {"message": CREATE_OK.format("ticker")},
             201,
         )  # Return Successful Creation of Resource
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
     def put():
-        data = StockRegister.parser.parse_args()
+        data = TickerRegister.parser.parse_args()
 
-        item = StockModel(
-            data["symbol"], data["prixch"], data["secxch"], data["active"]
+        item = TickerModel(
+            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
         )
 
         if item.active == 1:
@@ -80,7 +82,7 @@ class StockRegister(Resource):
                     400,
                 )  # Return Bad Request
 
-        if StockModel.find_by_symbol(data["symbol"]):
+        if TickerModel.find_by_symbol(data["symbol"]):
             try:
                 item.update()
 
@@ -104,16 +106,16 @@ class StockRegister(Resource):
             )  # Return Interval Server Error
 
         return (
-            {"message": CREATE_OK.format("stock")},
+            {"message": CREATE_OK.format("ticker")},
             201,
         )  # Return Successful Creation of Resource
 
 
-class StockList(Resource):
+class TickerList(Resource):
     @staticmethod
     def get(number_of_items="0"):
         try:
-            items = StockModel.get_rows(number_of_items)
+            items = TickerModel.get_rows(number_of_items)
 
         except Exception as e:
             print("Error occurred - ", e)
@@ -122,18 +124,18 @@ class StockList(Resource):
                 500,
             )  # Return Interval Server Error
 
-        # return {'stocks': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
+        # return {'tickers': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
         return {
-            "stocks": [item.json() for item in items]
+            "tickers": [item.json() for item in items]
         }  # but this one is slightly more readable
 
 
-class Stock(Resource):
+class Ticker(Resource):
     @staticmethod
     def get(symbol):
 
         try:
-            item = StockModel.find_by_symbol(symbol)
+            item = TickerModel.find_by_symbol(symbol)
 
         except Exception as e:
             print("Error occurred - ", e)
@@ -158,7 +160,7 @@ class Stock(Resource):
             return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
 
         try:
-            item_to_delete = StockModel.find_by_symbol(symbol)
+            item_to_delete = TickerModel.find_by_symbol(symbol)
 
             if item_to_delete:
                 item_to_delete.delete()
@@ -172,4 +174,4 @@ class Stock(Resource):
                 500,
             )  # Return Interval Server Error
 
-        return {"message": DELETE_OK.format("stock")}
+        return {"message": DELETE_OK.format("ticker")}

@@ -19,7 +19,7 @@ from resources.signals import (
     SignalListStatus,
     Signal,
 )
-from resources.stocks import StockRegister, StockList, Stock
+from resources.tickers import TickerRegister, TickerList, Ticker
 from resources.users import (
     UserRegister,
     UserList,
@@ -191,9 +191,9 @@ api.add_resource(PairRegister, "/v3/regpair")
 api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
 api.add_resource(Pair, "/v3/pair/<string:name>")
 
-api.add_resource(StockRegister, "/v3/regstock")
-api.add_resource(StockList, "/v3/stocks/<string:number_of_items>")
-api.add_resource(Stock, "/v3/stock/<string:symbol>")
+api.add_resource(TickerRegister, "/v3/regticker")
+api.add_resource(TickerList, "/v3/tickers/<string:number_of_items>")
+api.add_resource(Ticker, "/v3/ticker/<string:symbol>")
 
 api.add_resource(UserRegister, "/v3/reguser")
 api.add_resource(UserList, "/v3/users/<string:number_of_users>")

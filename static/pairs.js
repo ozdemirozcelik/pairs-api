@@ -6,7 +6,7 @@ const api_url_get_pair= server_url +'v3/pair/';
 const api_url_get_all_pairs= server_url +'v3/pairs/0';// "0" for all pairs.
 const api_url_post_put_pair= server_url +'v3/regpair';
 // define other api constants (defining as a separate constant to be used as a standalone script):
-const api_url_get_all_stocks= server_url +'v3/stocks/0';
+const api_url_get_all_tickers= server_url +'v3/tickers/0';
 
 
 // form data to be collected in these variables
@@ -27,8 +27,8 @@ var ticker2 = document.getElementById("ticker2");
 var hedge = document.getElementById("hedge");
 var hedge_update = document.getElementById("hedge-update");
 var pair_update = document.getElementById("pair-update");
-var ticker1_update = document.getElementById("ticker1-update");
-var ticker2_update = document.getElementById("ticker2-update");
+var pair_ticker1_update = document.getElementById("pair-ticker1-update");
+var pair_ticker2_update = document.getElementById("pair-ticker2-update");
 var notes_update = document.getElementById("notes-update");
 var getpairs_button = document.getElementById("getpairs_button");
 var pairlist = document.getElementById("pairlist");
@@ -42,7 +42,7 @@ var return_code_pairs;
 // update pair values btw tab switches to avoid the need of page refreshing
 $(document).ready(function(){
     $("#pairstab").click(function(e){
-        getStocks_pairs();
+        getTickers_pairs();
     });
 
 });
@@ -116,7 +116,7 @@ function handleFormSubmit_pairs(event) {
 
     // check empty inputs
     if(ticker1.value == "" || ticker2.value == "") {
-        alert("Please select stocks to create a pair!");
+        alert("Please select tickers to create a pair!");
     
     } else if ( hedge.value == 0 || hedge.value == "" ) {
         alert("Hedge value cannot be empty or zero!");
@@ -311,7 +311,7 @@ function putUpdate_pairs() {
     // check token status
     if (!localStorage.access_token) {
 
-        alert('You need to login to Edit Stock (PUT)')
+        alert('You need to login to Edit Ticker (PUT)')
 
     } else {
     
@@ -319,7 +319,7 @@ function putUpdate_pairs() {
         document.getElementById("updateall_pairs").disabled = true;
         
         if (pair_update.value == "") {
-            alert("Please select a stock from the list!");
+            alert("Please select a ticker from the list!");
             return
 
         }
@@ -371,13 +371,13 @@ function putUpdate_pairs() {
 }
 
 // TODO: error handling
-// list the stocks in the pair selection options
-async function getStocks_pairs() {
-    const response = await fetch(api_url_get_all_stocks);
-    stocks_data = await response.json();
+// list the tickers in the pair selection options
+async function getTickers_pairs() {
+    const response = await fetch(api_url_get_all_tickers);
+    tickers_data = await response.json();
 
     // sort alphabetically
-    stocks_data.stocks.sort( function( a, b ) {
+    tickers_data.tickers.sort( function( a, b ) {
         a = a.symbol.toLowerCase();
         b = b.symbol.toLowerCase();
     
@@ -388,13 +388,13 @@ async function getStocks_pairs() {
     ticker2.innerHTML = "";
 
 
-    // list the stocks in the pair selection options
-    for (var key in stocks_data.stocks) {
-        if (stocks_data.stocks.hasOwnProperty(key)) {
+    // list the tickers in the pair selection options
+    for (var key in tickers_data.tickers) {
+        if (tickers_data.tickers.hasOwnProperty(key)) {
             
             opt1 = document.createElement("option");
             opt2 = document.createElement("option");
-            str = stocks_data.stocks[key].symbol
+            str = tickers_data.tickers[key].symbol
             
             opt1.innerHTML += '<option>' + str + '</option>';
             opt1.setAttribute('value', str);          
@@ -493,8 +493,8 @@ async function getPair(name) {
     pair_data = await response_pair.json();
 
     hedge_update.value = pair_data.hedge;
-    ticker1_update.value = pair_data.ticker1;
-    ticker2_update.value = pair_data.ticker2;
+    pair_ticker1_update.value = pair_data.ticker1;
+    pair_ticker2_update.value = pair_data.ticker2;
     notes_update.value = pair_data.notes;
     
     if (pair_data.status) {

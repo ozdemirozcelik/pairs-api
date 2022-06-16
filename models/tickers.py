@@ -1,37 +1,43 @@
 from typing import Dict, List, Union  # for type hinting
 from db import db
 
-StockJSON = Dict[str, Union[str, int]]  # custom type hint
+TickerJSON = Dict[str, Union[str, int]]  # custom type hint
 
 
-class StockModel(db.Model):
-    __tablename__ = "stocks"
+class TickerModel(db.Model):
+    __tablename__ = "tickers"
 
     # sqlalchemy needs a primary key (either dummy or real)
     rowid = db.Column(
         db.Integer, primary_key=True, autoincrement=True
     )  # using 'rowid' as the default key
     symbol = db.Column(db.String(40), unique=True)
+    sectype = db.Column(db.String(20))
+    xch = db.Column(db.String(40))
     prixch = db.Column(db.String(40))
-    secxch = db.Column(db.String(40))
+    currency = db.Column(db.String(20))
     active = db.Column(db.Integer)
 
-    def __init__(self, symbol: str, prixch: str, secxch: str, active: int):
+    def __init__(self, symbol: str, sectype: str, xch: str, prixch: str, currency: str, active: int):
         self.symbol = symbol
+        self.sectype = sectype
+        self.xch = xch
         self.prixch = prixch
-        self.secxch = secxch
+        self.currency = currency
         self.active = active
 
-    def json(self) -> StockJSON:
+    def json(self) -> TickerJSON:
         return {
             "symbol": self.symbol,
+            "sectype": self.sectype,
+            "xch": self.xch,
             "prixch": self.prixch,
-            "secxch": self.secxch,
+            "currency": self.currency,
             "active": self.active,
         }
 
     @classmethod
-    def find_by_symbol(cls, symbol: str) -> "StockModel":
+    def find_by_symbol(cls, symbol: str) -> "TickerModel":
 
         return cls.query.filter_by(symbol=symbol).first()
 
@@ -89,10 +95,10 @@ class StockModel(db.Model):
 
         item_to_update = self.query.filter_by(symbol=self.symbol).first()
 
+        item_to_update.sectype = self.sectype
+        item_to_update.xch = self.xch
         item_to_update.prixch = self.prixch
-        item_to_update.secxch = self.secxch
-        # TODO
-        # check active pair status with the ticker, do not activate if already active
+        item_to_update.currency = self.currency
         item_to_update.active = self.active
 
         db.session.commit()
@@ -185,7 +191,7 @@ class StockModel(db.Model):
         #         connection.close()
 
     @classmethod
-    def find_active_ticker(cls, ticker1: str, ticker2: str) -> "StockModel":
+    def find_active_ticker(cls, ticker1: str, ticker2: str) -> "TickerModel":
 
         return cls.query.filter(
             ((cls.symbol == ticker1) | (cls.symbol == ticker2)) & (cls.active == 1)

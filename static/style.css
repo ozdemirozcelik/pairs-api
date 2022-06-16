@@ -122,7 +122,24 @@ input { display: table-cell; }
 .ticker {
     border-radius: 5%;
     box-sizing: border-box;
-    width: 72px;
+    width: 90px;
+}
+
+.sectype {
+    border-radius: 5%;
+    width: 90px;
+}
+.xch {
+    border-radius: 5%;
+    width: 90px;
+}
+.prixch {
+    border-radius: 5%;
+    width: 90px;
+}
+.currency {
+    border-radius: 5%;
+    width: 90px;
 }
 
 .ticker-update {
@@ -132,10 +149,24 @@ input { display: table-cell; }
     width: 75px;
     background-color: lightgrey;
 }
-
+.sectype-update {
+    border-radius: 5%;
+    width: 90px;
+}
+.xch-update {
+    border-radius: 5%;
+    width: 90px;
+}
+.prixch-update {
+    border-radius: 5%;
+    width: 90px;
+}
+.currency-update {
+    border-radius: 5%;
+    width: 90px;
+}
 .notes-update {
     border-style: none;
-    width: 100px;
 }
 
 .pair-update {
@@ -218,12 +249,12 @@ input { display: table-cell; }
     width: 70px;
     background-color: lightgrey;
 }
-#stk_ticker1_update {
+#signal_ticker1_update {
     border-style: none;
     width: 70px;
     background-color: lightgrey;
 }
-#stk_ticker2_update {
+#signal_ticker2_update {
     border-style: none;
     width: 70px;
     background-color: lightgrey;
@@ -241,11 +272,11 @@ input { display: table-cell; }
     border-style: none;
     width: 70px;
 }
-#stk_price1_update{
+#price1_update{
     border-style: none;
     width: 70px;
 }
-#stk_price2_update{
+#price2_update{
     border-style: none;
     width: 70px;
 }
