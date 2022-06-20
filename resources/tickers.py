@@ -39,7 +39,7 @@ class TickerRegister(Resource):
             )  # Return Bad Request
 
         item = TickerModel(
-            data["symbol"],data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
+            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
         )
 
         if item.active == 1:

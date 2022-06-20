@@ -277,7 +277,7 @@ function postSave_pairs() {
 
                     // create span element according to pair status
                     if (jsonResponse.status) {
-                        li.innerHTML = "<span title='active' class='round' style='background-color: yellow';></span>";
+                        li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
                     } else {
                         li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
                     }
@@ -424,7 +424,7 @@ async function listPairs() {
 
             // create span element according to pair status
             if (pairs_data.pairs[key].status) {
-                li.innerHTML = "<span title='active' class='round' style='background-color: yellow';></span>";
+                li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
             } else {
                 li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
             }
@@ -506,16 +506,17 @@ async function getPair(name) {
 
 function Update_pair(currentEl){
     
-    pairname = currentEl.lastChild; // first child is the round span element  
+    // enable if you want to check all children
+    // console.log(currentEl.children)
+    pairname = currentEl.firstChild.parentElement.id;
     
     // check if deleted
-    var item = document.getElementById(pairname.textContent);
-    if (item.innerText.includes("Deleted")) {
+    if (pairname.includes("Deleted")) {
         alert("Item is already deleted!");
         return
     }
-    pair_update.value = pairname.textContent;
-    getPair(pairname.textContent);
+    pair_update.value = pairname;
+    getPair(pairname);
 }
 
 function alertBefore_pairs() {

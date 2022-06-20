@@ -53,8 +53,8 @@ var order_status_update = document.getElementById("order_status_update");
 var order_comment_update = document.getElementById("order_comment_update");
 
 var ticker_type_update = document.getElementById("ticker_type_update");
-var ticker1_update = document.getElementById("ticker1_update");
-var ticker2_update = document.getElementById("ticker2_update");
+var ticker1_update = document.getElementById("signal_ticker1_update");
+var ticker2_update = document.getElementById("signal_ticker2_update");
 var hedge_param_update = document.getElementById("hedge_param_update");
 var order_id1_update = document.getElementById("order_id1_update");
 var order_id2_update = document.getElementById("order_id2_update");

@@ -52,30 +52,30 @@ class SignalModel(db.Model):
     status_msg = db.Column(db.String)
 
     def __init__(
-        self,
-        timestamp: datetime,
-        ticker: str,
-        order_action: str,
-        order_contracts: int,
-        order_price: float,
-        mar_pos: str,
-        mar_pos_size: int,
-        pre_mar_pos: str,
-        pre_mar_pos_size: int,
-        order_comment: str,
-        order_status: str,
-        ticker_type: str,
-        ticker1: str,
-        ticker2: str,
-        hedge_param: float,
-        order_id1: int,
-        order_id2: int,
-        price1: float,
-        price2: float,
-        fill_price: float,
-        slip: float,
-        error_msg: str,
-        status_msg: str,
+            self,
+            timestamp: datetime,
+            ticker: str,
+            order_action: str,
+            order_contracts: int,
+            order_price: float,
+            mar_pos: str,
+            mar_pos_size: int,
+            pre_mar_pos: str,
+            pre_mar_pos_size: int,
+            order_comment: str,
+            order_status: str,
+            ticker_type: str,
+            ticker1: str,
+            ticker2: str,
+            hedge_param: float,
+            order_id1: int,
+            order_id2: int,
+            price1: float,
+            price2: float,
+            fill_price: float,
+            slip: float,
+            error_msg: str,
+            status_msg: str,
     ):
         self.timestamp = timestamp
         self.ticker = ticker
@@ -336,15 +336,15 @@ class SignalModel(db.Model):
                     cls.query.filter(
                         (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
             else:
                 return (
                     cls.query.filter(cls.ticker1 == ticker1)
-                    .filter(cls.ticker_type == "single")
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .filter(cls.ticker_type == "single")
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
         else:
             if pair:
@@ -352,20 +352,20 @@ class SignalModel(db.Model):
                     cls.query.filter(
                         (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
             else:
                 return (
                     cls.query.filter(cls.ticker1 == ticker1)
-                    .filter(cls.ticker_type == "single")
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .filter(cls.ticker_type == "single")
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
 
     @classmethod
     def get_list_ticker_dates(
-        cls, ticker_name, number_of_items, start_date, end_date
+            cls, ticker_name, number_of_items, start_date, end_date
     ) -> List:
 
         pair = False
@@ -386,8 +386,8 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
             else:
                 return (
@@ -396,9 +396,9 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                    .filter(cls.ticker_type == "single")
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .filter(cls.ticker_type == "single")
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
         else:
             if pair:
@@ -409,8 +409,8 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
             else:
                 return (
@@ -419,9 +419,9 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                    .filter(cls.ticker_type == "single")
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .filter(cls.ticker_type == "single")
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
 
     @classmethod
@@ -434,14 +434,14 @@ class SignalModel(db.Model):
                         (cls.order_status == "waiting")
                         | (cls.order_status == "rerouted")
                     )
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
             else:
                 return (
                     cls.query.filter_by(order_status=order_status)
-                    .order_by(cls.rowid.desc())
-                    .all()
+                        .order_by(cls.rowid.desc())
+                        .all()
                 )
         else:
             if order_status == "waiting":
@@ -450,14 +450,14 @@ class SignalModel(db.Model):
                         (cls.order_status == "waiting")
                         | (cls.order_status == "rerouted")
                     )
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
             else:
                 return (
                     cls.query.filter_by(order_status=order_status)
-                    .order_by(cls.rowid.desc())
-                    .limit(number_of_items)
+                        .order_by(cls.rowid.desc())
+                        .limit(number_of_items)
                 )
 
     def check_ticker_status(self) -> bool:
@@ -505,7 +505,184 @@ class SignalModel(db.Model):
                 self.status_msg = "unknown ticker"
                 return False
 
-    def splitticker(self) -> bool:
+    def splitticker(self, ) -> bool:
+
+        success_flag = True
+        currency_match = True
+
+        eq12 = self.ticker.split("-")  # check if pair or single
+        # print(eq12)  # ['LNT', '1.25*NYSE:FTS']
+
+        if len(eq12) <= 2:
+
+            eq1_hedge = re.findall(
+                r"[-+]?\d*\.\d+|\d+", eq12[0]
+            )  # hedge constant for the 1st ticker
+            # print("eq1_hedge: ", eq1_hedge)  # []
+
+            if len(eq1_hedge) > 0:
+                eq1 = eq12[0].replace(eq1_hedge[0], "")
+            else:
+                eq1 = eq12[0]  # LNT
+
+            eq1 = eq1.replace("*", "")
+            # print("eq1: ", eq1)  # LNT
+
+            eq1_split = eq1.rsplit(":", maxsplit=1)
+            eq1_ticker_almost = eq1_split[len(eq1_split) - 1]
+
+            # print("eq1_split: ", eq1_split)  # ['LNT']
+            # print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
+
+            # check if the ticker security type is CASH or CRYPTO
+            item = TickerModel.find_by_symbol(eq1_ticker_almost)
+
+            if item:
+                if item.sectype == "CASH":
+                    fx1 = eq1_ticker_almost[0:3]  # get the first 3 char # USD
+                    fx2 = eq1_ticker_almost[-3:]  # get the last 3 char # CAD
+                    ticker_pair1 = fx1 + "." + fx2
+
+                    # TODO: improve validity check
+                    # check if valid fx pair
+                    if len(ticker_pair1) != 7:  # check if it is in USD.CAD format
+                        success_flag = False
+                    # check for currency mismatch
+                    if fx2 != item.currency:
+                        currency_match = False
+                        success_flag = False
+
+                elif item.sectype == "CRYPTO":
+                    cry2 = eq1_ticker_almost[-3:]  # get last 3 char
+                    ticker_pair1 = eq1_ticker_almost.replace(".", "")
+                    cry1 = eq1_ticker_almost[0:(len(ticker_pair1)-3)]  # get the first 3 char
+                    ticker_pair1 = cry1 + "." + cry2
+
+                    # TODO: improve validity check
+                    # check if valid crypto pair, accepts only USD pairs
+                    if cry2 != item.currency or cry2 != "USD":
+                        currency_match = False
+                        success_flag = False
+
+                else:
+
+                    if "." in eq1_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+                        ticker_pair1 = eq1_ticker_almost.replace(
+                            ".", " "
+                        )  # convert Tradingview -> IB format
+                    else:
+                        ticker_pair1 = "".join(
+                            char for char in eq1_ticker_almost if char.isalnum()
+                        )
+
+                        if eq1_ticker_almost != ticker_pair1:
+                            success_flag = False
+
+            # print("ticker_pair1: ", ticker_pair1)  # LNT
+
+            if len(eq1_hedge) != 0:
+                if eq1_hedge[0] != 1:
+                    success_flag = False
+
+            # print("problem_flag_first: ", success_flag)
+
+            self.ticker_type = "single"
+            self.ticker1 = ticker_pair1
+
+        if len(eq12) == 2:
+
+            eq2_hedge = re.findall(
+                r"[-+]?\d*\.\d+|\d+", eq12[1]
+            )  # hedge constant fot the 2nd ticker
+            # print("eq2_hedge: ", eq2_hedge)  # ['1.25']
+
+            if len(eq2_hedge) > 0:
+                eq2 = eq12[1].replace(eq2_hedge[0], "")
+            else:
+                eq2 = eq12[1]  # *NYSE:FTS
+
+            eq2 = eq2.replace("*", "")
+
+            # print("eq2: ", eq2)  # NYSE:FTS
+
+            eq2_split = eq2.rsplit(":", maxsplit=1)
+            eq2_ticker_almost = eq2_split[len(eq2_split) - 1]
+
+            # print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
+            # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
+
+            # check if the ticker security type is CASH or CRYPTO
+            item = TickerModel.find_by_symbol(eq1_ticker_almost)
+
+            if item:
+                if item.sectype == "CASH":
+                    fx1 = eq2_ticker_almost[0:3]  # get the first 3 char # USD
+                    fx2 = eq2_ticker_almost[-3:]  # get the last 3 char # CAD
+                    ticker_pair2 = fx1 + "." + fx2
+
+                    # TODO: improve validity check
+                    # check if valid fx pair
+                    if len(ticker_pair2) != 7:  # check if it is in USD.CAD format
+                        success_flag = False
+                    # check for currency mismatch
+                    if fx2 != item.currency:
+                        currency_match = False
+                        success_flag = False
+
+                elif item.sectype == "CRYPTO":
+                    cry2 = eq2_ticker_almost[-3:]  # get last 3 char
+                    ticker_pair2 = eq2_ticker_almost.replace(".", "")
+                    cry1 = eq2_ticker_almost[0:(len(ticker_pair2)-3)]  # get the first 3 char
+                    ticker_pair2 = cry1 + "." + cry2
+
+                    # TODO: improve validity check
+                    # check if valid cryptopair, accepts only USD pairs
+                    if cry2 != item.currency or cry2 != "USD":
+                        currency_match = False
+                        success_flag = False
+
+                else:
+
+                    if "." in eq2_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+                        ticker_pair2 = eq2_ticker_almost.replace(
+                            ".", " "
+                        )  # convert Tradingview -> IB format
+                    else:
+                        ticker_pair2 = "".join(
+                            char for char in eq2_ticker_almost if char.isalnum()
+                        )
+
+                        if eq2_ticker_almost != ticker_pair2:
+                            success_flag = False
+
+            # print("ticker_pair2: ", ticker_pair2)  # FTS
+
+            if len(eq2_hedge) == 0:
+                hedge_const = 1
+            else:
+                hedge_const = eq2_hedge[0]
+
+            # print("hedge_const: ", hedge_const)  # False
+            # print("problem_flag_final: ", success_flag)
+            # print("ticker_type: ", self.ticker_type)
+
+            self.ticker_type = "pair"
+            self.ticker2 = ticker_pair2
+            self.hedge_param = hedge_const
+
+        if len(eq12) > 2:
+            success_flag = False
+
+        if not success_flag:
+            self.order_status = "error"
+            self.status_msg = "problematic ticker!"
+            if not currency_match:
+                self.status_msg = "currency mismatch!"
+
+        return success_flag
+
+    # to split stocks only
+    def splitticker_stocks(self, ) -> bool:
 
         # Split the received webhook equation into tickers and hedge parameters
         # Tested with Tradingview webhooks and Interactive Brokers ticker format
