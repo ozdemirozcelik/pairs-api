@@ -382,7 +382,6 @@ def setup():
         flash("Please login!", "login")
         return redirect(url_for("dashboard"))
 
-
 # TEMPLATE FILTERS BELOW:
 
 # check if the date is today's date

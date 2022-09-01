@@ -26,6 +26,9 @@ class TickerRegister(Resource):
     parser.add_argument("prixch", type=str, default="NYSE")
     parser.add_argument("currency", type=str, default="USD")
     parser.add_argument("active", type=int, default=0)
+    parser.add_argument("active_pos", type=float)
+    parser.add_argument("active_pnl", type=float)
+    parser.add_argument("active_cost", type=float)
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -39,7 +42,8 @@ class TickerRegister(Resource):
             )  # Return Bad Request
 
         item = TickerModel(
-            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
+            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"],
+            data["active_pos"], data["active_pnl"], data["active_cost"]
         )
 
         if item.active == 1:
@@ -71,7 +75,8 @@ class TickerRegister(Resource):
         data = TickerRegister.parser.parse_args()
 
         item = TickerModel(
-            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"]
+            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"],
+            data["active_pos"], data["active_pnl"], data["active_cost"]
         )
 
         if item.active == 1:

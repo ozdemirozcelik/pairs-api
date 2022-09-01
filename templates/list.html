@@ -54,8 +54,8 @@
         <td>{{ signal.ticker }}</td>
         <td>{{ signal.order_comment }}</td> 
         <td>{{ signal.order_action }}</td>
-        <td>{{ signal.order_contracts }}</td>
-        <td>{{ signal.order_price }}</td>
+        <td>{{ "{:,}".format(signal.order_contracts) }}</td>
+        <td>{{ "{:,.2f}".format(signal.order_price) }}</td>
         {% if "err" in signal.order_status%}
         <td style="background-color:orange"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "created" in signal.order_status %}

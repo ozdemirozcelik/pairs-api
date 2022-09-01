@@ -1,7 +1,7 @@
 from typing import Dict, List, Union  # for type hinting
 from db import db
 
-TickerJSON = Dict[str, Union[str, int]]  # custom type hint
+TickerJSON = Dict[str, Union[str, int, float]]  # custom type hint
 
 
 class TickerModel(db.Model):
@@ -17,14 +17,21 @@ class TickerModel(db.Model):
     prixch = db.Column(db.String(40))
     currency = db.Column(db.String(20))
     active = db.Column(db.Integer)
+    # colums for active PNL
+    active_pos = db.Column(db.Float)
+    active_pnl = db.Column(db.Float)
+    active_cost = db.Column(db.Float)
 
-    def __init__(self, symbol: str, sectype: str, xch: str, prixch: str, currency: str, active: int):
+    def __init__(self, symbol: str, sectype: str, xch: str, prixch: str, currency: str, active: int, active_pos: float, active_pnl: float, active_cost: float):
         self.symbol = symbol
         self.sectype = sectype
         self.xch = xch
         self.prixch = prixch
         self.currency = currency
         self.active = active
+        self.active_pos = active_pos
+        self.active_pnl = active_pnl
+        self.active_cost = active_cost
 
     def json(self) -> TickerJSON:
         return {
@@ -34,6 +41,9 @@ class TickerModel(db.Model):
             "prixch": self.prixch,
             "currency": self.currency,
             "active": self.active,
+            "active_pos": self.active_pos,
+            "active_pnl": self.active_pnl,
+            "active_cost": self.active_cost
         }
 
     @classmethod
@@ -100,6 +110,9 @@ class TickerModel(db.Model):
         item_to_update.prixch = self.prixch
         item_to_update.currency = self.currency
         item_to_update.active = self.active
+        item_to_update.active_pos = self.active_pos
+        item_to_update.active_pnl = self.active_pnl
+        item_to_update.active_cost = self.active_cost
 
         db.session.commit()
 

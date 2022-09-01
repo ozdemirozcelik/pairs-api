@@ -1,5 +1,5 @@
-// define API end points for getting list of pairs and stocks
-const api_url_list_all_stock= server_url + 'v3/stocks/0';
+// define API end points for getting list of pairs and tickers
+const api_url_list_all_ticker= server_url + 'v3/tickers/0';
 const api_url_list_all_pair= server_url + 'v3/pairs/0';
 
 
@@ -19,7 +19,7 @@ var status_dic = {}; // used to store ticker status values to define order statu
 // load pair values since this is the active page on page load
 
 if (document.querySelector('input[name="tradetype"]:checked')) {
-    if (document.querySelector('input[name="tradetype"]:checked').value == "stock"){
+    if (document.querySelector('input[name="tradetype"]:checked').value == "ticker"){
 
         getStocks_dash(selected_ticker);
 
@@ -62,7 +62,7 @@ function checkTradeType(event){
         getPairs_dash(selected_ticker);
 
     } else {
-        // load stocks if trade type is stock
+        // load tickers if trade type is ticker
         getStocks_dash(selected_ticker);
 
     }
@@ -113,13 +113,13 @@ async function getPairs_dash(selected_ticker) {
 }
 
 // TO-DO: needs error handling in this function
-// list the stocks for the webhook creation
+// list the tickers for the webhook creation
 async function getStocks_dash(selected_ticker) {
-    const response = await fetch(api_url_list_all_stock);
-    stocks_data = await response.json();
+    const response = await fetch(api_url_list_all_ticker);
+    tickers_data = await response.json();
 
     // sort alphabetically
-    stocks_data.stocks.sort( function( a, b ) {
+    tickers_data.tickers.sort( function( a, b ) {
         a = a.symbol.toLowerCase();
         b = b.symbol.toLowerCase();
     
@@ -132,15 +132,15 @@ async function getStocks_dash(selected_ticker) {
     // reset ticker status 
     status_dic = {};
 
-    // list the stocks in the pair selection options
-    for (var key in stocks_data.stocks) {
-        if (stocks_data.stocks.hasOwnProperty(key)) {
+    // list the tickers in the pair selection options
+    for (var key in tickers_data.tickers) {
+        if (tickers_data.tickers.hasOwnProperty(key)) {
             
             opt = document.createElement("option");
-            str = stocks_data.stocks[key].symbol;
+            str = tickers_data.tickers[key].symbol;
 
             // store active status values
-            status_dic[str] =  stocks_data.stocks[key].active;
+            status_dic[str] =  tickers_data.tickers[key].active;
 
             opt.innerHTML += '<option>' + str + '</option>';
             opt.setAttribute('value', str);
