@@ -1,4 +1,4 @@
-# Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku
+# Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku & Dreamhost
 
 Version 3 of the Flask-RESTful API.
 
@@ -152,12 +152,10 @@ Flask sessions may not be persistent in Heroku, works fine in local.
 
 If the app is deployed remotely, a proxy will be activated to bypass CORS limitations.
 Proxy is set to "https://api-pairs-cors.herokuapp.com/" by default.
+Check if you need the following lines before deployment:
 
 ```javascript
-// use proxy to overcome CORS limitations
-var server_url = window.location.origin + "/";
-console.log("base_url: " + server_url);
-
+(base.html)(setup.html)
 if (server_url != "http://127.0.0.1:5000/") {
     const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
     var proxy_url = "https://api-pairs-cors.herokuapp.com/";
@@ -544,6 +542,12 @@ See the links below to add CORS headers to the proxied request:
 https://github.com/Rob--W/cors-anywhere
 
 https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-heroku-3lcb
+
+# DreamHost Shared Hosting Deployment:
+
+Please follow the instructions here:
+
+[DreamHost Shared Hosting Deployment](readmemore/DreamHost.md)
 
 # TradingView as the signal generator:
 

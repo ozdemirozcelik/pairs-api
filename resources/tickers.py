@@ -42,8 +42,15 @@ class TickerRegister(Resource):
             )  # Return Bad Request
 
         item = TickerModel(
-            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"],
-            data["active_pos"], data["active_pnl"], data["active_cost"]
+            data["symbol"],
+            data["sectype"],
+            data["xch"],
+            data["prixch"],
+            data["currency"],
+            data["active"],
+            data["active_pos"],
+            data["active_pnl"],
+            data["active_cost"],
         )
 
         if item.active == 1:
@@ -75,8 +82,15 @@ class TickerRegister(Resource):
         data = TickerRegister.parser.parse_args()
 
         item = TickerModel(
-            data["symbol"], data["sectype"], data["xch"], data["prixch"], data["currency"], data["active"],
-            data["active_pos"], data["active_pnl"], data["active_cost"]
+            data["symbol"],
+            data["sectype"],
+            data["xch"],
+            data["prixch"],
+            data["currency"],
+            data["active"],
+            data["active_pos"],
+            data["active_pnl"],
+            data["active_cost"],
         )
 
         if item.active == 1:

@@ -52,30 +52,30 @@ class SignalModel(db.Model):
     status_msg = db.Column(db.String)
 
     def __init__(
-            self,
-            timestamp: datetime,
-            ticker: str,
-            order_action: str,
-            order_contracts: int,
-            order_price: float,
-            mar_pos: str,
-            mar_pos_size: int,
-            pre_mar_pos: str,
-            pre_mar_pos_size: int,
-            order_comment: str,
-            order_status: str,
-            ticker_type: str,
-            ticker1: str,
-            ticker2: str,
-            hedge_param: float,
-            order_id1: int,
-            order_id2: int,
-            price1: float,
-            price2: float,
-            fill_price: float,
-            slip: float,
-            error_msg: str,
-            status_msg: str,
+        self,
+        timestamp: datetime,
+        ticker: str,
+        order_action: str,
+        order_contracts: int,
+        order_price: float,
+        mar_pos: str,
+        mar_pos_size: int,
+        pre_mar_pos: str,
+        pre_mar_pos_size: int,
+        order_comment: str,
+        order_status: str,
+        ticker_type: str,
+        ticker1: str,
+        ticker2: str,
+        hedge_param: float,
+        order_id1: int,
+        order_id2: int,
+        price1: float,
+        price2: float,
+        fill_price: float,
+        slip: float,
+        error_msg: str,
+        status_msg: str,
     ):
         self.timestamp = timestamp
         self.ticker = ticker
@@ -336,15 +336,15 @@ class SignalModel(db.Model):
                     cls.query.filter(
                         (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
             else:
                 return (
                     cls.query.filter(cls.ticker1 == ticker1)
-                        .filter(cls.ticker_type == "single")
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
         else:
             if pair:
@@ -352,20 +352,20 @@ class SignalModel(db.Model):
                     cls.query.filter(
                         (cls.ticker1 == ticker1) & (cls.ticker2 == ticker2)
                     )
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
             else:
                 return (
                     cls.query.filter(cls.ticker1 == ticker1)
-                        .filter(cls.ticker_type == "single")
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
 
     @classmethod
     def get_list_ticker_dates(
-            cls, ticker_name, number_of_items, start_date, end_date
+        cls, ticker_name, number_of_items, start_date, end_date
     ) -> List:
 
         pair = False
@@ -386,8 +386,8 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
             else:
                 return (
@@ -396,9 +396,9 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                        .filter(cls.ticker_type == "single")
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
         else:
             if pair:
@@ -409,8 +409,8 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
             else:
                 return (
@@ -419,9 +419,9 @@ class SignalModel(db.Model):
                         & (cls.timestamp <= end_date)
                         & (cls.timestamp >= start_date)
                     )
-                        .filter(cls.ticker_type == "single")
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .filter(cls.ticker_type == "single")
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
 
     @classmethod
@@ -434,14 +434,14 @@ class SignalModel(db.Model):
                         (cls.order_status == "waiting")
                         | (cls.order_status == "rerouted")
                     )
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
             else:
                 return (
                     cls.query.filter_by(order_status=order_status)
-                        .order_by(cls.rowid.desc())
-                        .all()
+                    .order_by(cls.rowid.desc())
+                    .all()
                 )
         else:
             if order_status == "waiting":
@@ -450,14 +450,14 @@ class SignalModel(db.Model):
                         (cls.order_status == "waiting")
                         | (cls.order_status == "rerouted")
                     )
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
             else:
                 return (
                     cls.query.filter_by(order_status=order_status)
-                        .order_by(cls.rowid.desc())
-                        .limit(number_of_items)
+                    .order_by(cls.rowid.desc())
+                    .limit(number_of_items)
                 )
 
     def check_ticker_status(self) -> bool:
@@ -505,7 +505,7 @@ class SignalModel(db.Model):
                 self.status_msg = "unknown ticker"
                 return False
 
-    def splitticker(self, ) -> bool:
+    def splitticker(self,) -> bool:
 
         success_flag = True
         currency_match = True
@@ -555,7 +555,9 @@ class SignalModel(db.Model):
                 elif item.sectype == "CRYPTO":
                     cry2 = eq1_ticker_almost[-3:]  # get last 3 char
                     ticker_pair1 = eq1_ticker_almost.replace(".", "")
-                    cry1 = eq1_ticker_almost[0:(len(ticker_pair1)-3)]  # get the first 3 char
+                    cry1 = eq1_ticker_almost[
+                        0 : (len(ticker_pair1) - 3)
+                    ]  # get the first 3 char
                     ticker_pair1 = cry1 + "." + cry2
 
                     # TODO: improve validity check
@@ -566,7 +568,9 @@ class SignalModel(db.Model):
 
                 else:
 
-                    if "." in eq1_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+                    if (
+                        "." in eq1_ticker_almost
+                    ):  # For Class A,B type tickers EXP: BF.A BF.B
                         ticker_pair1 = eq1_ticker_almost.replace(
                             ".", " "
                         )  # convert Tradingview -> IB format
@@ -632,7 +636,9 @@ class SignalModel(db.Model):
                 elif item.sectype == "CRYPTO":
                     cry2 = eq2_ticker_almost[-3:]  # get last 3 char
                     ticker_pair2 = eq2_ticker_almost.replace(".", "")
-                    cry1 = eq2_ticker_almost[0:(len(ticker_pair2)-3)]  # get the first 3 char
+                    cry1 = eq2_ticker_almost[
+                        0 : (len(ticker_pair2) - 3)
+                    ]  # get the first 3 char
                     ticker_pair2 = cry1 + "." + cry2
 
                     # TODO: improve validity check
@@ -643,7 +649,9 @@ class SignalModel(db.Model):
 
                 else:
 
-                    if "." in eq2_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+                    if (
+                        "." in eq2_ticker_almost
+                    ):  # For Class A,B type tickers EXP: BF.A BF.B
                         ticker_pair2 = eq2_ticker_almost.replace(
                             ".", " "
                         )  # convert Tradingview -> IB format
@@ -682,7 +690,7 @@ class SignalModel(db.Model):
         return success_flag
 
     # to split stocks only
-    def splitticker_stocks(self, ) -> bool:
+    def splitticker_stocks(self,) -> bool:
 
         # Split the received webhook equation into tickers and hedge parameters
         # Tested with Tradingview webhooks and Interactive Brokers ticker format

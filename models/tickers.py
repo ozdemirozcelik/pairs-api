@@ -22,7 +22,18 @@ class TickerModel(db.Model):
     active_pnl = db.Column(db.Float)
     active_cost = db.Column(db.Float)
 
-    def __init__(self, symbol: str, sectype: str, xch: str, prixch: str, currency: str, active: int, active_pos: float, active_pnl: float, active_cost: float):
+    def __init__(
+        self,
+        symbol: str,
+        sectype: str,
+        xch: str,
+        prixch: str,
+        currency: str,
+        active: int,
+        active_pos: float,
+        active_pnl: float,
+        active_cost: float,
+    ):
         self.symbol = symbol
         self.sectype = sectype
         self.xch = xch
@@ -43,7 +54,7 @@ class TickerModel(db.Model):
             "active": self.active,
             "active_pos": self.active_pos,
             "active_pnl": self.active_pnl,
-            "active_cost": self.active_cost
+            "active_cost": self.active_cost,
         }
 
     @classmethod
