@@ -14,6 +14,49 @@ DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
 TICKR_ERR = " ticker is already active in a pair!"
+ACTIVE_ERR = "ticker is not active!"
+
+
+class TickerUpdatePNL(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "symbol", type=str, required=True, help=EMPTY_ERR.format("symbol")
+    )
+    parser.add_argument("update", type=bool, default=False)
+    parser.add_argument("active_pos", type=float)
+    parser.add_argument("active_pnl", type=float)
+    parser.add_argument("active_cost", type=float)
+
+    @staticmethod
+    @jwt_required(fresh=True)  # need fresh token
+    def put():
+        data = TickerUpdatePNL.parser.parse_args()
+
+        # get ticker with symbol
+        item = TickerModel.find_by_symbol(data["symbol"])
+
+        if item:
+
+            item.active_pos = data["active_pos"]
+            item.active_pnl = data["active_pnl"]
+            item.active_cost = data["active_cost"]
+
+            try:
+                if item.active == 1:
+                    item.update()
+                else:
+                    return {"message": ACTIVE_ERR}, 400  # return Bad Request
+
+            except Exception as e:
+                print("Error occurred - ", e)
+                return (
+                    {"message": UPDATE_ERR},
+                    500,
+                )  # Return Interval Server Error
+
+            return item.json()
+
+        return {"message": NOT_FOUND}, 404  # Return Not Found
 
 
 class TickerRegister(Resource):

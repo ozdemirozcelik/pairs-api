@@ -19,7 +19,7 @@ from resources.signals import (
     SignalListStatus,
     Signal,
 )
-from resources.tickers import TickerRegister, TickerList, Ticker
+from resources.tickers import TickerRegister, TickerUpdatePNL, TickerList, Ticker
 from resources.users import (
     UserRegister,
     UserList,
@@ -192,6 +192,7 @@ api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
 api.add_resource(Pair, "/v3/pair/<string:name>")
 
 api.add_resource(TickerRegister, "/v3/regticker")
+api.add_resource(TickerUpdatePNL, "/v3/ticker/updatepnl")
 api.add_resource(TickerList, "/v3/tickers/<string:number_of_items>")
 api.add_resource(Ticker, "/v3/ticker/<string:symbol>")
 
