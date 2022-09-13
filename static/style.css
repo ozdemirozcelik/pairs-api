@@ -141,6 +141,10 @@ input { display: table-cell; }
     border-radius: 5%;
     width: 90px;
 }
+.order_type {
+    border-radius: 5%;
+    width: 90px;
+}
 
 .ticker-update {
     /* border-radius: 5%;

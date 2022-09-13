@@ -25,6 +25,7 @@ class TickerRegister(Resource):
     parser.add_argument("xch", type=str, default="SMART")
     parser.add_argument("prixch", type=str, default="NYSE")
     parser.add_argument("currency", type=str, default="USD")
+    parser.add_argument("order_type", type=str, default="RELATIVE")
     parser.add_argument("active", type=int, default=0)
     parser.add_argument("active_pos", type=float)
     parser.add_argument("active_pnl", type=float)
@@ -47,6 +48,7 @@ class TickerRegister(Resource):
             data["xch"],
             data["prixch"],
             data["currency"],
+            data["order_type"],
             data["active"],
             data["active_pos"],
             data["active_pnl"],
@@ -87,6 +89,7 @@ class TickerRegister(Resource):
             data["xch"],
             data["prixch"],
             data["currency"],
+            data["order_type"],
             data["active"],
             data["active_pos"],
             data["active_pnl"],

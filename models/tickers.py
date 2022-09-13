@@ -16,6 +16,7 @@ class TickerModel(db.Model):
     xch = db.Column(db.String(40))
     prixch = db.Column(db.String(40))
     currency = db.Column(db.String(20))
+    order_type = db.Column(db.String(20))
     active = db.Column(db.Integer)
     # colums for active PNL
     active_pos = db.Column(db.Float)
@@ -29,6 +30,7 @@ class TickerModel(db.Model):
         xch: str,
         prixch: str,
         currency: str,
+        order_type: str,
         active: int,
         active_pos: float,
         active_pnl: float,
@@ -39,6 +41,7 @@ class TickerModel(db.Model):
         self.xch = xch
         self.prixch = prixch
         self.currency = currency
+        self.order_type = order_type
         self.active = active
         self.active_pos = active_pos
         self.active_pnl = active_pnl
@@ -51,6 +54,7 @@ class TickerModel(db.Model):
             "xch": self.xch,
             "prixch": self.prixch,
             "currency": self.currency,
+            "order_type": self.order_type,
             "active": self.active,
             "active_pos": self.active_pos,
             "active_pnl": self.active_pnl,
@@ -120,6 +124,7 @@ class TickerModel(db.Model):
         item_to_update.xch = self.xch
         item_to_update.prixch = self.prixch
         item_to_update.currency = self.currency
+        item_to_update.order_type = self.order_type
         item_to_update.active = self.active
         item_to_update.active_pos = self.active_pos
         item_to_update.active_pnl = self.active_pnl

@@ -21,6 +21,7 @@ https://api-pairs-v3.herokuapp.com/
   - new dashboard
   - list view for signals
 - functionality to work with Interactive Brokers TWS API (Release V3.1)
+  - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
   
 # Use Cases
 
@@ -575,6 +576,11 @@ webhook URL should be:  '{URL_OF_YOUR_API}/v3/webhook'
 
 https://api-pairs-v3.herokuapp.com/
 
+# Using with Interactive Brokers
+
+Recommended to be used with Interactive Brokers.
+Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
+
 # Acknowledgements
 snippets:
 * [Sort a List](https://w3schools.com/howto/howto_js_sort_list.asp)
@@ -583,11 +589,6 @@ snippets:
 * [JavaScript Countdown Timer](https://www.w3schools.com/howto/howto_js_countdown.asp)
 * [Tooltip](http://css-tricks.com/snippets/css/css-triangle)
 
-# Considerations
-
-Considering for the next version:
-
-- send real time orders to exchange (possibly via Interactive Brokers)
 
 # Contributing
 

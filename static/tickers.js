@@ -432,6 +432,7 @@ async function getTicker(symbol) {
     document.getElementById("xch-update").value = ticker_data.xch;
     document.getElementById("prixch-update").value = ticker_data.prixch;
     document.getElementById("currency-update").value = ticker_data.currency;
+    document.getElementById("order_type-update").value = ticker_data.order_type;
     
     if (ticker_data.active) {
         document.getElementById("active-update").checked = "checked";
