@@ -1,4 +1,4 @@
-# Pairs-API v3 for trading stocks (single or pairs), deployed on Heroku & Dreamhost
+# Pairs-API v3 for trading tickers (single or pairs), deployed on Heroku & Dreamhost
 
 Version 3 of the Flask-RESTful API.
 
@@ -27,8 +27,8 @@ https://api-pairs-v3.herokuapp.com/
 
 With Pairs-API v3 you can:
 - catch webhooks from trading platforms or signal generators
-- list, save, update and delete stocks/pairs, order and price details with API calls
-- enable and disable stocks and pairs for active trading
+- list, save, update and delete tickers/pairs, order and price details with API calls
+- enable and disable tickers and pairs for active trading
 - use access tokens for authentication purposes with login system backend
 - TODO: send real time orders to exchange (possibly via Interactive Brokers)
 
@@ -125,18 +125,18 @@ needs currently set with Flask- JWT:
 
 - no token required:
   - POST signal
-  - GET stock & pair & signal
-  - GET stocks & pairs
+  - GET ticker & pair & signal
+  - GET tickers & pairs
   
 - optional token required: "@jwt_required(optional=True)":
   - GET signals (get more signals if token is available )
   
 - fresh token required "@jwt_required(fresh=True)":
   - PUT, Delete signal
-  - POST, PUT pair & stock
+  - POST, PUT pair & ticker
 
 - admin rights & fresh token required "@jwt_required(fresh=True)":
-  - DELETE signal & pair & stock
+  - DELETE signal & pair & ticker
   - GET, POST, PUT, DELETE user
 
 
@@ -171,9 +171,9 @@ Resources defined with flask_restful are:
 
 ```python
 api.add_resource(SignalWebhook, "/v3/webhook")
-api.add_resource(SignalPrice, "/v3/price")
+api.add_resource(SignalUpdateOrder, "/v3/signal/updateorder")
 api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
-api.add_resource(SignalListStatus,"/v3/signals/status/<string:order_status>/<string:number_of_items>")
+api.add_resource(SignalListStatus,"/v3/signals/status/<string:order_status>/<string:number_of_items>",)
 api.add_resource(SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>")
 api.add_resource(Signal, "/v3/signal/<string:rowid>")
 
@@ -181,9 +181,10 @@ api.add_resource(PairRegister, "/v3/regpair")
 api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
 api.add_resource(Pair, "/v3/pair/<string:name>")
 
-api.add_resource(StockRegister, "/v3/regstock")
-api.add_resource(StockList, "/v3/stocks/<string:number_of_items>")
-api.add_resource(Stock, "/v3/stock/<string:symbol>")
+api.add_resource(TickerRegister, "/v3/regticker")
+api.add_resource(TickerUpdatePNL, "/v3/ticker/updatepnl")
+api.add_resource(TickerList, "/v3/tickers/<string:number_of_items>")
+api.add_resource(Ticker, "/v3/ticker/<string:symbol>")
 
 api.add_resource(UserRegister, "/v3/reguser")
 api.add_resource(UserList, "/v3/users/<string:number_of_users>")
@@ -191,15 +192,16 @@ api.add_resource(User, "/v3/user/<string:username>")
 api.add_resource(UserLogin, "/v3/login")
 api.add_resource(UserLogout, "/v3/logout")
 api.add_resource(TokenRefresh, "/v3/refresh")
+
 ```
 
 # Request & Response Examples
 
-POSTMAN collection can be found under "local" folder.
+Please check the [POSTMAN collection](local/pairs_api%20v3.postman_collection.json) to test all resources.
 
-### POST request to register a single stock:
+### POST request to register a single ticker:
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regticker'
 ```
 Request Body:
 ```json
@@ -218,9 +220,9 @@ Response:
 }
 ```
 
-### PUT request to update a single stock:
+### PUT request to update a single ticker:
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/regstock'
+'http://api-pairs-v3.herokuapp.com/v3/regticker'
 ```
 Request Body:
 ```json
@@ -242,19 +244,19 @@ Response:
 }
 ```
 
-### GET request to get all stocks:
+### GET request to get all tickers:
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/stocks/0'
+'http://api-pairs-v3.herokuapp.com/v3/tickers/0'
 ```
 
-### GET request to receive certain number of stocks (for exp: 50):
+### GET request to receive certain number of tickers (for exp: 50):
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/stocks/2'
+'http://api-pairs-v3.herokuapp.com/v3/tickers/2'
 ```
 Response:
 ```json
 {
-    "stocks": [
+    "tickers": [
         {
             "symbol": "AAPL",
             "prixch": "SMART",
@@ -271,9 +273,9 @@ Response:
 }
 ```
 
-### GET request to get details of a certain stock:
+### GET request to get details of a certain ticker:
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/ticker/AAPL'
 ```
 
 Response:
@@ -285,9 +287,9 @@ Response:
     "active": 1
 }
 ```
-### DELETE request for a certain stock:
+### DELETE request for a certain ticker:
 ```python
-'http://api-pairs-v3.herokuapp.com/v3/stock/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/ticker/AAPL'
 ```
 Response:
 ```json
@@ -433,7 +435,7 @@ Response:
     ]
 }
 ```
-### POST request to update order price and status by order id
+### PUT request to update order price and status by order id
 ```python
 'http://api-pairs-v3.herokuapp.com/v3/signal/updateorder'
 ```

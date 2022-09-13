@@ -7,10 +7,10 @@
 	},
 	"item": [
 		{
-			"name": "stocks",
+			"name": "tickers",
 			"item": [
 				{
-					"name": "register (a stock)",
+					"name": "register (a ticker)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -27,22 +27,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"symbol\": \"EEE\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"NASDAQ\",\r\n    \"active\": 0\r\n\r\n}"
+							"raw": "{\r\n    \"symbol\": \"CCC\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NASDAQ\",\r\n    \"currency\":\"USD\",\r\n    \"active\": 0\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v3}}/regstock",
+							"raw": "{{pairs_api_v3}}/regticker",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"regstock"
+								"regticker"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "update(a stock)",
+					"name": "update(a ticker)",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -59,22 +59,55 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"symbol\": \"CCC\",\r\n    \"prixch\": \"SMART\",\r\n    \"secxch\": \"ISLAND\",\r\n    \"active\": 1\r\n\r\n}"
+							"raw": "{\r\n    \"symbol\": \"CCC\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NASDAQ\",\r\n    \"currency\": \"USD\",\r\n    \"order_type\": \"RELATIVE\",\r\n    \"active\": 0\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v3}}/regstock",
+							"raw": "{{pairs_api_v3}}/regticker",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"regstock"
+								"regticker"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "stocks (# of items)",
+					"name": "update(PNL)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"symbol\": \"ACC\",\r\n    \"active_pos\": 12,\r\n    \"active_pnl\": 100.5,\r\n    \"active_cost\": 106\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/ticker/updatepnl",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"ticker",
+								"updatepnl"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tickers (# of items)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -86,12 +119,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v3}}/stocks/0",
+							"raw": "{{pairs_api_v3}}/tickers/0",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"stocks",
+								"tickers",
 								"0"
 							]
 						}
@@ -99,7 +132,7 @@
 					"response": []
 				},
 				{
-					"name": "stock (details)",
+					"name": "ticker (details)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -110,12 +143,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v3}}/stock/CCC",
+							"raw": "{{pairs_api_v3}}/ticker/CCC",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"stock",
+								"ticker",
 								"CCC"
 							]
 						}
@@ -123,7 +156,7 @@
 					"response": []
 				},
 				{
-					"name": "stock (delete)",
+					"name": "ticker (delete)",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -134,12 +167,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v3}}/stock/CCC",
+							"raw": "{{pairs_api_v3}}/ticker/CCC",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"stock",
+								"ticker",
 								"CCC"
 							]
 						}
@@ -169,7 +202,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"AAA-BBB\",\r\n    \"hedge\": 1.123456789,\r\n    \"status\": 1,\r\n    \"do not save\": 0\r\n}"
+							"raw": "{\r\n    \"ticker1\": \"AAA\",\r\n    \"ticker2\": \"BBB\",\r\n    \"hedge\": 1.123,\r\n    \"status\": 0,\r\n    \"do not save\": 0\r\n}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v3}}/regpair",
@@ -201,7 +234,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"XXX-ZZZ\",\r\n    \"hedge\": 1.5878878979879879879877,\r\n    \"status\": 0\r\n}"
+							"raw": "{\r\n    \"name\": \"AAA-XXX\",\r\n    \"hedge\": 1.4,\r\n    \"status\": 0\r\n}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v3}}/regpair",
@@ -308,37 +341,6 @@
 					"response": []
 				},
 				{
-					"name": "register (a signal) HEROKU",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"NMFC-0.72*NASDAQ:ROIC\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": -0.01,\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": 100,\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \"Enter Long(...)\"\r\n}"
-						},
-						"url": {
-							"raw": "https://api-pairs-v3.herokuapp.com/v3/webhook",
-							"protocol": "https",
-							"host": [
-								"api-pairs-v3",
-								"herokuapp",
-								"com"
-							],
-							"path": [
-								"v3",
-								"webhook"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "update (a signal)",
 					"request": {
 						"method": "PUT",
@@ -357,6 +359,71 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n            \"passphrase\": \"webhook\",\r\n            \"rowid\": 31,\r\n            \"timestamp\": \"2022-05-27 00:01:42\",\r\n            \"ticker\": \"NMFC\",\r\n            \"order_action\": \"buy\",\r\n            \"order_contracts\": 100,\r\n            \"order_price\": -0.01,\r\n            \"mar_pos\": \"long\",\r\n            \"mar_pos_size\": 100,\r\n            \"pre_mar_pos\": \"flat\",\r\n            \"pre_mar_pos_size\": 0,\r\n            \"order_comment\": \"Enter Long(...)\",\r\n            \"order_status\": \"canceled\",\r\n            \"ticker_type\": \"single\",\r\n            \"stk_ticker1\": \"NMFC\",\r\n            \"stk_ticker2\": null,\r\n            \"hedge_param\": null,\r\n            \"order_id1\": 12,\r\n            \"order_id2\": 14,\r\n            \"stk_price1\": null,\r\n            \"stk_price2\": null,\r\n            \"fill_price\": null,\r\n            \"slip\": null,\r\n            \"error_msg\": \"unregistered ticker\"\r\n        }"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/webhook",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update (by order_id)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n            \"passphrase\": \"webhook\",\r\n            \"rowid\": 31,\r\n            \"timestamp\": \"2022-05-27 00:01:42\",\r\n            \"ticker\": \"NMFC\",\r\n            \"order_action\": \"buy\",\r\n            \"order_contracts\": 100,\r\n            \"order_price\": -0.01,\r\n            \"mar_pos\": \"long\",\r\n            \"mar_pos_size\": 100,\r\n            \"pre_mar_pos\": \"flat\",\r\n            \"pre_mar_pos_size\": 0,\r\n            \"order_comment\": \"Enter Long(...)\",\r\n            \"order_status\": \"canceled\",\r\n            \"ticker_type\": \"single\",\r\n            \"stk_ticker1\": \"NMFC\",\r\n            \"stk_ticker2\": null,\r\n            \"hedge_param\": null,\r\n            \"order_id1\": 12,\r\n            \"order_id2\": 14,\r\n            \"stk_price1\": null,\r\n            \"stk_price2\": null,\r\n            \"fill_price\": null,\r\n            \"slip\": null,\r\n            \"error_msg\": \"unregistered ticker\"\r\n        }"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/webhook",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update (a signal) Test",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"rowid\": 43, \"timestamp\": \"2022-05-31 18:46:23\", \"ticker\": \"MA-3*V\", \"order_action\": \"sell\", \"order_contracts\": 90, \"order_price\": null, \"mar_pos\": null, \"mar_pos_size\": null, \"pre_mar_pos\": null, \"pre_mar_pos_size\": null, \"order_comment\": \"Enter Short\", \"order_status\": \"waiting\", \"ticker_type\": \"pair\", \"stk_ticker1\": \"MA\", \"stk_ticker2\": \"V\", \"hedge_param\": 3.0, \"order_id1\": null, \"order_id2\": null, \"stk_price1\": null, \"stk_price2\": null, \"fill_price\": null, \"slip\": null, \"error_msg\": \"duplicate order\", \"passphrase\": \"webhook\"}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v3}}/webhook",

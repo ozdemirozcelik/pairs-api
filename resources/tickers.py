@@ -22,7 +22,6 @@ class TickerUpdatePNL(Resource):
     parser.add_argument(
         "symbol", type=str, required=True, help=EMPTY_ERR.format("symbol")
     )
-    parser.add_argument("update", type=bool, default=False)
     parser.add_argument("active_pos", type=float)
     parser.add_argument("active_pnl", type=float)
     parser.add_argument("active_cost", type=float)
@@ -43,7 +42,7 @@ class TickerUpdatePNL(Resource):
 
             try:
                 if item.active == 1:
-                    item.update()
+                    item.update(1)
                 else:
                     return {"message": ACTIVE_ERR}, 400  # return Bad Request
 
@@ -70,9 +69,13 @@ class TickerRegister(Resource):
     parser.add_argument("currency", type=str, default="USD")
     parser.add_argument("order_type", type=str, default="RELATIVE")
     parser.add_argument("active", type=int, default=0)
+    # update_pnl to be "True" to update active_pos, active_pnl, active_cost
+    parser.add_argument("update_pnl", type=bool, default=False)
     parser.add_argument("active_pos", type=float)
     parser.add_argument("active_pnl", type=float)
     parser.add_argument("active_cost", type=float)
+
+
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -147,9 +150,12 @@ class TickerRegister(Resource):
                     400,
                 )  # Return Bad Request
 
-        if TickerModel.find_by_symbol(data["symbol"]):
+        item_to_update = TickerModel.find_by_symbol(data["symbol"])
+
+        if item_to_update:
             try:
-                item.update()
+                print(data["update_pnl"])
+                item.update(data["update_pnl"])
 
             except Exception as e:
                 print("Error occurred - ", e)
@@ -158,7 +164,7 @@ class TickerRegister(Resource):
                     500,
                 )  # Return Interval Server Error
 
-            return item.json()
+            return item_to_update.json()
 
         try:
             item.insert()

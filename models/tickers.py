@@ -18,7 +18,7 @@ class TickerModel(db.Model):
     currency = db.Column(db.String(20))
     order_type = db.Column(db.String(20))
     active = db.Column(db.Integer)
-    # colums for active PNL
+    # columns for active PNL
     active_pos = db.Column(db.Float)
     active_pnl = db.Column(db.Float)
     active_cost = db.Column(db.Float)
@@ -116,7 +116,7 @@ class TickerModel(db.Model):
     #         if connection:
     #             connection.close()  # disconnect the database even if exception occurs
 
-    def update(self) -> None:
+    def update(self, update_pnl: bool) -> None:
 
         item_to_update = self.query.filter_by(symbol=self.symbol).first()
 
@@ -126,9 +126,11 @@ class TickerModel(db.Model):
         item_to_update.currency = self.currency
         item_to_update.order_type = self.order_type
         item_to_update.active = self.active
-        item_to_update.active_pos = self.active_pos
-        item_to_update.active_pnl = self.active_pnl
-        item_to_update.active_cost = self.active_cost
+
+        if update_pnl:
+            item_to_update.active_pos = self.active_pos
+            item_to_update.active_pnl = self.active_pnl
+            item_to_update.active_cost = self.active_cost
 
         db.session.commit()
 
