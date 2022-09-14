@@ -825,4 +825,4 @@ class SignalModel(db.Model):
 
         return cls.query.filter(
             (cls.order_id1 == orderid) | (cls.order_id2 == orderid)
-        ).first()
+        ).order_by(cls.rowid.desc()).first() # get the most recent order in case of a multiple order id situation

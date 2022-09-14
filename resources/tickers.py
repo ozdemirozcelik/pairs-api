@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from models.tickers import TickerModel
 from flask_jwt_extended import jwt_required, get_jwt
 from models.pairs import PairModel
+from models.signals import SignalModel
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
@@ -14,11 +15,14 @@ DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
 TICKR_ERR = " ticker is already active in a pair!"
-ACTIVE_ERR = "ticker is not active!"
+PASS_ERR = "incorrect passphrase."
 
 
 class TickerUpdatePNL(Resource):
     parser = reqparse.RequestParser()
+    parser.add_argument(
+        "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
+    )
     parser.add_argument(
         "symbol", type=str, required=True, help=EMPTY_ERR.format("symbol")
     )
@@ -26,10 +30,16 @@ class TickerUpdatePNL(Resource):
     parser.add_argument("active_pnl", type=float)
     parser.add_argument("active_cost", type=float)
 
-    @staticmethod
-    @jwt_required(fresh=True)  # need fresh token
+    @staticmethod # this is to update PNL and no need to have an active session
     def put():
         data = TickerUpdatePNL.parser.parse_args()
+
+        # format return message inline with flask_restful parser errors
+        if SignalModel.passphrase_wrong(data["passphrase"]):
+            return_msg = {"message": {"passphrase": PASS_ERR}}
+            #  return {"message": PASS_ERR}, 400  # return Bad Request
+            return return_msg, 400  # return Bad Request
+
 
         # get ticker with symbol
         item = TickerModel.find_by_symbol(data["symbol"])
@@ -41,10 +51,7 @@ class TickerUpdatePNL(Resource):
             item.active_cost = data["active_cost"]
 
             try:
-                if item.active == 1:
-                    item.update(1)
-                else:
-                    return {"message": ACTIVE_ERR}, 400  # return Bad Request
+                item.update(1)
 
             except Exception as e:
                 print("Error occurred - ", e)

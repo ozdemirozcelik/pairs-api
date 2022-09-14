@@ -9,6 +9,8 @@ from flask_jwt_extended import JWTManager
 from jwt import ExpiredSignatureError
 from blacklist import BLACKLIST
 from models.signals import SignalModel
+from models.tickers import TickerModel
+from models.pairs import PairModel
 from models.session import SessionModel
 from resources.pairs import PairRegister, PairList, Pair
 from resources.signals import (
@@ -252,7 +254,7 @@ def dashboard():
     signals = [item.json() for item in items]
 
     return render_template(
-        "dash.html", signals=signals, title="DASHBOARD", tab1="tab active", tab2="tab"
+        "dash.html", signals=signals, title="DASHBOARD", tab1="tab active", tab2="tab", tab3="tab"
     )
 
 
@@ -334,7 +336,7 @@ def dashboard_list():
             flash("Login to see more!", "login_for_more")
     else:
         return render_template(
-            "list.html", title="LIST SIGNALS", tab2="tab active", tab1="tab"
+            "list.html", title="LIST SIGNALS", tab2="tab active", tab1="tab", tab3="tab"
         )
 
     signals = [item.json() for item in items]
@@ -345,10 +347,65 @@ def dashboard_list():
         title="LIST SIGNALS",
         tab2="tab active",
         tab1="tab",
+        tab3="tab",
         start_date=start_date,
         end_date=end_date - timedelta(days=1),
         selected_ticker=selected_ticker,
         selected_trade_type=selected_trade_type,
+    )
+
+@app.get("/positions")
+def positions():
+    # (flask-session-change) Flask sessions may not be persistent in Heroku, works fine in local
+    # consider disabling below for Heroku
+
+    ##
+    # if session.get("token") is None:
+    #     session["token"] = None
+    #
+    # if session["token"] == "yes_token":
+    #     items = SignalModel.get_rows(str(50))
+    # else:
+    #     items = SignalModel.get_rows(str(5))
+    #     flash("Login to see more!", "login_for_more")
+    #
+    # signals = [item.json() for item in items]
+    ##
+
+    # consider enabling below for Heroku:
+    # this method uses a simple custom session table created in the database
+
+    access_token = request.cookies.get("access_token")
+
+    SessionModel.delete_expired()  # clean expired session data
+
+    if access_token:
+        simplesession = SessionModel.find_by_value(access_token[-10:])
+    else:
+        simplesession = None
+
+    if simplesession:
+        active_tickers = TickerModel.get_active_tickers(str(20))
+        active_pairs = PairModel.get_active_pairs(str(20))
+
+    else:
+        active_tickers = TickerModel.get_active_tickers(str(3))
+        active_pairs = PairModel.get_active_pairs(str(3))
+        flash("Login for more details!", "login_for_more")
+
+    pairs = [item.json() for item in active_pairs]
+    print(active_pairs)
+
+    pairs_ticker = []
+
+    for item in active_pairs:
+        pairs_ticker.append(TickerModel.find_by_symbol(item.ticker1).json())
+        pairs_ticker.append(TickerModel.find_by_symbol(item.ticker2).json())
+
+    tickers = [item.json() for item in active_tickers]
+
+    return render_template(
+        "pos.html", pairs=pairs, tickers=tickers, pairs_ticker=pairs_ticker, title="POSITIONS", tab3="tab active", tab2="tab", tab1="tab"
     )
 
 

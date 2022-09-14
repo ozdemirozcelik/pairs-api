@@ -108,6 +108,14 @@ input { display: table-cell; }
     overflow: auto;
     letter-spacing:0.3px;
 }
+.column_positions {
+    height: 510px;
+    padding: 20px;
+    margin: 2px;
+    background-color: lightgrey;
+    overflow: auto;
+    letter-spacing:0.3px;
+}
 .container {
     display: flex;
 }
@@ -116,6 +124,13 @@ input { display: table-cell; }
     table-layout: auto;
     width: 100%;
     text-align: center;
+    font-size: 90%;
+}
+
+.positions {
+    table-layout: auto;
+    width: 80%;
+    text-align: left;
     font-size: 90%;
 }
 

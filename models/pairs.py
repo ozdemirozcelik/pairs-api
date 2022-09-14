@@ -210,3 +210,11 @@ class PairModel(db.Model):
         return cls.query.filter(
             ((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & (cls.status == 1)
         ).first()
+
+    @classmethod
+    def get_active_pairs(cls, number_of_items: str) -> List:
+
+        if number_of_items == "0":
+            return cls.query.filter(cls.status == 1)
+        else:
+            return cls.query.filter(cls.status == 1).limit(number_of_items).all()
