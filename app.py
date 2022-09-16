@@ -404,14 +404,16 @@ def positions():
         active_pairs = PairModel.get_active_pairs(str(20))
         acc_pnl = AccountModel.get_rows(str(1))
 
+        # having index problems with heroku deployment with the following.
+        # len() doesn't work.
+        # if acc_pnl[0]:
+        #     pnl = acc_pnl[0].json()
+
+        #using this instead:
         try:
             pnl = acc_pnl[0].json()
         except IndexError:
             pass
-
-        # having index problems with heroku deployment with the following. len(.) also doesn't work.
-        # if acc_pnl[0]:
-        #     pnl = acc_pnl[0].json()
 
     else:
         active_tickers = TickerModel.get_active_tickers(str(3))
