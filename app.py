@@ -395,25 +395,34 @@ def positions():
     else:
         simplesession = None
 
+    pnl = {
+        "rowid": "NA",
+    }
+
     if simplesession:
         active_tickers = TickerModel.get_active_tickers(str(20))
         active_pairs = PairModel.get_active_pairs(str(20))
         acc_pnl = AccountModel.get_rows(str(1))
 
+        if acc_pnl:
+            pnl = acc_pnl[0].json()
+
     else:
         active_tickers = TickerModel.get_active_tickers(str(3))
         active_pairs = PairModel.get_active_pairs(str(3))
-        acc_pnl = []
+
         flash("Login to see more details!", "login_for_more")
 
     pair_pos_all = []
 
     for pair in active_pairs:
-        pair_pos_all.append({
-            "pair": pair.json(),
-            "ticker1": TickerModel.find_by_symbol(pair.ticker1).json(),
-            "ticker2": TickerModel.find_by_symbol(pair.ticker2).json()
-        })
+        pair_pos_all.append(
+            {
+                "pair": pair.json(),
+                "ticker1": TickerModel.find_by_symbol(pair.ticker1).json(),
+                "ticker2": TickerModel.find_by_symbol(pair.ticker2).json(),
+            }
+        )
 
     pair_pairs_ticker = []
 
@@ -422,13 +431,6 @@ def positions():
         pair_pairs_ticker.append(TickerModel.find_by_symbol(item.ticker2).json())
 
     other_pos = [item.json() for item in active_tickers]
-
-    if len(acc_pnl) != 0:
-        pnl = acc_pnl[0].json()
-    else:
-        pnl = {
-            "rowid": "NA",
-        }
 
     return render_template(
         "pos.html",
