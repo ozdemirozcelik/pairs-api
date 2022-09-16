@@ -404,7 +404,7 @@ def positions():
         active_pairs = PairModel.get_active_pairs(str(20))
         acc_pnl = AccountModel.get_rows(str(1))
 
-        if acc_pnl:
+        if acc_pnl[0]:
             pnl = acc_pnl[0].json()
 
     else:
