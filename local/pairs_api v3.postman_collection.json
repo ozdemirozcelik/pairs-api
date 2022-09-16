@@ -91,7 +91,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"symbol\": \"ACC\",\r\n    \"active_pos\": 12,\r\n    \"active_pnl\": 100.5,\r\n    \"active_cost\": 106\r\n\r\n}"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"symbol\": \"ACC\",\r\n    \"active_pos\": 12,\r\n    \"active_pnl\": 100.5,\r\n    \"active_cost\": 106\r\n\r\n}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v3}}/ticker/updatepnl",
@@ -174,6 +174,126 @@
 							"path": [
 								"ticker",
 								"CCC"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "account",
+			"item": [
+				{
+					"name": "register (PNL)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"AvailableFunds\": 31000,\r\n    \"BuyingPower\": 103295,\r\n    \"DailyPnL\": 268.9,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588,\r\n    \"RealizedPnL\": 30,\r\n    \"UnrealizedPnL\": -1000\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regpnl",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regpnl"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update(PNL)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"rowid\":10,\r\n    \"timestamp\":\"2022-06-16 23:55:36\",\r\n    \"AvailableFunds\": 32000,\r\n    \"BuyingPower\": 103295,\r\n    \"DailyPnL\": 268.9,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588,\r\n    \"RealizedPnL\": 30,\r\n    \"UnrealizedPnL\": -1000\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{pairs_api_v3}}/regpnl",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"regpnl"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pnl (# of items)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/pnl/1",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"pnl",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pnl(delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v3}}/pnl/2",
+							"host": [
+								"{{pairs_api_v3}}"
+							],
+							"path": [
+								"pnl",
+								"2"
 							]
 						}
 					},
@@ -385,27 +505,29 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n            \"passphrase\": \"webhook\",\r\n            \"rowid\": 31,\r\n            \"timestamp\": \"2022-05-27 00:01:42\",\r\n            \"ticker\": \"NMFC\",\r\n            \"order_action\": \"buy\",\r\n            \"order_contracts\": 100,\r\n            \"order_price\": -0.01,\r\n            \"mar_pos\": \"long\",\r\n            \"mar_pos_size\": 100,\r\n            \"pre_mar_pos\": \"flat\",\r\n            \"pre_mar_pos_size\": 0,\r\n            \"order_comment\": \"Enter Long(...)\",\r\n            \"order_status\": \"canceled\",\r\n            \"ticker_type\": \"single\",\r\n            \"stk_ticker1\": \"NMFC\",\r\n            \"stk_ticker2\": null,\r\n            \"hedge_param\": null,\r\n            \"order_id1\": 12,\r\n            \"order_id2\": 14,\r\n            \"stk_price1\": null,\r\n            \"stk_price2\": null,\r\n            \"fill_price\": null,\r\n            \"slip\": null,\r\n            \"error_msg\": \"unregistered ticker\"\r\n        }"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"order_id\": 1166,\r\n    \"stk_price\": 326.50,\r\n    \"cancel\":true,\r\n    \"partial\": true,\r\n    \"order_contracts\": 15\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v3}}/webhook",
+							"raw": "{{pairs_api_v3}}/signal/updateorder",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"webhook"
+								"signal",
+								"updateorder"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "update (a signal) Test",
+					"name": "update (by order_id)(cancel)",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -417,21 +539,21 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text",
-								"disabled": true
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"rowid\": 43, \"timestamp\": \"2022-05-31 18:46:23\", \"ticker\": \"MA-3*V\", \"order_action\": \"sell\", \"order_contracts\": 90, \"order_price\": null, \"mar_pos\": null, \"mar_pos_size\": null, \"pre_mar_pos\": null, \"pre_mar_pos_size\": null, \"order_comment\": \"Enter Short\", \"order_status\": \"waiting\", \"ticker_type\": \"pair\", \"stk_ticker1\": \"MA\", \"stk_ticker2\": \"V\", \"hedge_param\": 3.0, \"order_id1\": null, \"order_id2\": null, \"stk_price1\": null, \"stk_price2\": null, \"fill_price\": null, \"slip\": null, \"error_msg\": \"duplicate order\", \"passphrase\": \"webhook\"}"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"order_id\": 1166,\r\n    \"stk_price\": 326.50,\r\n    \"cancel\":true,\r\n    \"partial\": true,\r\n    \"order_contracts\": 15\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v3}}/webhook",
+							"raw": "{{pairs_api_v3}}/signal/updateorder",
 							"host": [
 								"{{pairs_api_v3}}"
 							],
 							"path": [
-								"webhook"
+								"signal",
+								"updateorder"
 							]
 						}
 					},

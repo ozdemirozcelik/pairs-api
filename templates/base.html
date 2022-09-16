@@ -50,15 +50,15 @@
 
 <script>
 
-// use proxy to overcome CORS limitations
 var server_url = window.location.origin + "/";
 console.log("base_url: " + server_url);
 
-if (server_url != "http://127.0.0.1:5000/") {
-    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
-    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-    server_url = proxy_url + updatedURL;
-};
+// Edit your proxy and enable to overcome CORS limitations
+// if (server_url != "http://127.0.0.1:5000/") {
+//    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
+//    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
+//    server_url = proxy_url + updatedURL;
+//};
 
 
 </script>

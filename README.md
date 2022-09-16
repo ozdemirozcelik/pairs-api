@@ -2,14 +2,14 @@
 
 Version 3 of the Flask-RESTful API.
 
-(Latest Release: v3.1)
+(Latest Release: v3.2)
 
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
 
-A working demo is deployed in Heroku with PostgreSQL:
+A working demo for the latest release is deployed in Heroku with PostgreSQL:
 
-https://api-pairs-v3.herokuapp.com/
+https://api-pairs.herokuapp.com/
 
 
 # Additions to v2
@@ -153,19 +153,21 @@ Flask sessions may not be persistent in Heroku, works fine in local.
 
 ### templates/setup.html
 
-If the app is deployed remotely, a proxy will be activated to bypass CORS limitations.
+If the app is deployed remotely, a proxy can be activated to bypass CORS limitations.
 Proxy is set to "https://api-pairs-cors.herokuapp.com/" by default.
-Check if you need the following lines before deployment:
+Check if you need the enable the following lines before deployment:
 
 ```javascript
 (base.html)(setup.html)
-if (server_url != "http://127.0.0.1:5000/") {
-    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
-    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-    server_url = proxy_url + updatedURL;
+// Edit your proxy and enable to overcome CORS limitations
+// if (server_url != "http://127.0.0.1:5000/") {
+//    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
+//    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
+//    server_url = proxy_url + updatedURL;
+//};
 ```
 
-Check [Heroku deployment](#heroku-deployment) to learn for more about using your own proxy server.
+Check [Heroku deployment](#heroku-deployment) to learn for more about using your own proxy server on Heroku.
 
 # Resources
 
@@ -580,7 +582,7 @@ webhook URL should be:  '{URL_OF_YOUR_API}/v3/webhook'
 
 # Demo:
 
-https://api-pairs-v3.herokuapp.com/
+https://api-pairs.herokuapp.com/
 
 # Using with Interactive Brokers
 
