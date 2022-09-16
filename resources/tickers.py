@@ -30,7 +30,7 @@ class TickerUpdatePNL(Resource):
     parser.add_argument("active_pnl", type=float)
     parser.add_argument("active_cost", type=float)
 
-    @staticmethod # this is to update PNL and no need to have an active session
+    @staticmethod  # this is to update PNL and no need to have an active session
     def put():
         data = TickerUpdatePNL.parser.parse_args()
 
@@ -39,7 +39,6 @@ class TickerUpdatePNL(Resource):
             return_msg = {"message": {"passphrase": PASS_ERR}}
             #  return {"message": PASS_ERR}, 400  # return Bad Request
             return return_msg, 400  # return Bad Request
-
 
         # get ticker with symbol
         item = TickerModel.find_by_symbol(data["symbol"])
@@ -78,11 +77,9 @@ class TickerRegister(Resource):
     parser.add_argument("active", type=int, default=0)
     # update_pnl to be "True" to update active_pos, active_pnl, active_cost
     parser.add_argument("update_pnl", type=bool, default=False)
-    parser.add_argument("active_pos", type=float)
-    parser.add_argument("active_pnl", type=float)
-    parser.add_argument("active_cost", type=float)
-
-
+    parser.add_argument("active_pos", type=float, default=0)
+    parser.add_argument("active_pnl", type=float, default=0)
+    parser.add_argument("active_cost", type=float, default=0)
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token

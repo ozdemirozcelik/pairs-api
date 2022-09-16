@@ -11,7 +11,7 @@ from models.tickers import TickerModel
 
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
-PASSPHRASE = "webhook"  # Passphrase is required to register webhooks
+PASSPHRASE = "webhook"  # Passphrase is required to register webhooks (& to update account positions & PNL)
 
 
 class SignalModel(db.Model):
@@ -823,6 +823,8 @@ class SignalModel(db.Model):
     @classmethod
     def find_by_orderid(cls, orderid) -> "SignalModel":
 
-        return cls.query.filter(
-            (cls.order_id1 == orderid) | (cls.order_id2 == orderid)
-        ).order_by(cls.rowid.desc()).first() # get the most recent order in case of a multiple order id situation
+        return (
+            cls.query.filter((cls.order_id1 == orderid) | (cls.order_id2 == orderid))
+            .order_by(cls.rowid.desc())
+            .first()
+        )  # get the most recent order in case of a multiple order id situation

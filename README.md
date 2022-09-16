@@ -22,6 +22,7 @@ https://api-pairs-v3.herokuapp.com/
   - list view for signals
 - functionality to work with Interactive Brokers TWS API (Release V3.1)
   - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
+- Keep account position and PNL details
   
 # Use Cases
 
@@ -31,6 +32,7 @@ With Pairs-API v3 you can:
 - enable and disable tickers and pairs for active trading
 - use access tokens for authentication purposes with login system backend
 - TODO: send real time orders to exchange (possibly via Interactive Brokers)
+- see account positions and PNL details
 
 # Requirements
 
@@ -193,6 +195,8 @@ api.add_resource(UserLogin, "/v3/login")
 api.add_resource(UserLogout, "/v3/logout")
 api.add_resource(TokenRefresh, "/v3/refresh")
 
+api.add_resource(PNLRegister, "/v3/regpnl")
+api.add_resource(PNLList, "/v3/pnl/<string:number_of_items>")
 ```
 
 # Request & Response Examples

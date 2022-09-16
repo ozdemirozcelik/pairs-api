@@ -10,6 +10,7 @@ from jwt import ExpiredSignatureError
 from blacklist import BLACKLIST
 from models.signals import SignalModel
 from models.tickers import TickerModel
+from models.account import AccountModel
 from models.pairs import PairModel
 from models.session import SessionModel
 from resources.pairs import PairRegister, PairList, Pair
@@ -30,6 +31,7 @@ from resources.users import (
     UserLogout,
     TokenRefresh,
 )
+from resources.account import PNLRegister, PNLList, PNL
 from db import db
 from datetime import datetime
 from datetime import timedelta
@@ -205,6 +207,9 @@ api.add_resource(UserLogin, "/v3/login")
 api.add_resource(UserLogout, "/v3/logout")
 api.add_resource(TokenRefresh, "/v3/refresh")
 
+api.add_resource(PNLRegister, "/v3/regpnl")
+api.add_resource(PNLList, "/v3/pnl/<string:number_of_items>")
+
 
 # Resource definitions (End)
 
@@ -254,7 +259,12 @@ def dashboard():
     signals = [item.json() for item in items]
 
     return render_template(
-        "dash.html", signals=signals, title="DASHBOARD", tab1="tab active", tab2="tab", tab3="tab"
+        "dash.html",
+        signals=signals,
+        title="DASHBOARD",
+        tab1="tab active",
+        tab2="tab",
+        tab3="tab",
     )
 
 
@@ -354,6 +364,7 @@ def dashboard_list():
         selected_trade_type=selected_trade_type,
     )
 
+
 @app.get("/positions")
 def positions():
     # (flask-session-change) Flask sessions may not be persistent in Heroku, works fine in local
@@ -387,25 +398,47 @@ def positions():
     if simplesession:
         active_tickers = TickerModel.get_active_tickers(str(20))
         active_pairs = PairModel.get_active_pairs(str(20))
+        acc_pnl = AccountModel.get_rows(str(1))
 
     else:
         active_tickers = TickerModel.get_active_tickers(str(3))
         active_pairs = PairModel.get_active_pairs(str(3))
-        flash("Login for more details!", "login_for_more")
+        acc_pnl = []
+        flash("Login to see more details!", "login_for_more")
 
-    pairs = [item.json() for item in active_pairs]
-    print(active_pairs)
+    pair_pos_all = []
 
-    pairs_ticker = []
+    for pair in active_pairs:
+        pair_pos_all.append({
+            "pair": pair.json(),
+            "ticker1": TickerModel.find_by_symbol(pair.ticker1).json(),
+            "ticker2": TickerModel.find_by_symbol(pair.ticker2).json()
+        })
+
+    pair_pairs_ticker = []
 
     for item in active_pairs:
-        pairs_ticker.append(TickerModel.find_by_symbol(item.ticker1).json())
-        pairs_ticker.append(TickerModel.find_by_symbol(item.ticker2).json())
+        pair_pairs_ticker.append(TickerModel.find_by_symbol(item.ticker1).json())
+        pair_pairs_ticker.append(TickerModel.find_by_symbol(item.ticker2).json())
 
-    tickers = [item.json() for item in active_tickers]
+    other_pos = [item.json() for item in active_tickers]
+
+    if acc_pnl:
+        pnl = acc_pnl[0].json()
+    else:
+        pnl = {
+            "rowid": "NA",
+        }
 
     return render_template(
-        "pos.html", pairs=pairs, tickers=tickers, pairs_ticker=pairs_ticker, title="POSITIONS", tab3="tab active", tab2="tab", tab1="tab"
+        "pos.html",
+        pair_pos_all=pair_pos_all,
+        other_pos=other_pos,
+        pnl=pnl,
+        title="POSITIONS",
+        tab3="tab active",
+        tab2="tab",
+        tab1="tab",
     )
 
 
@@ -481,17 +514,21 @@ def pct_time(value):
 @app.template_filter("timediff")
 def timediff(value):
     date_format = "%Y-%m-%d %H:%M:%S"
-    value = value.split(".")[0]  # clean the timezone info if necessary
-    date_signal = datetime.strptime(value, date_format)  # convert string to timestamp
 
-    date_now = datetime.now(tz=pytz.utc)
-    date_now_formatted = date_now.strftime(date_format)  # format as string
-    date_now_final = datetime.strptime(
-        date_now_formatted, date_format
-    )  # convert to timestamp
+    try:
+        value = value.split(".")[0]  # clean the timezone info if necessary
+        date_signal = datetime.strptime(
+            value, date_format
+        )  # convert string to timestamp
 
-    date_diff = (date_now_final - date_signal).total_seconds() / 60.0
+        date_now = datetime.now(tz=pytz.utc)
+        date_now_formatted = date_now.strftime(date_format)  # format as string
+        date_now_final = datetime.strptime(
+            date_now_formatted, date_format
+        )  # convert to timestamp
 
-    if value is None:
+        date_diff = (date_now_final - date_signal).total_seconds() / 60.0
+    except:
         return ""
+
     return round(date_diff)
