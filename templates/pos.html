@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block positions %}
+
+    <label for="last_update"><b>(Last Update: {{ pnl.timestamp}} UTC)({{ pnl.timestamp|timediff }} min ago)</b></label>
+    <h3> Account PNL</h3>
+    <div class="loginmsg2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "login_for_more" %}    
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+{% if pnl.rowid is number %}
+    <table class="pnl">
+        <tr>
+            <th>DailyPnL</th>
+            <th>RealizedPnL</th>
+            <th>UnrealizedPnL</th>
+            <th>NetLiquidation</th>
+            <th>GrossPositionValue</th>
+            <th>AvailableFunds</th>
+        </tr>
+        <tr>
+            {% if pnl.DailyPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.DailyPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+            ${{ "{:,}".format(pnl.DailyPnL|int)  }}</td>
+            {% if pnl.RealizedPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.RealizedPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+            ${{ "{:,}".format(pnl.RealizedPnL|int)  }}</td>
+            {% if pnl.UnrealizedPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.UnrealizedPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+            ${{ "{:,}".format(pnl.UnrealizedPnL|int)  }}</td>
+            <td>${{ "{:,}".format(pnl.NetLiquidation|int)  }}</td>
+            <td>${{ "{:,}".format(pnl.GrossPositionValue|int)  }}</td>
+            <td>${{ "{:,}".format(pnl.AvailableFunds|int) }}</td>
+
+        </tr>
+{% endif %}              
+</table>
+<br>
+<h3> Positions</h3>
+<table class="positions">
+    <tr>
+        <th>pair</th>
+        <th>&#931pnl</th>
+        <th>ticker 1</th>
+        <th>position</th>
+        <th>cost</th>
+        <th>pnl</th>
+        <th>ticker 2</th>
+        <th>position</th>
+        <th>cost</th>
+        <th>pnl</th>
+        <th style="text-align: center;">check</th>
+        
+    </tr>
+    {% for pos in pair_pos_all %}
+    <tr>
+        {% if pos.ticker1.active_pos < 0 %}
+        <td style="background-color:lightpink;">{% elif pos.ticker1.active_pos > 0 %}
+        <td style="background-color:palegreen;">{% else %}
+        <td>{% endif %}
+        {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}</td>
+
+        {% if (pos.ticker1.active_pnl + pos.ticker2.active_pnl) < 0 %}<td style="color:darkred;font-weight:bold">{% elif (pos.ticker1.active_pnl + pos.ticker2.active_pnl) > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        ${{ pos.ticker1.active_pnl + pos.ticker2.active_pnl }}</td>
+
+        <td>{{ pos.ticker1.symbol }}</td>
+ 
+        <td>{{ pos.ticker1.active_pos }}</td>
+
+        <td>${{ "{:,}".format(pos.ticker1.active_cost) }}</td>
+
+        {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        ${{ pos.ticker1.active_pnl }}</td>
+
+        <td>{{ pos.ticker2.symbol }}</td>
+
+        <td>{{ pos.ticker2.active_pos }}</td>
+
+        <td>${{ "{:,}".format(pos.ticker2.active_cost) }}</td>
+
+        {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        ${{ pos.ticker2.active_pnl }}</td>
+
+        {% if pos.ticker1.active_pos != 0 %}
+            {% if (pos.ticker2.active_pos/pos.ticker1.active_pos)|float|abs|round(2,) != pos.pair.hedge %}
+                {% if ((pos.ticker2.active_pos/pos.ticker1.active_pos/pos.pair.hedge)|float|abs|round(3,)-1)|abs>= 0.05 %}<td style="background-color:orange;text-align: center;">hedge={{ (pos.ticker2.active_pos/pos.ticker1.active_pos)|float|abs|round(2,) }}</td>
+                {% else %}<td style="background-color:lightyellow;text-align: center;">hedge={{ (pos.ticker2.active_pos/pos.ticker1.active_pos)|float|abs|round(2,) }}</td>
+                {% endif %}
+            {% else %}<td style="text-align: center;">ok</td>
+            {% endif %}
+        {% elif pos.ticker2.active_pos > 2 %}<td style="background-color:orange;text-align: center;">2nd pair</td>
+        {% elif pos.ticker2.active_pos == 0 %}<td style="text-align: center;">ok</td>
+        {% else %}<td style="background-color:lightyellow;text-align: center;">2nd pair</td>{% endif %}
+
+    </tr>
+    {% endfor %}                  
+</table>
+<br>
+<div class="loginmsg2">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "login_for_more" %}    
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+{% if other_pos%}
+    <h3> Other Pos.</h3>
+    <table class="otherpos">
+        <tr>
+            <th style="text-align: left;">ticker</th>
+            <th>position</th>
+            <th>cost</th>
+            <th>pnl</th>
+        </tr>
+        {% for ticker in other_pos %}
+        <tr>
+            {% if ticker.active_pos < 0 %}<td style="color:darkred;font-weight:bold;text-align: left;">{% elif ticker.active_pos > 0 %}<td style="color:green;font-weight:bold;text-align: left;">{% else %}<td style="text-align: left;">{% endif %}
+            {{ ticker.symbol }}</td>
+            <td>{{ ticker.active_pos }}</td>
+            <td>{{ ticker.active_cost }}</td>
+            <td>{{ ticker.active_pnl }}</td>
+
+        </tr>
+        {% endfor %}                  
+    </table>
+    <br>
+    <div class="loginmsg2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "login_for_more" %}    
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block legendpos %}
+<div class="legend">
+    <span class='numberCircle' style='background-color: palegreen';>&nbsp;</span> long
+    <span class='numberCircle' style='background-color: lightpink';>&nbsp;</span> short
+    <span class='numberCircle' style='background-color: lightyellow';>&nbsp;</span> error
+    <span class='numberCircle' style='background-color: orange';>&nbsp;</span> warning
+</div>
+{% endblock %}
