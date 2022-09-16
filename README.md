@@ -22,7 +22,7 @@ https://api-pairs-v3.herokuapp.com/
   - list view for signals
 - functionality to work with Interactive Brokers TWS API (Release V3.1)
   - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
-- Keep account position and PNL details
+- keep account position and PNL details
   
 # Use Cases
 

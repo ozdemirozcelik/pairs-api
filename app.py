@@ -423,7 +423,7 @@ def positions():
 
     other_pos = [item.json() for item in active_tickers]
 
-    if acc_pnl:
+    if len(acc_pnl) != 0:
         pnl = acc_pnl[0].json()
     else:
         pnl = {
