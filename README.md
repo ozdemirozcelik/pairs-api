@@ -23,6 +23,7 @@ https://api-pairs.herokuapp.com/
 - functionality to work with Interactive Brokers TWS API (Release V3.1)
   - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
 - keep account position and PNL details
+- v3.3 works on heroku-22 stack
   
 # Use Cases
 

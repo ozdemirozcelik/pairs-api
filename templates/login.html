@@ -10,15 +10,21 @@
                 <input type="password" placeholder="123" autocomplete='password' name="password" required>
                 <label for="expire"><b>validity:</b></label>
                 <select name="expire" id="expire">
-                    <option value="1">1</option>
-                    <option value="3">3</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="60">60</option>
-                    <option value="120">120</option>
-                </select> (min) 
+                    <option value="1">1m</option>
+                    <option value="3">3m</option>
+                    <option value="5">5m</option>
+                    <option value="10">10m</option>
+                    <option value="20">20m</option>
+                    <option value="30" selected="selected">30m</option>
+                    <option value="60">1h</option>
+                    <option value="120">2h</option>
+                    <option value="240">4h</option>
+                    <option value="480">8h</option>
+                    <option value="720">12h</option>
+                    <option value="1440">1d</option>
+                    <option value="2880">2d</option>
+                    <option value="10080">1w</option>
+                </select>
                 <br><br>
                 <button type="submit" >Login</button>
             </div>

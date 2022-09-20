@@ -29,7 +29,7 @@
             ${{ "{:,}".format(pnl.DailyPnL|int)  }}</td>
             {% if pnl.RealizedPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.RealizedPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
             ${{ "{:,}".format(pnl.RealizedPnL|int)  }}</td>
-            {% if pnl.UnrealizedPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.UnrealizedPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+            {% if pnl.UnrealizedPnL < 0 %}<td style="color:darkred;font-weight:bold;">{% elif pnl.UnrealizedPnL > 0 %}<td style="color:green;font-weight:bold;">{% else %}<td>{% endif %}
             ${{ "{:,}".format(pnl.UnrealizedPnL|int)  }}</td>
             <td>${{ "{:,}".format(pnl.NetLiquidation|int)  }}</td>
             <td>${{ "{:,}".format(pnl.GrossPositionValue|int)  }}</td>
@@ -38,20 +38,20 @@
         </tr>
 {% endif %}              
 </table>
-<br>
+
 <h3> Positions</h3>
 <table class="positions">
     <tr>
         <th>pair</th>
-        <th>&#931pnl</th>
+        <th style="border-right-style: groove;">&#931pnl</th>
         <th>ticker 1</th>
         <th>position</th>
         <th>cost</th>
-        <th>pnl</th>
+        <th style="border-right-style: groove;">pnl</th>
         <th>ticker 2</th>
         <th>position</th>
         <th>cost</th>
-        <th>pnl</th>
+        <th style="border-right-style: groove;">pnl</th>
         <th style="text-align: center;">check</th>
         
     </tr>
@@ -63,7 +63,7 @@
         <td>{% endif %}
         {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}</td>
 
-        {% if (pos.ticker1.active_pnl + pos.ticker2.active_pnl) < 0 %}<td style="color:darkred;font-weight:bold">{% elif (pos.ticker1.active_pnl + pos.ticker2.active_pnl) > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        {% if (pos.ticker1.active_pnl + pos.ticker2.active_pnl) < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif (pos.ticker1.active_pnl + pos.ticker2.active_pnl) > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
         ${{ pos.ticker1.active_pnl + pos.ticker2.active_pnl }}</td>
 
         <td>{{ pos.ticker1.symbol }}</td>
@@ -72,7 +72,7 @@
 
         <td>${{ "{:,}".format(pos.ticker1.active_cost) }}</td>
 
-        {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
         ${{ pos.ticker1.active_pnl }}</td>
 
         <td>{{ pos.ticker2.symbol }}</td>
@@ -81,7 +81,7 @@
 
         <td>${{ "{:,}".format(pos.ticker2.active_cost) }}</td>
 
-        {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
+        {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
         ${{ pos.ticker2.active_pnl }}</td>
 
         {% if pos.ticker1.active_pos != 0 %}
@@ -98,7 +98,7 @@
     </tr>
     {% endfor %}                  
 </table>
-<br>
+
 <div class="loginmsg2">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

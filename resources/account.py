@@ -34,12 +34,12 @@ class PNLRegister(Resource):
     )
     parser.add_argument("AvailableFunds", type=float)
     parser.add_argument("BuyingPower", type=float)
-    parser.add_argument("DailyPnL", type=float)
     parser.add_argument("GrossPositionValue", type=float)
     parser.add_argument("MaintMarginReq", type=float)
     parser.add_argument("NetLiquidation", type=float)
-    parser.add_argument("RealizedPnL", type=float)
-    parser.add_argument("UnrealizedPnL", type=float)
+    parser.add_argument("DailyPnL", type=float, default=-1)
+    parser.add_argument("RealizedPnL", type=float, default=-1)
+    parser.add_argument("UnrealizedPnL", type=float, default=-1)
 
     @staticmethod
     def post():

@@ -193,14 +193,11 @@ function setExpire() {
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
                 
-            // Output the result in an element with id="demo"
-            // document.getElementById("countdown").innerHTML = days + "d " + hours + "h "
-            // + minutes + "m " + seconds + "s ";
-
-            document.getElementById("countdown").innerHTML = hours + "h "
+            // Output
+            document.getElementById("countdown").innerHTML = days + "d " + hours + "h "
             + minutes + "m " + seconds + "s ";
                 
-            // If the count down is over, write some text 
+            // count down is over
             if (distance < 0) {
                 clearInterval(intervalid);
                 document.getElementById("countdown").innerHTML = "No Fresh Token!";
