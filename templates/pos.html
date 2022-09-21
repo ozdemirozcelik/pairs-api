@@ -68,7 +68,7 @@
 
         <td>{{ pos.ticker1.symbol }}</td>
  
-        <td>{{ pos.ticker1.active_pos }}</td>
+        <td>{{ "{:,}".format(pos.ticker1.active_pos|int)  }}</td>
 
         <td>${{ "{:,}".format(pos.ticker1.active_cost) }}</td>
 
@@ -77,7 +77,7 @@
 
         <td>{{ pos.ticker2.symbol }}</td>
 
-        <td>{{ pos.ticker2.active_pos }}</td>
+        <td>{{ "{:,}".format(pos.ticker2.active_pos|int)  }}</td>
 
         <td>${{ "{:,}".format(pos.ticker2.active_cost) }}</td>
 
@@ -121,11 +121,15 @@
         </tr>
         {% for ticker in other_pos %}
         <tr>
-            {% if ticker.active_pos < 0 %}<td style="color:darkred;font-weight:bold;text-align: left;">{% elif ticker.active_pos > 0 %}<td style="color:green;font-weight:bold;text-align: left;">{% else %}<td style="text-align: left;">{% endif %}
+            {% if ticker.active_pos < 0 %}
+            <td style="background-color:lightpink;">{% elif ticker.active_pos > 0 %}
+            <td style="background-color:palegreen;">{% else %}
+            <td>{% endif %}
             {{ ticker.symbol }}</td>
-            <td>{{ ticker.active_pos }}</td>
+            <td>{{ "{:,}".format(ticker.active_pos|int)  }}</td>
             <td>{{ ticker.active_cost }}</td>
-            <td>{{ ticker.active_pnl }}</td>
+            {% if ticker.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif ticker.active_pnl > 0 %}<td style="color:green;font-weight:bold;">{% else %}<td>{% endif %}
+                ${{ ticker.active_pnl }}</td>
 
         </tr>
         {% endfor %}                  

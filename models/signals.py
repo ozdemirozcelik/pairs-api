@@ -828,3 +828,13 @@ class SignalModel(db.Model):
             .order_by(cls.rowid.desc())
             .first()
         )  # get the most recent order in case of a multiple order id situation
+
+
+    @classmethod
+    # multiple order id situation happens a lot, better to double check the ticker
+    def find_by_orderid_ticker(cls, orderid, ticker) -> "SignalModel":
+        return (
+            cls.query.filter(((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & ((cls.order_id1 == orderid) | (cls.order_id2 == orderid)))
+                .order_by(cls.rowid.desc())
+                .first()
+        )  # get the most recent order in case of a multiple order id situation

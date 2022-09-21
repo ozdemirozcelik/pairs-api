@@ -568,6 +568,8 @@ async function listSignals() {
                 li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status.includes("cancel")) {
                 li.innerHTML = "<span class='field-tip'><span title='canceled' class='numberCircle' style='background-color: lightgoldenrodyellow';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
+            } else if (signals_data.signals[key].order_status.includes("part")) {
+                li.innerHTML = "<span title='part.filled' class='numberCircle' style='background-color: greenyellow';>"+ signals_data.signals[key].rowid +"</span>";            
             } else if (signals_data.signals[key].order_status.includes("filled")) {
                 li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("created")) {

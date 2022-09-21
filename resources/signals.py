@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from models.signals import SignalModel
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 from datetime import datetime
+import math
 
 EMPTY_ERR = "'{}' cannot be empty!"
 PASS_ERR = "incorrect passphrase."
@@ -16,7 +17,6 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
-PART_ERR = "missing contract amount to update partial fill"
 
 
 class SignalUpdateOrder(Resource):
@@ -24,11 +24,12 @@ class SignalUpdateOrder(Resource):
     parser.add_argument(
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
-    parser.add_argument("order_id", type=int)
-    parser.add_argument("price", type=float)
+    parser.add_argument("order_id", type=int, required=True,)
+    parser.add_argument("symbol", type=str, required=True)
+    parser.add_argument("price", type=float, required=True)
+    parser.add_argument("filled_qty", type=float, required=True)
+
     parser.add_argument("cancel", type=bool, default=False)
-    parser.add_argument("partial", type=bool, default=False)
-    parser.add_argument("order_contracts", type=int)
 
     @staticmethod
     def put():
@@ -41,78 +42,86 @@ class SignalUpdateOrder(Resource):
             return return_msg, 400  # return Bad Request
 
         # get signal with rowid
-        item = SignalModel.find_by_orderid(data["order_id"])
+        item = SignalModel.find_by_orderid_ticker(data["order_id"], data["symbol"])
 
         if item:
-
+            # cancel the order
             if data["cancel"]:
+                order_status_old = item.order_status
+                status_msg_old = item.status_msg
+
                 item.order_status = "canceled"
-                item.status_msg = "multiple active orders"
+
+                if order_status_old == "part.filled":
+                    item.status_msg = "(*)part.filled | " + status_msg_old
+                else:
+                    item.status_msg = "mult.act.orders"
 
             else:
-                if item.order_id1 == data["order_id"]:
-                    item.price1 = data["price"]
-                    item.order_status = "filled(...)"
-
-                if item.order_id2 == data["order_id"]:
-                    item.price2 = data["price"]
-                    item.order_status = "filled(...)"
-
-                if item.ticker_type == "pair":
-
-                    # if both orders are filled for pairs
-                    if item.price1 and item.price2:
-                        item.fill_price = round(
-                            item.price1 - item.hedge_param * item.price2, 4
+                if item.order_status != "filled":
+                    # check if ticker and order id matches
+                    if item.order_id1 == data["order_id"] and item.ticker1 == data["symbol"]:
+                        item.price1 = data["price"]
+                        item.order_status = "filled(...)"
+                        item.status_msg = "remained(" + str(item.ticker1) + str("): ") + str(
+                            math.floor(item.order_contracts) - data["filled_qty"]
                         )
-                        item.order_status = "filled"
-                        # calculate slip if order price is defined, use 'is not None' to avoid "0" oder price problem
-                        if item.order_price is not None:
-                            if item.order_action == "buy":
-                                item.slip = round(item.order_price - item.fill_price, 4)
-                            else:
-                                item.slip = -round(
-                                    item.order_price - item.fill_price, 4
-                                )
 
-                        # if updating orders contracts (used for canceled but partially filled orders)
-                        # assumes that the partially filled order keeps the hedge ratio
-                        if data["partial"]:
-                            if data["order_contracts"]:
-                                order_contracts_old = item.order_contracts
-                                item.order_contracts = data["order_contracts"]
+                    elif item.order_id2 == data["order_id"] and item.ticker2 == data["symbol"]:
+                        item.price2 = data["price"]
+                        item.order_status = "filled(...)"
+
+                    else:
+                        return {"message": NOT_FOUND}, 404  # Return Not Found
+
+                    if item.ticker_type == "pair":
+
+                        # if both orders are filled for pairs
+                        if item.price1 and item.price2:
+                            item.fill_price = round(
+                                item.price1 - item.hedge_param * item.price2, 4
+                            )
+
+                            if math.floor(item.order_contracts * item.hedge_param) > data["filled_qty"]:
                                 item.order_status = "part.filled"
-                                item.status_msg = "canceled amount: " + str(
-                                    order_contracts_old - item.order_contracts
+                                item.status_msg = "remained(" +str(item.ticker2) + str("): ") + str(
+                                    math.floor(item.order_contracts * item.hedge_param) - data["filled_qty"]
                                 )
                             else:
-                                return {"message": PART_ERR}  # return Bad Request
+                                item.order_status = "filled"
+                                item.status_msg = ""
 
-                else:
-                    if item.price1:
-                        item.fill_price = item.price1
-                        item.order_status = "filled"
-                        # calculate slip if order price is defined
-                        if item.order_price is not None:
-                            if item.order_action == "buy":
-                                item.slip = round(item.order_price - item.fill_price, 4)
-                            else:
-                                item.slip = -round(
-                                    item.order_price - item.fill_price, 4
-                                )
+                            # calculate slip if order price is defined,
+                            # use 'is not None' to avoid "0" order price problem
+                            if item.order_price is not None:
+                                if item.order_action == "buy":
+                                    item.slip = round(item.order_price - item.fill_price, 4)
+                                else:
+                                    item.slip = -round(
+                                        item.order_price - item.fill_price, 4
+                                    )
 
-                        # if updating orders contracts (used for canceled but half filled orders)
-                        # assumes that the half filled order keeps the hedge ratio
-                        if data["partial"]:
-                            if data["order_contracts"]:
-                                order_contracts_old = item.order_contracts
-                                item.order_contracts = data["order_contracts"]
+                    else:
+                        if item.price1:
+                            item.fill_price = item.price1 and item.ticker1 == data["symbol"]  # double check ticker symbol
+
+                            if item.order_contracts > data["filled_qty"]:
                                 item.order_status = "part.filled"
-                                item.status_msg = "canceled amount: " + str(
-                                    order_contracts_old - item.order_contracts
+                                item.status_msg = "remained: " + str(
+                                    item.order_contracts - data["filled_qty"]
                                 )
                             else:
-                                return {"message": PART_ERR}  # return Bad Request
+                                item.order_status = "filled"
+                                item.status_msg = ""
+
+                            # calculate slip if order price is defined
+                            if item.order_price is not None:
+                                if item.order_action == "buy":
+                                    item.slip = round(item.order_price - item.fill_price, 4)
+                                else:
+                                    item.slip = -round(
+                                        item.order_price - item.fill_price, 4
+                                    )
 
             try:
                 item.update(item.rowid)

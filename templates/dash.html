@@ -25,7 +25,7 @@
         <td>{{ signal.order_comment }}</td> 
         <td>{{ signal.order_action }}</td>
         <td>{{ "{:,}".format(signal.order_contracts) }}</td>
-        <td>{% if signal.order_price is number %}{{ "{:,.2f}".format(signal.order_price) }}{% endif %}</td>
+        <td>{% if signal.order_price is number %}{{ "{:,.3f}".format(signal.order_price) }}{% endif %}</td>
         {% if "err" in signal.order_status%}
         <td style="background-color:orange"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "created" in signal.order_status %}
@@ -34,8 +34,11 @@
         <td style="background-color:lightgoldenrodyellow"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "waiting" in signal.order_status or "rerouted" in signal.order_status %}
         <td style="background-color:whitesmoke"><span class='field-tip'>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
+        {% elif "part." in signal.order_status %}
+        <td style="background-color:greenyellow"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>         
         {% elif "filled" in signal.order_status %}
-        <td style="background-color:lightgreen"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>                              
+        <td style="background-color:lightgreen"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td> 
+                           
         {% else %}
         <td>{{ signal.order_status }}</td>                                                   
         {% endif %}                

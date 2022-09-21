@@ -448,48 +448,46 @@ Response:
 ```
 
 ````
-"cancel":true  to cancel order
-"partial":true  to update partially filled "order_contracts" amount
+"cancel":true to cancel the order
 ````
-
 Request Body:
 ```json
 {
     "passphrase": "webhook",
-    "order_id": 945,
-    "stk_price": 100.756,
-    "cancel":false,
-    "partial": false,
-    "order_contracts": 0
+    "symbol": "ROIC",
+    "order_id": 8,
+    "price": 15.55,
+    "filled_qty": 100
 }
 ```
 
 Response:
-(fill_price & slip is calculated automatically)
+(fill_price & slip & order status for partially filled orders are calculated automatically)
 ```json
 {
-    "rowid": 47,
-    "ticker": "MA-3*V",
+    "rowid": 5,
+    "ticker": "NMFC-0.75*ROIC",
     "order_action": "buy",
-    "order_contracts": 20,
-    "order_price": -2.0,
+    "order_contracts": 603,
+    "order_price": 0.98,
     "mar_pos": "long",
-    "mar_pos_size": 20,
+    "mar_pos_size": 603,
     "pre_mar_pos": "flat",
     "pre_mar_pos_size": 0,
     "order_comment": "Enter Long",
-    "order_status": "filled",
+    "order_status": "part.filled",
     "ticker_type": "pair",
-    "stk_ticker1": "MA",
-    "stk_ticker2": "V",
-    "hedge_param": 3.0,
-    "order_id1": 944,
-    "order_id2": 945,
-    "stk_price1": 300.1,
-    "stk_price2": 100.756,
-    "fill_price": -2.168,
-    "slip": 0.168,
-    "error_msg": null
+    "ticker1": "NMFC",
+    "ticker2": "ROIC",
+    "hedge_param": 0.75,
+    "order_id1": 7,
+    "order_id2": 8,
+    "price1": 12.6,
+    "price2": 15.55,
+    "fill_price": 0.9375,
+    "slip": 0.0425,
+    "error_msg": null,
+    "status_msg": "remained(ROIC): 352.0"
 }
 ```
 
