@@ -148,12 +148,13 @@ class SignalWebhook(Resource):
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("rowid", type=int, default=0)
-    parser.add_argument(
-        "timestamp",
-        type=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
-        help=DATE_ERR,
-    )
-    # parser.add_argument("timestamp", type=str)
+    # TODO: Having problems with Postgres with below. Postgres keeps recording the time with timezone.
+    # parser.add_argument(
+    #     "timestamp",
+    #     type=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
+    #     help=DATE_ERR,
+    # )
+    parser.add_argument("timestamp", type=str)
     parser.add_argument(
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
     )

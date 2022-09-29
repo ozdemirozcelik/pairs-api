@@ -1,3 +1,5 @@
+<video src='https://youtu.be/-jfJ6g-fZpI' width=640/></video>
+
 # Pairs-API v3 for trading tickers (single or pairs), deployed on Heroku & Dreamhost
 
 Version 3 of the Flask-RESTful API.
@@ -34,6 +36,15 @@ With Pairs-API v3 you can:
 - use access tokens for authentication purposes with login system backend
 - TODO: send real time orders to exchange (possibly via Interactive Brokers)
 - see account positions and PNL details
+
+# Considerations
+
+Considering for the next version:
+
+- add statistical analysis and visualization 
+- improve error handling, add unit tests
+- set up CI for the repository
+
 
 # Requirements
 
@@ -79,10 +90,15 @@ These are mainly used for Heroku and Heroku Postgres.
 (windows: change -if necessary- version declarations from 'flask~=2.0.2'' to 'flask==2.0.2')
 
 ````
-$ pip install -r requirements.txt
-(conda install --file requirements.txt)
+$ pip install -r requirements.txt --user
+(conda install --file requirements_conda.txt)
 ````
-SQLAlchemy should take care of database creation. 
+try this if conda fails to install requirements. or try with pip:
+````
+(conda config --append channels conda-forge)
+````
+check this out if you get an invalidversionspec error:
+https://github.com/conda/conda/issues/9519#issuecomment-690486632
 
 ### run flask:
 ````
@@ -533,7 +549,7 @@ Clone repository, login to Heroku, add git remote and push:
 ````
 $ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 $ heroku login
-$ heroku git:remote -a api-pairs-v3
+$ heroku git:remote -a [your-heroku-app-name]
 $ git push heroku main
 ````
 
