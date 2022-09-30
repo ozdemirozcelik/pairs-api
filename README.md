@@ -1,4 +1,3 @@
-<video src='https://youtu.be/-jfJ6g-fZpI' width=640/></video>
 
 # Pairs-API v3 for trading tickers (single or pairs), deployed on Heroku & Dreamhost
 
@@ -12,6 +11,10 @@ Configured to be used with SQLite3 for local use.
 A working demo for the latest release is deployed in Heroku with PostgreSQL:
 
 https://api-pairs.herokuapp.com/
+
+# Watch Demo
+
+[![Watch on YouTube](https://ozdemirozcelik.github.io/utubelink.png)](https://www.youtube.com/watch?v=-jfJ6g-fZpI "Watch on YouTube")
 
 
 # Additions to v2
