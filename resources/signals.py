@@ -279,6 +279,10 @@ class SignalWebhook(Resource):
             #  return {"message": PASS_ERR}, 400  # Old return Bad Request
             return return_msg, 400  # Old return Bad Request
 
+        date_format = "%Y-%m-%d %H:%M:%S"
+        value = data["timestamp"].split(".")[0]  # clean the timezone info if necessary
+        data["timestamp"] = datetime.strptime(value, date_format)  # convert string to timestamp
+
         if SignalModel.find_by_rowid(data["rowid"]):
 
             item = SignalModel(
