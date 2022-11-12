@@ -1,31 +1,38 @@
 {% extends 'base.html' %}
 {% block submitlist %}
 
-<div class="left-element">
-    <form action="list" method="get">
-        <div id="tradetype">
-            <input type="radio" id="checkpair" name="tradetype" value="pair" {% if selected_trade_type == "pair" %} checked {% endif %}><span>pair</span>
-            <input type="radio" id="checkticker" name="tradetype" value="ticker" {% if selected_trade_type == "ticker" %} checked {% endif %}><span>ticker</span>
-        </div>
-        <br>
-        <div>
+<div style="width: 100%;font-size: medium;">
+    <div style="width: 50%; height: 100px; float: left;">
+        <form action="list" method="get">
+            <div id="tradetype">
+                <input type="radio" id="checkpair" name="tradetype" value="pair" {% if selected_trade_type == "pair" %} checked {% endif %}><span>pair</span>
+                <input type="radio" id="checkticker" name="tradetype" value="ticker" {% if selected_trade_type == "ticker" %} checked {% endif %}><span>ticker</span>
+            </div>
+            <br>
+            <div>
 
-            <label for="ticker_webhook" id="ticker_webhook_label"></label>
-            <select onchange="changeStatusColor(this); "name="ticker_webhook" id="ticker_webhook">                    
-            <option disabled selected value></option>
-            </select>&nbsp
-            <span title= "ticker status" id="show_status" class="round" style="vertical-align:middle";></span> 
-            <br><br>                       
+                <label for="ticker_webhook" id="ticker_webhook_label"></label>
+                <select onchange="changeStatusColor(this); "name="ticker_webhook" id="ticker_webhook">
+                <option disabled selected value></option>
+                </select>&nbsp
+                <span title= "ticker status" id="show_status" class="round" style="vertical-align:middle";></span>
+                <br><br>
 
-            <input type="date" id="start_date" name="start_date" value={{start_date}}>
-            <input type="date" id="end_date" name="end_date" value={{end_date}}> 
-            <button type="submit">List Signals</button>                         
-        </div>            
-    </form>
-</div>  
-<div class="right-element">
+                <input type="date" id="start_date" name="start_date" value={{start_date}}>
+                <input type="date" id="end_date" name="end_date" value={{end_date}}>
+                <button type="submit">List Signals</button>
+            </div>
+        </form>
+    </div>
+    <div style="margin-left: 90%; height: 100px; border-style: groove; text-align: left; font-size: medium;">
+        <b>slippage:</b><br><br>
+        buy:  {{slip_buy}} <br>
+        sell: {{slip_sell}}<br>
+        avg: {{slip_avg}}<br>
+    </div>
+</div>
 
-</div>  
+
 {% endblock %}
 
 {% block tablelist %}

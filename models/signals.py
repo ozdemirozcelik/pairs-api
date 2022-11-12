@@ -815,10 +815,66 @@ class SignalModel(db.Model):
 
         return success_flag
 
-    # TODO: COMPLETE
     @classmethod
-    def get_avg_slip(cls, ticker_name) -> List:
-        pass
+    def get_avg_slip(cls, ticker_name, start_date, end_date) -> dict:
+
+        slip_dic = {}
+
+        pair = False
+
+        tickers = ticker_name.split("-")  # check if pair or single
+        ticker1 = tickers[0]
+        ticker2 = ""
+        if len(tickers) == 2:
+            ticker2 = tickers[1]
+            pair = True
+
+        if pair:
+            slip_dic['buy'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+                & (cls.order_action == "buy")
+            ).scalar()
+
+            slip_dic['sell'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+                & (cls.order_action == "sell")
+            ).scalar()
+
+            slip_dic['avg'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+            ).scalar()
+
+        else:
+            slip_dic['buy'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+                & (cls.order_action == "buy")
+            ).filter(cls.ticker_type == "single").scalar()
+
+            slip_dic['sell'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+                & (cls.order_action == "sell")
+            ).filter(cls.ticker_type == "single").scalar()
+
+            slip_dic['avg'] = db.session.query(db.func.avg(cls.slip)).filter(
+                (cls.ticker1 == ticker1)
+                & (cls.timestamp <= end_date)
+                & (cls.timestamp >= start_date)
+            ).filter(cls.ticker_type == "single").scalar()
+
+        return slip_dic
 
     @classmethod
     def find_by_orderid(cls, orderid) -> "SignalModel":

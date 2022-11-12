@@ -315,7 +315,7 @@ def dashboard_list():
         end_date = end_date + timedelta(
             days=1
         )  # Add 1 day to "%Y-%m-%d" 00:00:00 to reach end of day
-
+        
     except:
         start_date = datetime.now(tz=pytz.utc) - timedelta(days=1)
         date_now = datetime.now(tz=pytz.utc)
@@ -335,6 +335,9 @@ def dashboard_list():
         simplesession = None
 
     if selected_ticker:
+
+        slip_dic = SignalModel.get_avg_slip(selected_ticker, start_date, end_date)
+
         if simplesession:
             items = SignalModel.get_list_ticker_dates(
                 selected_ticker, "0", start_date, end_date
@@ -351,6 +354,17 @@ def dashboard_list():
 
     signals = [item.json() for item in items]
 
+    slip_buy ="?"
+    slip_sell ="?"
+    slip_avg ="?"
+
+    if slip_dic['buy']:
+        slip_buy = str(round(slip_dic['buy'], 5))
+    if slip_dic['sell']:
+        slip_sell = str(round(slip_dic['sell'], 5))
+    if slip_dic['avg']:
+        slip_avg = str(round(slip_dic['avg'], 5))
+
     return render_template(
         "list.html",
         signals=signals,
@@ -362,8 +376,10 @@ def dashboard_list():
         end_date=end_date - timedelta(days=1),
         selected_ticker=selected_ticker,
         selected_trade_type=selected_trade_type,
+        slip_buy=slip_buy,
+        slip_sell=slip_sell,
+        slip_avg=slip_avg
     )
-
 
 @app.get("/positions")
 def positions():
