@@ -179,6 +179,19 @@ function checkTradeType(event){
     }
 }
 
+// get query string if any
+function getQueryParams(url) {
+    const paramArr = url.slice(url.indexOf('?') + 1).split('&');
+    const params = {};
+    paramArr.map(param => {
+        const [key, val] = param.split('=');
+        params[key] = decodeURIComponent(val);
+    })
+    return params;
+}
+
+params = getQueryParams(window.location.href)
+
 // TO-DO: needs error handling in this function
 // list the pairs for the webhook creation
 async function getPairs_webhook() {
@@ -218,6 +231,25 @@ async function getPairs_webhook() {
             ticker_webhook.appendChild(opt);                 
         }
     }
+
+    if (params['closepair'] != null) {
+        console.log(params['closepair'])
+        ticker_webhook.value = params['closepair'];  
+        if (Number(params['closecontracts'])>0) {
+            order_action.value = "sell";
+            pre_mar_pos.value = "long"; 
+        } else {
+            order_action.value = "buy";
+            pre_mar_pos.value = "short"; 
+        }
+        order_contracts.value = Math.abs(params['closecontracts']); 
+        order_price.value = params['closeprice'];
+        mar_pos.value = "flat";
+        mar_pos_size.value = 0;
+        pre_mar_pos_size.value = Math.abs(params['closecontracts']); 
+    
+    }
+    
     changeStatusColor(ticker_webhook);
 }
 
@@ -301,24 +333,26 @@ function handleFormSubmit_signals(event) {
         } else {
             formJSON_signals['ticker']=tickers[0];
         }
-
-        // disabled with v3, API is taking care of this:
-        // check if the ticker status is active or passive, and edit order status
-        // if (!status_dic[formJSON_signals['ticker_webhook']]) {
-        //     formJSON_signals['order_status'] = "canceled"; // set order status as canceled cause ticker is not set as active
-        //     formJSON_signals['order_comment'] = "ticker is not active"; 
-
-        // } else {
-        
+       
         // edit hidden comments
         if (formJSON_signals.mar_pos == 'flat'){
-            formJSON_signals['order_comment'] = "Pos. Closed";
+            formJSON_signals['order_comment'] = "Pos. Closed(manual)";
         } else if (formJSON_signals.order_action == 'buy'){
-            formJSON_signals['order_comment']  = "Enter Long";
+            formJSON_signals['order_comment']  = "Long(manual)";
         } else {
-            formJSON_signals['order_comment']  = "Enter Short";
+            formJSON_signals['order_comment']  = "Short(manual)";
         }
-        // }
+
+        if (formJSON_signals['pyramiding'] == 'yes') {
+            formJSON_signals['order_comment']  = formJSON_signals['order_comment']  + "(pyramiding)";
+        }
+
+        if (formJSON_signals['market_order1'] == 'yes') {
+            formJSON_signals['order_comment']  = formJSON_signals['order_comment']  + "(market1)";
+        }
+        if (formJSON_signals['market_order2'] == 'yes') {
+            formJSON_signals['order_comment']  = formJSON_signals['order_comment']  + "(market2)";
+        } 
 
         // remove empty and null keys
         Object.keys(formJSON_signals).forEach((k) => (formJSON_signals[k] == "" || formJSON_signals[k] == null) && delete formJSON_signals[k]);
@@ -326,6 +360,7 @@ function handleFormSubmit_signals(event) {
         // remove unused keyss
         delete formJSON_signals['ticker_webhook'];
         delete formJSON_signals['tradetype'];
+        delete formJSON_signals['pyramiding'];
 
         const results = document.querySelector('.results-webhook pre');
 
@@ -568,8 +603,6 @@ async function listSignals() {
                 li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status.includes("cancel")) {
                 li.innerHTML = "<span class='field-tip'><span title='canceled' class='numberCircle' style='background-color: lightgoldenrodyellow';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
-            } else if (signals_data.signals[key].order_status.includes("part")) {
-                li.innerHTML = "<span title='part.filled' class='numberCircle' style='background-color: greenyellow';>"+ signals_data.signals[key].rowid +"</span>";            
             } else if (signals_data.signals[key].order_status.includes("filled")) {
                 li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("created")) {

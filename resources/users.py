@@ -47,10 +47,10 @@ class UserRegister(Resource):
     def default_users():
         # Add Default Users
         if not UserModel.find_by_username("admin"):
-            admin = UserModel("admin", "123")
+            admin = UserModel("admin", "password")
             admin.insert()
         if not UserModel.find_by_username("user1"):
-            user = UserModel("user1", "123")
+            user = UserModel("user1", "password")
             user.insert()
 
     @staticmethod

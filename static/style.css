@@ -426,6 +426,20 @@ button:hover {
     background-color: aqua;
 }
 
+.closeposbutton {
+
+    font-size: 80%;
+    padding: 2px;
+    color:black;
+    border:2px solid black;
+    border-radius:2px;
+    background: darkgray;
+    cursor:default;
+    vertical-align:middle;
+    text-align: center;
+    letter-spacing:0.5px;
+}
+
 .countdown {
 
     float: right;

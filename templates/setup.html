@@ -104,9 +104,9 @@
             <form class="modal-login-content animate">   
             <div class="modal-login-container">
                 <label for="username"><b>username:</b></label>
-                <input type="text" placeholder="admin or user1" autocomplete='username' name="username" required>       
+                <input type="text" autocomplete='username' name="username" required>       
                 <label for="password"><b>password:</b></label>
-                <input type="password" placeholder="123" autocomplete='password' name="password" required>
+                <input type="password" autocomplete='password' name="password" required>
                 <label for="expire"><b>validity:</b></label>
                 <select name="expire" id="expire">
                     <option value="1">1m</option>
@@ -212,9 +212,24 @@
                                 <label for="passphrase">Passphrase(*):&nbsp</label>
                                 <input type="text" name="passphrase" id="passphrase" autocomplete='passphrase'>
                             </p>
+                            <br>
+                            <p>
+                                <input type="hidden" name="pyramiding" value="no">
+                                <label for="pyramiding">Pyramiding</label>
+                                <input type="checkbox" id="pyramiding" name="pyramiding" value="yes"/>                              
+                            </p>
+                            <p>
+                                <input type="hidden" name="market_order1" value="no">
+                                <label for="market_order1">Mar.Ord.(ticker1)</label>
+                                <input type="checkbox" id="market_order1" name="market_order1" value="yes"/>                              
+                            </p>
+                            <p>
+                                <input type="hidden" name="market_order2" value="no">
+                                <label for="market_order2">Mar.Ord.(ticker2)</label>
+                                <input type="checkbox" id="market_order2" name="market_order2" value="yes"/>                              
+                            </p>
                             <input id="order_comment" name="order_comment" type="hidden" value=" ">
-                            <input name="order_status" type="hidden" value="waiting">
-                                                       
+                            <input name="order_status" type="hidden" value="waiting">                                                     
                             <br><br>
                             <button type="submit">Create JSON</button>
                         </div>

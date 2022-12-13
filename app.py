@@ -315,7 +315,7 @@ def dashboard_list():
         end_date = end_date + timedelta(
             days=1
         )  # Add 1 day to "%Y-%m-%d" 00:00:00 to reach end of day
-        
+
     except:
         start_date = datetime.now(tz=pytz.utc) - timedelta(days=1)
         date_now = datetime.now(tz=pytz.utc)
@@ -364,6 +364,7 @@ def dashboard_list():
         slip_sell = str(round(slip_dic['sell'], 5))
     if slip_dic['avg']:
         slip_avg = str(round(slip_dic['avg'], 5))
+
 
     return render_template(
         "list.html",
@@ -558,3 +559,83 @@ def timediff(value):
         return ""
 
     return round(date_diff)
+
+
+### EMAIL NOTIFICATIONS ###
+
+# for email notifications
+from flask_mail import Mail, Message
+from apscheduler.schedulers.background import BackgroundScheduler
+
+# configuration of email
+app.config['MAIL_SERVER']='smtp.dreamhost.com'
+app.config['MAIL_PORT'] = 465
+# app.config['MAIL_USERNAME'] = 'noreply@test.biqode.com'
+# app.config['MAIL_PASSWORD'] = 'ibkrtest12'
+app.config['MAIL_USERNAME'] = 'noreply@pairs.biqode.com'
+app.config['MAIL_PASSWORD'] = 'pairswarning'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+email_subject = 'Server Problem'
+
+mail = Mail(app) # instantiate the mail class
+
+def get_waiting_time():
+
+    send_email = False
+    warned = False
+    print("***checking to warn")
+
+    signal_to_check = SignalModel.check_timestamp()
+
+    if signal_to_check:
+        if iftoday(str(signal_to_check.timestamp)):
+            diff = timediff(str(signal_to_check.timestamp))
+
+            if (signal_to_check.error_msg):
+                if ("(warned)" in signal_to_check.error_msg):
+                    warned = True
+
+            if int(diff) > 2 and not warned:
+                    print("***SENDING EMAIL****")
+                    send_email = True
+                    print(signal_to_check.error_msg)
+                    if (signal_to_check.error_msg):
+                        signal_to_check.error_msg = signal_to_check.error_msg + "(warned)"
+                    else:
+                        signal_to_check.error_msg = "(warned)"
+
+                    signal_to_check.update(signal_to_check.rowid)
+
+    else:
+        print("***nothing to warn")
+
+    return send_email
+
+
+def warning_email_context():
+    with app.app_context():  # being executed through a new thread outside the app context and the Mail object need this
+
+        send_email = get_waiting_time()
+
+        if send_email:
+            msg = Message(
+                email_subject,
+                sender='noreply@pairs.biqode.com',
+                recipients=['ibkr.notifications@gmail.com']
+            )
+            msg.body = 'waiting orders-possible server problem'
+            mail.send(msg)
+            print('****warning email sent...')
+
+        else:
+            print('***no email')
+
+### SCHEDULER ###
+# https://betterprogramming.pub/introduction-to-apscheduler-86337f3bb4a6
+scheduler = BackgroundScheduler(daemon=True)
+# scheduler.add_job(warning_email_context, 'interval', seconds=10)
+scheduler.add_job(warning_email_context, 'interval', minutes=1)
+scheduler.start()
+#sched.shutdown()

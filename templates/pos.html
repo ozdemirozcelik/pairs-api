@@ -26,14 +26,14 @@
         </tr>
         <tr>
             {% if pnl.DailyPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.DailyPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
-            ${{ "{:,}".format(pnl.DailyPnL|int)  }}</td>
+            C${{ "{:,}".format(pnl.DailyPnL|int)  }}</td>
             {% if pnl.RealizedPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.RealizedPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
-            ${{ "{:,}".format(pnl.RealizedPnL|int)  }}</td>
+            C${{ "{:,}".format(pnl.RealizedPnL|int)  }}</td>
             {% if pnl.UnrealizedPnL < 0 %}<td style="color:darkred;font-weight:bold;">{% elif pnl.UnrealizedPnL > 0 %}<td style="color:green;font-weight:bold;">{% else %}<td>{% endif %}
-            ${{ "{:,}".format(pnl.UnrealizedPnL|int)  }}</td>
-            <td>${{ "{:,}".format(pnl.NetLiquidation|int)  }}</td>
-            <td>${{ "{:,}".format(pnl.GrossPositionValue|int)  }}</td>
-            <td>${{ "{:,}".format(pnl.AvailableFunds|int) }}</td>
+            C${{ "{:,}".format(pnl.UnrealizedPnL|int)  }}</td>
+            <td>C${{ "{:,}".format(pnl.NetLiquidation|int)  }}</td>
+            <td>C${{ "{:,}".format(pnl.GrossPositionValue|int)  }}</td>
+            <td>C${{ "{:,}".format(pnl.AvailableFunds|int) }}</td>
 
         </tr>
 {% endif %}              
@@ -43,14 +43,14 @@
 <table class="positions">
     <tr>
         <th>pair</th>
-        <th style="border-right-style: groove;">&#931pnl</th>
+        <th style="border-right-style: groove;">&#931pnl(US$)</th>
         <th>ticker 1</th>
         <th>position</th>
-        <th>cost</th>
+        <th>cost(US$)</th>
         <th style="border-right-style: groove;">pnl</th>
         <th>ticker 2</th>
         <th>position</th>
-        <th>cost</th>
+        <th>cost(US$)</th>
         <th style="border-right-style: groove;">pnl</th>
         <th style="text-align: center;">check</th>
         
@@ -58,19 +58,38 @@
     {% for pos in pair_pos_all %}
     <tr>
         {% if pos.ticker1.active_pos < 0 %}
+        
         <td style="background-color:lightpink;">{% elif pos.ticker1.active_pos > 0 %}
         <td style="background-color:palegreen;">{% else %}
         <td>{% endif %}
-        {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}</td>
-
-        {% if (pos.ticker1.active_pnl + pos.ticker2.active_pnl) < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif (pos.ticker1.active_pnl + pos.ticker2.active_pnl) > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
-        ${{ pos.ticker1.active_pnl + pos.ticker2.active_pnl }}</td>
+        {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}
+        </td>
+        
+        {% if (pos.ticker1.active_pnl + pos.ticker2.active_pnl) < 0 %}
+        <td style="color:darkred;font-weight:bold;border-right-style: groove;">
+        <span class='field-tip'>
+        {% elif (pos.ticker1.active_pnl + pos.ticker2.active_pnl) > 0 %}
+        <td style="color:green;font-weight:bold;border-right-style: groove;">
+        <span class='field-tip'>
+        {% else %}
+        <td style="border-right-style: groove;">
+        <span class='field-tip'>
+        {% endif %}
+        ${{ pos.ticker1.active_pnl + pos.ticker2.active_pnl }}
+        <span class='tip-content'>
+        avg: ${{ "{:.3f}".format((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)) }}
+        {% if pos.ticker1.active_pos|abs > 0 %}
+         | act: ${{ "{:.3f}".format((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)+(pos.ticker1.active_pnl + pos.ticker2.active_pnl)/pos.ticker1.active_pos) }}
+        {% endif %}
+        </span></span>
+        </td>
+        
 
         <td>{{ pos.ticker1.symbol }}</td>
  
         <td>{{ "{:,}".format(pos.ticker1.active_pos|int)  }}</td>
 
-        <td>${{ "{:,}".format(pos.ticker1.active_cost) }}</td>
+        <td>${{ "{:,}".format((pos.ticker1.active_cost * pos.ticker1.active_pos)|abs|int) }}</td>
 
         {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
         ${{ pos.ticker1.active_pnl }}</td>
@@ -79,7 +98,7 @@
 
         <td>{{ "{:,}".format(pos.ticker2.active_pos|int)  }}</td>
 
-        <td>${{ "{:,}".format(pos.ticker2.active_cost) }}</td>
+        <td>${{ "{:,}".format((pos.ticker2.active_cost * pos.ticker2.active_pos)|abs|int) }}</td>
 
         {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
         ${{ pos.ticker2.active_pnl }}</td>
@@ -94,6 +113,17 @@
         {% elif pos.ticker2.active_pos > 2 %}<td style="background-color:orange;text-align: center;">2nd pair</td>
         {% elif pos.ticker2.active_pos == 0 %}<td style="text-align: center;">ok</td>
         {% else %}<td style="background-color:lightyellow;text-align: center;">2nd pair</td>{% endif %}
+
+        {% if pos.ticker1.active_pos|abs > 0 %}
+        
+        <td>
+            <span class='field-tip'>
+            <a href="./setup?closepair={{ pos.pair.name }}&closecontracts={{ pos.ticker1.active_pos }}&closeprice={{ ((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)+(pos.ticker1.active_pnl + pos.ticker2.active_pnl)/pos.ticker1.active_pos)|round(3,) }}" class="closeposbutton">close</a>
+            <span class='tip-content'>
+            close {{pos.pair.name}}
+            </span></span>
+        </td>
+        {% endif %}
 
     </tr>
     {% endfor %}                  
@@ -153,7 +183,7 @@
 <div class="legend">
     <span class='numberCircle' style='background-color: palegreen';>&nbsp;</span> long
     <span class='numberCircle' style='background-color: lightpink';>&nbsp;</span> short
-    <span class='numberCircle' style='background-color: lightyellow';>&nbsp;</span> warning
-    <span class='numberCircle' style='background-color: orange';>&nbsp;</span> error
+    <span class='numberCircle' style='background-color: lightyellow';>&nbsp;</span> error
+    <span class='numberCircle' style='background-color: orange';>&nbsp;</span> warning
 </div>
 {% endblock %}

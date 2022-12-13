@@ -856,6 +856,7 @@ class SignalModel(db.Model):
         else:
             slip_dic['buy'] = db.session.query(db.func.avg(cls.slip)).filter(
                 (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
                 & (cls.timestamp <= end_date)
                 & (cls.timestamp >= start_date)
                 & (cls.order_action == "buy")
@@ -863,6 +864,7 @@ class SignalModel(db.Model):
 
             slip_dic['sell'] = db.session.query(db.func.avg(cls.slip)).filter(
                 (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
                 & (cls.timestamp <= end_date)
                 & (cls.timestamp >= start_date)
                 & (cls.order_action == "sell")
@@ -870,6 +872,7 @@ class SignalModel(db.Model):
 
             slip_dic['avg'] = db.session.query(db.func.avg(cls.slip)).filter(
                 (cls.ticker1 == ticker1)
+                & (cls.ticker2 == ticker2)
                 & (cls.timestamp <= end_date)
                 & (cls.timestamp >= start_date)
             ).filter(cls.ticker_type == "single").scalar()
@@ -894,3 +897,11 @@ class SignalModel(db.Model):
                 .order_by(cls.rowid.desc())
                 .first()
         )  # get the most recent order in case of a multiple order id situation
+
+    @classmethod
+    def check_timestamp(cls) -> "SignalModel":
+        return (
+            cls.query.filter(((cls.order_status == "waiting") | (cls.order_status == "rerouted") | (cls.order_status == "error") | (cls.order_status == "critical err")))
+                .order_by(cls.rowid.desc())
+                .first()
+        )

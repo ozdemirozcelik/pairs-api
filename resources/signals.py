@@ -17,6 +17,7 @@ CREATE_OK = "'{}' created successfully."
 DELETE_OK = "'{}' deleted successfully."
 NOT_FOUND = "item not found."
 PRIV_ERR = "'{}' privilege required."
+PART_ERR = "missing contract amount to update partial fill"
 
 
 class SignalUpdateOrder(Resource):
@@ -30,6 +31,10 @@ class SignalUpdateOrder(Resource):
     parser.add_argument("filled_qty", type=float, required=True)
 
     parser.add_argument("cancel", type=bool, default=False)
+
+    # TODO: may not be necessary, check and delete if so
+    parser.add_argument("partial", type=bool, default=False)
+    parser.add_argument("order_contracts", type=int)
 
     @staticmethod
     def put():
@@ -47,32 +52,35 @@ class SignalUpdateOrder(Resource):
         if item:
             # cancel the order
             if data["cancel"]:
-                order_status_old = item.order_status
-                status_msg_old = item.status_msg
-
                 item.order_status = "canceled"
+                item.status_msg = "multiple active orders"
 
-                if order_status_old == "part.filled":
-                    item.status_msg = "(*)part.filled | " + status_msg_old
+            # TODO: may not be necessary, check and delete if so
+            # if updating orders contracts (used for canceled but partially filled orders)
+            # assumes that the partially filled order keeps the hedge ratio
+            elif data["partial"]:
+                if data["order_contracts"]:
+                    order_contracts_old = item.order_contracts
+                    item.order_contracts = data["order_contracts"]
+                    item.order_status = "part.filled"
+                    item.status_msg = "canceled amount: " + str(
+                        order_contracts_old - item.order_contracts
+                    )
                 else:
-                    item.status_msg = "mult.act.orders"
+                    return {"message": PART_ERR}  # return Bad Request
 
             else:
                 if item.order_status != "filled":
-                    # check if ticker and order id matches
-                    if item.order_id1 == data["order_id"] and item.ticker1 == data["symbol"]:
+                    if item.order_id1 == data["order_id"] and item.ticker1 == data["symbol"]:  # double check ticker symbol
                         item.price1 = data["price"]
                         item.order_status = "filled(...)"
                         item.status_msg = "remained(" + str(item.ticker1) + str("): ") + str(
                             math.floor(item.order_contracts) - data["filled_qty"]
                         )
 
-                    elif item.order_id2 == data["order_id"] and item.ticker2 == data["symbol"]:
+                    if item.order_id2 == data["order_id"] and item.ticker2 == data["symbol"]:
                         item.price2 = data["price"]
                         item.order_status = "filled(...)"
-
-                    else:
-                        return {"message": NOT_FOUND}, 404  # Return Not Found
 
                     if item.ticker_type == "pair":
 
@@ -148,13 +156,12 @@ class SignalWebhook(Resource):
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
     parser.add_argument("rowid", type=int, default=0)
-    # TODO: Having problems with Postgres with below. Postgres keeps recording the time with timezone.
-    # parser.add_argument(
-    #     "timestamp",
-    #     type=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
-    #     help=DATE_ERR,
-    # )
-    parser.add_argument("timestamp", type=str)
+    parser.add_argument(
+        "timestamp",
+        type=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
+        help=DATE_ERR,
+    )
+    # parser.add_argument("timestamp", type=str)
     parser.add_argument(
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
     )
@@ -278,10 +285,6 @@ class SignalWebhook(Resource):
             return_msg = {"message": {"passphrase": PASS_ERR}}
             #  return {"message": PASS_ERR}, 400  # Old return Bad Request
             return return_msg, 400  # Old return Bad Request
-
-        date_format = "%Y-%m-%d %H:%M:%S"
-        value = data["timestamp"].split(".")[0]  # clean the timezone info if necessary
-        data["timestamp"] = datetime.strptime(value, date_format)  # convert string to timestamp
 
         if SignalModel.find_by_rowid(data["rowid"]):
 
