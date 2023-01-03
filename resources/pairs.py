@@ -30,9 +30,34 @@ class PairRegister(Resource):
         "hedge", type=float, required=True, help=EMPTY_ERR.format("hedge")
     )
     parser.add_argument(
-        "status", type=int, default=0,
+        "status",
+        type=int,
+        default=0,
     )
     parser.add_argument("notes", type=str)
+    parser.add_argument(
+        "contracts", type=int, required=True, help=EMPTY_ERR.format("contracts")
+    )
+    parser.add_argument(
+        "act_price",
+        type=float,
+        default=0,
+    )
+    parser.add_argument(
+        "sma",
+        type=float,
+        default=0,
+    )
+    parser.add_argument(
+        "sma_dist",
+        type=float,
+        default=0,
+    )
+    parser.add_argument(
+        "std",
+        type=float,
+        default=0,
+    )
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -46,6 +71,11 @@ class PairRegister(Resource):
             data["hedge"],
             data["status"],
             data["notes"],
+            data["contracts"],
+            data["act_price"],
+            data["sma"],
+            data["sma_dist"],
+            data["std"],
         )
 
         if item.status == 1:
@@ -98,6 +128,11 @@ class PairRegister(Resource):
             data["hedge"],
             data["status"],
             data["notes"],
+            data["contracts"],
+            data["act_price"],
+            data["sma"],
+            data["sma_dist"],
+            data["std"],
         )
 
         if item.status == 1:

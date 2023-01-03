@@ -26,6 +26,8 @@ var ticker1 = document.getElementById("ticker1");
 var ticker2 = document.getElementById("ticker2");
 var hedge = document.getElementById("hedge");
 var hedge_update = document.getElementById("hedge-update");
+var contracts = document.getElementById("contracts");
+var contracts_update = document.getElementById("contracts-update");
 var pair_update = document.getElementById("pair-update");
 var pair_ticker1_update = document.getElementById("pair-ticker1-update");
 var pair_ticker2_update = document.getElementById("pair-ticker2-update");
@@ -121,6 +123,9 @@ function handleFormSubmit_pairs(event) {
     } else if ( hedge.value == 0 || hedge.value == "" ) {
         alert("Hedge value cannot be empty or zero!");
     
+    } else if ( contracts.value == 0 || contracts.value == "" ) {
+        alert("Contracts value cannot be empty or zero!");
+    
     } else {
         
         const data = new FormData(event.target);
@@ -162,6 +167,9 @@ function handleFormSubmit_pairs_update(event) {
     } else if ( hedge_update.value == 0 || hedge_update.value == "" ) {
         alert("Hedge value cannot be empty or zero!");
 
+    } else if ( contracts_update.value == 0 || contracts_update.value == "" ) {
+        alert("Contracts value cannot be empty or zero!");
+    
     } else {
     
         const data = new FormData(event.target);
@@ -278,8 +286,10 @@ function postSave_pairs() {
                     // create span element according to pair status
                     if (jsonResponse.status) {
                         li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
-                    } else {
+                    } else if (pairs_data.pairs[key].status==0) {
                         li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                    } else {
+                        li.innerHTML = "<span title='watch' class='round' style='background-color: yellow';></span>";
                     }
 
                     li.setAttribute('id', pair_text);
@@ -325,7 +335,7 @@ function putUpdate_pairs() {
         }
         
         pair_text = formJSON_update_pairs.name;
-        alert("Sending PUT request for: " + pair_text + " | Hedge: " + formJSON_update_pairs.hedge + " | Status: " + formJSON_update_pairs.status);
+        alert("Sending PUT request for: " + pair_text + " | Hedge: " + formJSON_update_pairs.hedge + " | Contracts: " + formJSON_update_pairs.contracts + " | Status: " + formJSON_update_pairs.status);
 
         fetch(api_url_post_put_pair, {
                 method: "PUT",
@@ -352,7 +362,7 @@ function putUpdate_pairs() {
             }  else {
                 var status_msg
 
-                switch(jsonResponse.status) { case 0: status_msg = "passive"; break; case 1: status_msg = "active"; break; default: status_msg = "unknown" };
+                switch(jsonResponse.status) { case 0: status_msg = "passive"; break; case 1: status_msg = "active"; break; case -1: status_msg = "watch"; break; default: status_msg = "unknown" };
 
                 alert("Updated " + jsonResponse.name + " | Code: " + return_code + "\nTrade Status is " + status_msg.toUpperCase());
 
@@ -423,10 +433,12 @@ async function listPairs() {
             str = pairs_data.pairs[key].name
 
             // create span element according to pair status
-            if (pairs_data.pairs[key].status) {
+            if (pairs_data.pairs[key].status==1) {
                 li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
-            } else {
+            } else if (pairs_data.pairs[key].status==0) {
                 li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+            } else {
+                li.innerHTML = "<span title='watch' class='round' style='background-color: yellow';></span>";
             }
 
             li.setAttribute('id', str);             
@@ -493,14 +505,17 @@ async function getPair(name) {
     pair_data = await response_pair.json();
 
     hedge_update.value = pair_data.hedge;
+    contracts_update.value = pair_data.contracts;
     pair_ticker1_update.value = pair_data.ticker1;
     pair_ticker2_update.value = pair_data.ticker2;
     notes_update.value = pair_data.notes;
     
-    if (pair_data.status) {
+    if (pair_data.status==1) {
         document.getElementById("active-pair-update").checked = "checked";
-    } else {
+    } else  if (pair_data.status==0) {
         document.getElementById("passive-pair-update").checked = "checked";
+    } else {
+        document.getElementById("watch-pair-update").checked = "checked";
     }
 }
 

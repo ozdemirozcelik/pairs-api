@@ -45,12 +45,19 @@ _parser.add_argument("expire", type=int, default=10)
 class UserRegister(Resource):
     @staticmethod
     def default_users():
+        from app import configs
+
+        admin_username = configs.get("SECRET", "ADMIN_USERNAME")
+        admin_password = configs.get("SECRET", "ADMIN_PASSWORD")
+        user1_username = configs.get("SECRET", "USER1_USERNAME")
+        user1_password = configs.get("SECRET", "USER1_PASSWORD")
+
         # Add Default Users
-        if not UserModel.find_by_username("admin"):
-            admin = UserModel("admin", "password")
+        if not UserModel.find_by_username(admin_username):
+            admin = UserModel(admin_username, admin_password)
             admin.insert()
-        if not UserModel.find_by_username("user1"):
-            user = UserModel("user1", "password")
+        if not UserModel.find_by_username(user1_username):
+            user = UserModel(user1_username, user1_password)
             user.insert()
 
     @staticmethod

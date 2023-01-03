@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block positions %}
 
-    <label for="last_update"><b>(Last Update: {{ pnl.timestamp}} UTC)({{ pnl.timestamp|timediff }} min ago)</b></label>
+    <label for="last_update"><b>Last PNL Update:({{ pnl.timestamp|timediff }} min ago)</b></label>
     <h3> Account PNL</h3>
     <div class="loginmsg2">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                {% if category == "login_for_more" %}    
+                {% if category == "login_for_pnl" %}    
                     {{ message }}
                 {% endif %}
             {% endfor %}
@@ -23,6 +23,9 @@
             <th>NetLiquidation</th>
             <th>GrossPositionValue</th>
             <th>AvailableFunds</th>
+            <th>&#931DistanceSMA</th>
+            <th>Ceiling</th>
+            <th></th>
         </tr>
         <tr>
             {% if pnl.DailyPnL < 0 %}<td style="color:darkred;font-weight:bold">{% elif pnl.DailyPnL > 0 %}<td style="color:green;font-weight:bold">{% else %}<td>{% endif %}
@@ -33,14 +36,17 @@
             C${{ "{:,}".format(pnl.UnrealizedPnL|int)  }}</td>
             <td>C${{ "{:,}".format(pnl.NetLiquidation|int)  }}</td>
             <td>C${{ "{:,}".format(pnl.GrossPositionValue|int)  }}</td>
-            <td>C${{ "{:,}".format(pnl.AvailableFunds|int) }}</td>
-
+            <td style="border-right-style: groove;">C${{ "{:,}".format(pnl.AvailableFunds|int) }}</td>
+            <td>C${{ "{:,}".format(sum_act_sma|int) }}</td>
+            <td>C${{ "{:,}".format(sum_act_sma|int + pnl.NetLiquidation|int) }}</td>
+            <td style="text-align: right;">({{last_price_update|timediff("EST") }} min ago)</td>
+            
         </tr>
 {% endif %}              
 </table>
 
 <h3> Positions</h3>
-<table class="positions">
+<table id="postable" class="positions">
     <tr>
         <th>pair</th>
         <th style="border-right-style: groove;">&#931pnl(US$)</th>
@@ -52,6 +58,8 @@
         <th>position</th>
         <th>cost(US$)</th>
         <th style="border-right-style: groove;">pnl</th>
+        <th style="border-right-style: groove;">dist.SMA(US$)</th>
+        <th style="border-right-style: groove;">dist.std.dev</th>
         <th style="text-align: center;">check</th>
         
     </tr>
@@ -75,7 +83,7 @@
         <td style="border-right-style: groove;">
         <span class='field-tip'>
         {% endif %}
-        ${{ pos.ticker1.active_pnl + pos.ticker2.active_pnl }}
+        ${{ "{:,.0f}".format(pos.ticker1.active_pnl + pos.ticker2.active_pnl) }}
         <span class='tip-content'>
         avg: ${{ "{:.3f}".format((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)) }}
         {% if pos.ticker1.active_pos|abs > 0 %}
@@ -84,25 +92,38 @@
         </span></span>
         </td>
         
-
         <td>{{ pos.ticker1.symbol }}</td>
  
-        <td>{{ "{:,}".format(pos.ticker1.active_pos|int)  }}</td>
+        <td>{{ "{:,.0f}".format(pos.ticker1.active_pos)  }}</td>
 
-        <td>${{ "{:,}".format((pos.ticker1.active_cost * pos.ticker1.active_pos)|abs|int) }}</td>
+        <td>${{ "{:,.0f}".format((pos.ticker1.active_cost * pos.ticker1.active_pos)|abs) }}</td>
 
         {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
-        ${{ pos.ticker1.active_pnl }}</td>
+        ${{ "{:,.0f}".format(pos.ticker1.active_pnl) }}</td>
 
         <td>{{ pos.ticker2.symbol }}</td>
 
-        <td>{{ "{:,}".format(pos.ticker2.active_pos|int)  }}</td>
+        <td>{{ "{:,.0f}".format(pos.ticker2.active_pos)  }}</td>
 
-        <td>${{ "{:,}".format((pos.ticker2.active_cost * pos.ticker2.active_pos)|abs|int) }}</td>
+        <td>${{ "{:,.0f}".format((pos.ticker2.active_cost * pos.ticker2.active_pos)|abs) }}</td>
 
         {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
-        ${{ pos.ticker2.active_pnl }}</td>
+        ${{ "{:,.0f}".format(pos.ticker2.active_pnl) }}</td>
 
+        {% if pos.ticker1.active_pos|abs > 0 %}
+            {% if pos.ticker1.active_pos|int*pos.pair.sma_dist > 0 %}
+                <td bgcolor="lightblue" style="border-right-style: groove;">${{ "{:,.0f}".format((pos.ticker1.active_pos*pos.pair.sma_dist)) }}</td>
+            {% else %}
+                <td bgcolor="peachpuff" style="border-right-style: groove;">${{ "{:,.0f}".format((pos.ticker1.active_pos*pos.pair.sma_dist)) }}</td>
+            {% endif %}
+        {% else %}
+            <td style="color:darkblue;font-weight:bold;border-right-style: groove;">${{ "{:,.0f}".format((pos.pair.contracts*pos.pair.sma_dist|abs)) }}</td>
+        {% endif %}
+
+        {% if pos.pair.std!=0 %}
+        <td style="color:darkblue;font-weight:bold;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+        {% else %}<td>{% endif %}
+        
         {% if pos.ticker1.active_pos != 0 %}
             {% if (pos.ticker2.active_pos/pos.ticker1.active_pos)|float|abs|round(2,) != pos.pair.hedge %}
                 {% if ((pos.ticker2.active_pos/pos.ticker1.active_pos/pos.pair.hedge)|float|abs|round(3,)-1)|abs>= 0.05 %}<td style="background-color:orange;text-align: center;">hedge={{ (pos.ticker2.active_pos/pos.ticker1.active_pos)|float|abs|round(2,) }}</td>
@@ -115,14 +136,39 @@
         {% else %}<td style="background-color:lightyellow;text-align: center;">2nd pair</td>{% endif %}
 
         {% if pos.ticker1.active_pos|abs > 0 %}
-        
+
         <td>
             <span class='field-tip'>
-            <a href="./setup?closepair={{ pos.pair.name }}&closecontracts={{ pos.ticker1.active_pos }}&closeprice={{ ((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)+(pos.ticker1.active_pnl + pos.ticker2.active_pnl)/pos.ticker1.active_pos)|round(3,) }}" class="closeposbutton">close</a>
+            <a href="./setup?tradeaction=close&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.ticker1.active_pos }}&tradeprice={{ ((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)+(pos.ticker1.active_pnl + pos.ticker2.active_pnl)/pos.ticker1.active_pos)|round(3,) }}" class="closeposbutton">close</a>
             <span class='tip-content'>
             close {{pos.pair.name}}
             </span></span>
         </td>
+        <td>
+            <span class='field-tip'>
+            <a href="./setup?tradeaction=revert&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.ticker1.active_pos }}&tradeprice={{ ((pos.ticker1.active_cost - pos.pair.hedge * pos.ticker2.active_cost)+(pos.ticker1.active_pnl + pos.ticker2.active_pnl)/pos.ticker1.active_pos)|round(3,) }}" class="closeposbutton">revert</a>
+            <span class='tip-content'>
+            close {{pos.pair.name}}
+            </span></span>
+        </td>
+        {% else %}
+            {% if pos.pair.act_price < pos.pair.sma %}
+                <td>
+                    <span class='field-tip'>
+                    <a href="./setup?tradeaction=buy&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.pair.contracts }}&tradeprice={{ pos.pair.act_price }}" class="buyposbutton">buy</a>
+                    <span class='tip-content'>
+                    buy {{pos.pair.name}}
+                    </span></span>
+                </td>
+            {% else %}
+                <td>
+                    <span class='field-tip'>
+                    <a href="./setup?tradeaction=sell&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.pair.contracts }}&tradeprice={{ pos.pair.act_price }}" class="sellposbutton">sell</a>
+                    <span class='tip-content'>
+                    buy {{pos.pair.name}}
+                    </span></span>
+                </td>
+            {% endif %}
         {% endif %}
 
     </tr>
@@ -140,6 +186,7 @@
     {% endif %}
     {% endwith %}
 </div>
+
 {% if other_pos%}
     <h3> Other Pos.</h3>
     <table class="otherpos">
@@ -156,7 +203,7 @@
             <td style="background-color:palegreen;">{% else %}
             <td>{% endif %}
             {{ ticker.symbol }}</td>
-            <td>{{ "{:,}".format(ticker.active_pos|int)  }}</td>
+            <td>{{ "{:,.0f}".format(ticker.active_pos)  }}</td>
             <td>{{ ticker.active_cost }}</td>
             {% if ticker.active_pnl < 0 %}<td style="color:darkred;font-weight:bold">{% elif ticker.active_pnl > 0 %}<td style="color:green;font-weight:bold;">{% else %}<td>{% endif %}
                 ${{ ticker.active_pnl }}</td>
@@ -178,6 +225,7 @@
     </div>
 {% endif %}
 {% endblock %}
+
 
 {% block legendpos %}
 <div class="legend">

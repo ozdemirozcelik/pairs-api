@@ -454,6 +454,10 @@
                                 <input type="text" name="hedge" id="hedge" class="float"> 
                                 <input name="status" type="hidden" value="0"/>
                             </p>
+                            <p>
+                                <label for="contracts">Contracts:&nbsp;</label>
+                                <input type="text" name="contracts" id="contracts" class="integer"> 
+                            </p>
                             <br><br>
                             <button type="submit">Create JSON</button>
                         </div>
@@ -507,6 +511,10 @@
                                     <input type="text" name="hedge" id="hedge-update" class="float">
                                 </p>
                                 <p>
+                                    <label for="contracts-update">Contracts:&nbsp;</label>
+                                    <input type="text" name="contracts" id="contracts-update" class="integer">
+                                </p>
+                                <p>
                                     <label for="notes-update">Notes:&nbsp;</label>
                                     <input type="text" id="notes-update" name="notes" class="notes-update"/>
                                 </p>
@@ -518,6 +526,11 @@
                                 <p>
                                     <label>&nbsp;</label>  
                                     <input type="radio" id="passive-pair-update" name="status" value="0"><span>passive</span>
+                                    
+                                </p>
+                                <p>
+                                    <label>&nbsp;</label>  
+                                    <input type="radio" id="watch-pair-update" name="status" value="-1"><span>watch</span>
                                     
                                 </p>
                                 

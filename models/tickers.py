@@ -235,3 +235,11 @@ class TickerModel(db.Model):
             return cls.query.filter(cls.active == 1)
         else:
             return cls.query.filter(cls.active == 1).limit(number_of_items).all()
+
+    @classmethod
+    def get_watchlist_tickers(cls, number_of_items: str) -> List:
+
+        if number_of_items == "0":
+            return cls.query.filter(cls.active == -1)
+        else:
+            return cls.query.filter(cls.active == -1).limit(number_of_items).all()

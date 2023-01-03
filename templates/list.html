@@ -53,9 +53,9 @@
     <tr>
         <td>{{ signal.rowid }}</td>
         {% if signal.timestamp|iftoday %}
-        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time}}</td>                 
+        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time("UTC")}}</td>                 
         {% else %}
-        <td>{{ signal.timestamp|pct_time}}</td>
+        <td>{{ signal.timestamp|pct_time("UTC")}}</td>
         {% endif %} 
         <td>{{ signal.ticker }}</td>
         <td>{{ signal.order_comment }}</td> 
@@ -110,6 +110,7 @@
 <div class="legendleft">
     <span class='round' style='background-color: yellowgreen';>&nbsp;</span> active
     <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+    <span class='round' style='background-color: yellow';>&nbsp;</span> watch
 </div>
 <div class="legend">
     <span class='numberCircle' style='background-color: whitesmoke';>&nbsp;</span> waiting

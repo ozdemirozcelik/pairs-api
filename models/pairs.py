@@ -17,6 +17,11 @@ class PairModel(db.Model):
     hedge = db.Column(db.Float(precision=8))
     status = db.Column(db.Integer)
     notes = db.Column(db.String)
+    contracts = db.Column(db.Integer)
+    act_price = db.Column(db.Float(precision=4))
+    sma = db.Column(db.Float(precision=4))
+    sma_dist = db.Column(db.Float(precision=4))
+    std = db.Column(db.Float(precision=4))
 
     def __init__(
         self,
@@ -26,6 +31,11 @@ class PairModel(db.Model):
         hedge: float,
         status: int,
         notes: str,
+        contracts: str,
+        act_price: str,
+        sma: str,
+        sma_dist: str,
+        std: str,
     ):
         self.name = name
         self.hedge = hedge
@@ -33,6 +43,11 @@ class PairModel(db.Model):
         self.ticker1 = ticker1
         self.ticker2 = ticker2
         self.notes = notes
+        self.contracts = contracts
+        self.act_price = act_price
+        self.sma = sma
+        self.sma_dist = sma_dist
+        self.std = std
 
     def json(self) -> PairJSON:
         return {
@@ -42,6 +57,11 @@ class PairModel(db.Model):
             "hedge": self.hedge,
             "status": self.status,
             "notes": self.notes,
+            "contracts": self.contracts,
+            "act_price": self.act_price,
+            "sma": self.sma,
+            "sma_dist": self.sma_dist,
+            "std": self.std,
         }
 
     @classmethod
@@ -104,6 +124,11 @@ class PairModel(db.Model):
         item_to_update.hedge = self.hedge
         item_to_update.status = self.status
         item_to_update.notes = self.notes
+        item_to_update.contracts = self.contracts
+        item_to_update.act_price = self.act_price
+        item_to_update.sma = self.sma
+        item_to_update.sma_dist = self.sma_dist
+        item_to_update.std = self.std
 
         db.session.commit()
 
@@ -218,3 +243,11 @@ class PairModel(db.Model):
             return cls.query.filter(cls.status == 1)
         else:
             return cls.query.filter(cls.status == 1).limit(number_of_items).all()
+
+    @classmethod
+    def get_watchlist_pairs(cls, number_of_items: str) -> List:
+
+        if number_of_items == "0":
+            return cls.query.filter(cls.status == -1)
+        else:
+            return cls.query.filter(cls.status == -1).limit(number_of_items).all()

@@ -17,9 +17,9 @@
     <tr>
         <td>{{ signal.rowid }}</td>
         {% if signal.timestamp|iftoday %}
-        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time}}</td>                 
+        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time("UTC")}}</td>                 
         {% else %}
-        <td>{{ signal.timestamp|pct_time}}</td>
+        <td>{{ signal.timestamp|pct_time("UTC")}}</td>
         {% endif %} 
         <td>{{ signal.ticker }}</td>
         <td>{{ signal.order_comment }}</td> 

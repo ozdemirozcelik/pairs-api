@@ -25,7 +25,11 @@ class SignalUpdateOrder(Resource):
     parser.add_argument(
         "passphrase", type=str, required=True, help=EMPTY_ERR.format("passphrase")
     )
-    parser.add_argument("order_id", type=int, required=True,)
+    parser.add_argument(
+        "order_id",
+        type=int,
+        required=True,
+    )
     parser.add_argument("symbol", type=str, required=True)
     parser.add_argument("price", type=float, required=True)
     parser.add_argument("filled_qty", type=float, required=True)
@@ -71,14 +75,23 @@ class SignalUpdateOrder(Resource):
 
             else:
                 if item.order_status != "filled":
-                    if item.order_id1 == data["order_id"] and item.ticker1 == data["symbol"]:  # double check ticker symbol
+                    if (
+                        item.order_id1 == data["order_id"]
+                        and item.ticker1 == data["symbol"]
+                    ):  # double check ticker symbol
                         item.price1 = data["price"]
                         item.order_status = "filled(...)"
-                        item.status_msg = "remained(" + str(item.ticker1) + str("): ") + str(
-                            math.floor(item.order_contracts) - data["filled_qty"]
+                        item.status_msg = (
+                            "remained("
+                            + str(item.ticker1)
+                            + str("): ")
+                            + str(math.floor(item.order_contracts) - data["filled_qty"])
                         )
 
-                    if item.order_id2 == data["order_id"] and item.ticker2 == data["symbol"]:
+                    if (
+                        item.order_id2 == data["order_id"]
+                        and item.ticker2 == data["symbol"]
+                    ):
                         item.price2 = data["price"]
                         item.order_status = "filled(...)"
 
@@ -90,10 +103,21 @@ class SignalUpdateOrder(Resource):
                                 item.price1 - item.hedge_param * item.price2, 4
                             )
 
-                            if math.floor(item.order_contracts * item.hedge_param) > data["filled_qty"]:
+                            if (
+                                math.floor(item.order_contracts * item.hedge_param)
+                                > data["filled_qty"]
+                            ):
                                 item.order_status = "part.filled"
-                                item.status_msg = "remained(" +str(item.ticker2) + str("): ") + str(
-                                    math.floor(item.order_contracts * item.hedge_param) - data["filled_qty"]
+                                item.status_msg = (
+                                    "remained("
+                                    + str(item.ticker2)
+                                    + str("): ")
+                                    + str(
+                                        math.floor(
+                                            item.order_contracts * item.hedge_param
+                                        )
+                                        - data["filled_qty"]
+                                    )
                                 )
                             else:
                                 item.order_status = "filled"
@@ -103,7 +127,9 @@ class SignalUpdateOrder(Resource):
                             # use 'is not None' to avoid "0" order price problem
                             if item.order_price is not None:
                                 if item.order_action == "buy":
-                                    item.slip = round(item.order_price - item.fill_price, 4)
+                                    item.slip = round(
+                                        item.order_price - item.fill_price, 4
+                                    )
                                 else:
                                     item.slip = -round(
                                         item.order_price - item.fill_price, 4
@@ -111,7 +137,7 @@ class SignalUpdateOrder(Resource):
 
                     else:
                         if item.price1:
-                            item.fill_price = item.price1 and item.ticker1 == data["symbol"]  # double check ticker symbol
+                            item.fill_price = item.price1
 
                             if item.order_contracts > data["filled_qty"]:
                                 item.order_status = "part.filled"
@@ -125,7 +151,9 @@ class SignalUpdateOrder(Resource):
                             # calculate slip if order price is defined
                             if item.order_price is not None:
                                 if item.order_action == "buy":
-                                    item.slip = round(item.order_price - item.fill_price, 4)
+                                    item.slip = round(
+                                        item.order_price - item.fill_price, 4
+                                    )
                                 else:
                                     item.slip = -round(
                                         item.order_price - item.fill_price, 4
@@ -166,7 +194,10 @@ class SignalWebhook(Resource):
         "ticker", type=str, required=True, help=EMPTY_ERR.format("ticker")
     )
     parser.add_argument(
-        "order_action", type=str, required=True, help=EMPTY_ERR.format("order_action"),
+        "order_action",
+        type=str,
+        required=True,
+        help=EMPTY_ERR.format("order_action"),
     )
     parser.add_argument(
         "order_contracts",
@@ -175,19 +206,24 @@ class SignalWebhook(Resource):
         help=EMPTY_ERR.format("order_contracts"),
     )
     parser.add_argument(
-        "order_price", type=float,
+        "order_price",
+        type=float,
     )
     parser.add_argument(
-        "mar_pos", type=str,
+        "mar_pos",
+        type=str,
     )
     parser.add_argument(
-        "mar_pos_size", type=int,
+        "mar_pos_size",
+        type=int,
     )
     parser.add_argument(
-        "pre_mar_pos", type=str,
+        "pre_mar_pos",
+        type=str,
     )
     parser.add_argument(
-        "pre_mar_pos_size", type=int,
+        "pre_mar_pos_size",
+        type=int,
     )
     parser.add_argument("order_comment", type=str, default="")
     parser.add_argument("order_status", type=str, default="waiting")

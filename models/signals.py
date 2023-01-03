@@ -9,9 +9,12 @@ from sqlalchemy.sql import (
 from models.pairs import PairModel
 from models.tickers import TickerModel
 
+from app import configs
+
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
-PASSPHRASE = "webhook"  # Passphrase is required to register webhooks (& to update account positions & PNL)
+# Passphrase is required to register webhooks (& to update account positions & PNL)
+PASSPHRASE = configs.get("SECRET", "WEBHOOK_PASSPHRASE")
 
 
 class SignalModel(db.Model):
@@ -470,7 +473,7 @@ class SignalModel(db.Model):
             if pair:
                 # check trade status
                 # if pair is not active set a static pair status (not possible to update)
-                if not pair.status:
+                if pair.status != 1:
                     self.order_status = "canceled"
                     self.status_msg = "passive ticker"
                     return False
@@ -505,7 +508,9 @@ class SignalModel(db.Model):
                 self.status_msg = "unknown ticker"
                 return False
 
-    def splitticker(self,) -> bool:
+    def splitticker(
+        self,
+    ) -> bool:
 
         success_flag = True
         currency_match = True
@@ -690,7 +695,9 @@ class SignalModel(db.Model):
         return success_flag
 
     # to split stocks only
-    def splitticker_stocks(self,) -> bool:
+    def splitticker_stocks(
+        self,
+    ) -> bool:
 
         # Split the received webhook equation into tickers and hedge parameters
         # Tested with Tradingview webhooks and Interactive Brokers ticker format
@@ -830,52 +837,79 @@ class SignalModel(db.Model):
             pair = True
 
         if pair:
-            slip_dic['buy'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-                & (cls.order_action == "buy")
-            ).scalar()
+            slip_dic["buy"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                    & (cls.order_action == "buy")
+                )
+                .scalar()
+            )
 
-            slip_dic['sell'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-                & (cls.order_action == "sell")
-            ).scalar()
+            slip_dic["sell"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                    & (cls.order_action == "sell")
+                )
+                .scalar()
+            )
 
-            slip_dic['avg'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-            ).scalar()
+            slip_dic["avg"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                )
+                .scalar()
+            )
 
         else:
-            slip_dic['buy'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-                & (cls.order_action == "buy")
-            ).filter(cls.ticker_type == "single").scalar()
+            slip_dic["buy"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                    & (cls.order_action == "buy")
+                )
+                .filter(cls.ticker_type == "single")
+                .scalar()
+            )
 
-            slip_dic['sell'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-                & (cls.order_action == "sell")
-            ).filter(cls.ticker_type == "single").scalar()
+            slip_dic["sell"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                    & (cls.order_action == "sell")
+                )
+                .filter(cls.ticker_type == "single")
+                .scalar()
+            )
 
-            slip_dic['avg'] = db.session.query(db.func.avg(cls.slip)).filter(
-                (cls.ticker1 == ticker1)
-                & (cls.ticker2 == ticker2)
-                & (cls.timestamp <= end_date)
-                & (cls.timestamp >= start_date)
-            ).filter(cls.ticker_type == "single").scalar()
+            slip_dic["avg"] = (
+                db.session.query(db.func.avg(cls.slip))
+                .filter(
+                    (cls.ticker1 == ticker1)
+                    & (cls.ticker2 == ticker2)
+                    & (cls.timestamp <= end_date)
+                    & (cls.timestamp >= start_date)
+                )
+                .filter(cls.ticker_type == "single")
+                .scalar()
+            )
 
         return slip_dic
 
@@ -888,20 +922,29 @@ class SignalModel(db.Model):
             .first()
         )  # get the most recent order in case of a multiple order id situation
 
-
     @classmethod
     # multiple order id situation happens a lot, better to double check the ticker
     def find_by_orderid_ticker(cls, orderid, ticker) -> "SignalModel":
         return (
-            cls.query.filter(((cls.ticker1 == ticker) | (cls.ticker2 == ticker)) & ((cls.order_id1 == orderid) | (cls.order_id2 == orderid)))
-                .order_by(cls.rowid.desc())
-                .first()
+            cls.query.filter(
+                ((cls.ticker1 == ticker) | (cls.ticker2 == ticker))
+                & ((cls.order_id1 == orderid) | (cls.order_id2 == orderid))
+            )
+            .order_by(cls.rowid.desc())
+            .first()
         )  # get the most recent order in case of a multiple order id situation
 
     @classmethod
     def check_timestamp(cls) -> "SignalModel":
         return (
-            cls.query.filter(((cls.order_status == "waiting") | (cls.order_status == "rerouted") | (cls.order_status == "error") | (cls.order_status == "critical err")))
-                .order_by(cls.rowid.desc())
-                .first()
+            cls.query.filter(
+                (
+                    (cls.order_status == "waiting")
+                    | (cls.order_status == "rerouted")
+                    | (cls.order_status == "error")
+                    | (cls.order_status == "critical err")
+                )
+            )
+            .order_by(cls.rowid.desc())
+            .first()
         )

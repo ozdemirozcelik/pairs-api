@@ -44,13 +44,17 @@ function handleFormSubmit_tickerlist(event) {
 // change status color
 function changeStatusColor(ticker) {
 
-    if (!status_dic[ticker.value]) {
+    if (status_dic[ticker.value]==0) {
         document.getElementById("show_status").style.background = 'lightcoral';
         document.getElementById("show_status").title = 'passive';
 
-    } else {
+    } else if (status_dic[ticker.value]==1)  {
         document.getElementById("show_status").style.background = 'yellowgreen';
         document.getElementById("show_status").title = 'active';
+    }
+    else {
+        document.getElementById("show_status").style.background = 'yellow';
+        document.getElementById("show_status").title = 'watch';
     }
 
 }
@@ -106,7 +110,7 @@ async function getPairs_dash(selected_ticker) {
             ticker_webhook.appendChild(opt); 
         }
     }
-    if (document.getElementById(selected_ticker)) {
+    if (selected_ticker) {
         document.getElementById(selected_ticker).selected = true;
     } 
     changeStatusColor(ticker_webhook);
@@ -148,7 +152,7 @@ async function getStocks_dash(selected_ticker) {
             ticker_webhook.appendChild(opt);                    
         }
     }
-    if (document.getElementById(selected_ticker)) {
+    if (selected_ticker) {
         document.getElementById(selected_ticker).selected = true;
     } 
     changeStatusColor(ticker_webhook);

@@ -18,6 +18,7 @@
             <li id="dashboard" {% if tab1=="tab active" %}class="active"{% endif %}><a href="dashboard">Dashboard</a></li>
             <li id="listsignalstab" {% if tab2=="tab active" %}class="active"{% endif %}><a href="list">List Signals</a></li>
             <li id="positionstab" {% if tab3=="tab active" %}class="active"{% endif %}><a href="positions">Positions</a></li>
+            <li id="watchlisttab" {% if tab4=="tab active" %}class="active"{% endif %}><a href="watchlist">Watchlist</a></li>
         </ul>
 
         <div id="tab1" class="{{ tab1 }}">
@@ -46,6 +47,12 @@
             </div>
             {% block legendpos %}
             {% endblock %}       
+        </div>
+        <div id="tab4" class="{{ tab4 }}">
+            <div class="column_watchlist"> 
+                {% block watchlist %}
+                {% endblock %}
+            </div>   
         </div>
 
 <script>

@@ -1,6 +1,9 @@
-# Pairs-API v4 for trading tickers (single or pairs), deployed on Heroku & Dreamhost
 
-Version 4 of the Flask-RESTful API.
+# Pairs-API v3 for trading tickers (single or pairs), deployed on Heroku & Dreamhost
+
+Version 3 of the Flask-RESTful API.
+
+(Latest Release: v3.2)
 
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
 Configured to be used with SQLite3 for local use.
@@ -9,25 +12,42 @@ A working demo for the latest release is deployed in Heroku with PostgreSQL:
 
 https://api-pairs.herokuapp.com/
 
+# Watch Demo
 
-# Additions to v3
+[![Watch on YouTube](https://ozdemirozcelik.github.io/utubelink.png)](https://www.youtube.com/watch?v=-jfJ6g-fZpI "Watch on YouTube")
 
-- additional API resources for backtests
-- email notifications for problematic orders
+
+# Additions to v2
+
+- additional API resources
+- functionality to create server side sessions
+- functionality to work with TradingView webhooks (Release V3.O)
 - demo improvements:
-  - positions page improvements and quick close position button
-- more functionality to work with Interactive Brokers TWS API
+  - new dashboard
+  - list view for signals
+- functionality to work with Interactive Brokers TWS API (Release V3.1)
   - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
+- keep account position and PNL details
+- v3.3 works on heroku-22 stack
   
 # Use Cases
 
-With Pairs-API v4 you can:
+With Pairs-API v3 you can:
 - catch webhooks from trading platforms or signal generators
 - list, save, update and delete tickers/pairs, order and price details with API calls
 - enable and disable tickers and pairs for active trading
 - use access tokens for authentication purposes with login system backend
 - TODO: send real time orders to exchange (possibly via Interactive Brokers)
 - see account positions and PNL details
+
+# Considerations
+
+Considering for the next version:
+
+- add statistical analysis and visualization 
+- improve error handling, add unit tests
+- set up CI for the repository
+
 
 # Requirements
 
@@ -46,7 +66,7 @@ With Pairs-API v4 you can:
 
 ### clone git repository:
 ```bash
-$ git clone https://github.com/ozdemirozcelik/pairs-api-v4.git
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 ````
 ### create and activate virtual environment:
 ````bash
@@ -73,10 +93,15 @@ These are mainly used for Heroku and Heroku Postgres.
 (windows: change -if necessary- version declarations from 'flask~=2.0.2'' to 'flask==2.0.2')
 
 ````
-$ pip install -r requirements.txt
-(conda install --file requirements.txt)
+$ pip install -r requirements.txt --user
+(conda install --file requirements_conda.txt)
 ````
-SQLAlchemy should take care of database creation. 
+try this if conda fails to install requirements. or try with pip:
+````
+(conda config --append channels conda-forge)
+````
+check this out if you get an invalidversionspec error:
+https://github.com/conda/conda/issues/9519#issuecomment-690486632
 
 ### run flask:
 ````
@@ -169,40 +194,40 @@ Check [Heroku deployment](#heroku-deployment) to learn for more about using your
 Resources defined with flask_restful are:
 
 ```python
-api.add_resource(SignalWebhook, "/v4/webhook")
-api.add_resource(SignalUpdateOrder, "/v4/signal/updateorder")
-api.add_resource(SignalList, "/v4/signals/<string:number_of_items>")
-api.add_resource(SignalListStatus,"/v4/signals/status/<string:order_status>/<string:number_of_items>",)
-api.add_resource(SignalListTicker, "/v4/signals/ticker/<string:ticker_name>/<string:number_of_items>")
-api.add_resource(Signal, "/v4/signal/<string:rowid>")
+api.add_resource(SignalWebhook, "/v3/webhook")
+api.add_resource(SignalUpdateOrder, "/v3/signal/updateorder")
+api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
+api.add_resource(SignalListStatus,"/v3/signals/status/<string:order_status>/<string:number_of_items>",)
+api.add_resource(SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>")
+api.add_resource(Signal, "/v3/signal/<string:rowid>")
 
-api.add_resource(PairRegister, "/v4/regpair")
-api.add_resource(PairList, "/v4/pairs/<string:number_of_items>")
-api.add_resource(Pair, "/v4/pair/<string:name>")
+api.add_resource(PairRegister, "/v3/regpair")
+api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
+api.add_resource(Pair, "/v3/pair/<string:name>")
 
-api.add_resource(TickerRegister, "/v4/regticker")
-api.add_resource(TickerUpdatePNL, "/v4/ticker/updatepnl")
-api.add_resource(TickerList, "/v4/tickers/<string:number_of_items>")
-api.add_resource(Ticker, "/v4/ticker/<string:symbol>")
+api.add_resource(TickerRegister, "/v3/regticker")
+api.add_resource(TickerUpdatePNL, "/v3/ticker/updatepnl")
+api.add_resource(TickerList, "/v3/tickers/<string:number_of_items>")
+api.add_resource(Ticker, "/v3/ticker/<string:symbol>")
 
-api.add_resource(UserRegister, "/v4/reguser")
-api.add_resource(UserList, "/v4/users/<string:number_of_users>")
-api.add_resource(User, "/v4/user/<string:username>")
-api.add_resource(UserLogin, "/v4/login")
-api.add_resource(UserLogout, "/v4/logout")
-api.add_resource(TokenRefresh, "/v4/refresh")
+api.add_resource(UserRegister, "/v3/reguser")
+api.add_resource(UserList, "/v3/users/<string:number_of_users>")
+api.add_resource(User, "/v3/user/<string:username>")
+api.add_resource(UserLogin, "/v3/login")
+api.add_resource(UserLogout, "/v3/logout")
+api.add_resource(TokenRefresh, "/v3/refresh")
 
-api.add_resource(PNLRegister, "/v4/regpnl")
-api.add_resource(PNLList, "/v4/pnl/<string:number_of_items>")
+api.add_resource(PNLRegister, "/v3/regpnl")
+api.add_resource(PNLList, "/v3/pnl/<string:number_of_items>")
 ```
 
 # Request & Response Examples
 
-Please check the [POSTMAN collection](local/pairs_api%20v4.postman_collection.json) to test all resources.
+Please check the [POSTMAN collection](local/pairs_api%20v3.postman_collection.json) to test all resources.
 
 ### POST request to register a single ticker:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/regticker'
+'http://api-pairs-v3.herokuapp.com/v3/regticker'
 ```
 Request Body:
 ```json
@@ -223,7 +248,7 @@ Response:
 
 ### PUT request to update a single ticker:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/regticker'
+'http://api-pairs-v3.herokuapp.com/v3/regticker'
 ```
 Request Body:
 ```json
@@ -247,12 +272,12 @@ Response:
 
 ### GET request to get all tickers:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/tickers/0'
+'http://api-pairs-v3.herokuapp.com/v3/tickers/0'
 ```
 
 ### GET request to receive certain number of tickers (for exp: 50):
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/tickers/2'
+'http://api-pairs-v3.herokuapp.com/v3/tickers/2'
 ```
 Response:
 ```json
@@ -276,7 +301,7 @@ Response:
 
 ### GET request to get details of a certain ticker:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/ticker/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/ticker/AAPL'
 ```
 
 Response:
@@ -290,7 +315,7 @@ Response:
 ```
 ### DELETE request for a certain ticker:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/ticker/AAPL'
+'http://api-pairs-v3.herokuapp.com/v3/ticker/AAPL'
 ```
 Response:
 ```json
@@ -301,7 +326,7 @@ Response:
 
 ### POST request to register a pair:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/regpair'
+'http://api-pairs-v3.herokuapp.com/v3/regpair'
 ```
 Request Body:
 ```json
@@ -322,7 +347,7 @@ Response:
 
 ### PUT request to update a pair:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/regpair'
+'http://api-pairs-v3.herokuapp.com/v3/regpair'
 ```
 Request Body:
 ```json
@@ -349,7 +374,7 @@ Response:
 
 ### POST request to register a webhook signal:
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/webhook'
+'http://api-pairs-v3.herokuapp.com/v3/webhook'
 ```
 Request Body:
 ```json
@@ -377,7 +402,7 @@ Response:
 
 ### GET request to get a list of signals with certain trade status
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/signals/status/waiting/2'
+'http://api-pairs-v3.herokuapp.com/v3/signals/status/waiting/2'
 ```
 Response:
 ```json
@@ -438,58 +463,56 @@ Response:
 ```
 ### PUT request to update order price and status by order id
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/signal/updateorder'
+'http://api-pairs-v3.herokuapp.com/v3/signal/updateorder'
 ```
 
 ````
-"cancel":true  to cancel order
-"partial":true  to update partially filled "order_contracts" amount
+"cancel":true to cancel the order
 ````
-
 Request Body:
 ```json
 {
     "passphrase": "webhook",
-    "order_id": 945,
-    "stk_price": 100.756,
-    "cancel":false,
-    "partial": false,
-    "order_contracts": 0
+    "symbol": "ROIC",
+    "order_id": 8,
+    "price": 15.55,
+    "filled_qty": 100
 }
 ```
 
 Response:
-(fill_price & slip is calculated automatically)
+(fill_price & slip & order status for partially filled orders are calculated automatically)
 ```json
 {
-    "rowid": 47,
-    "ticker": "MA-3*V",
+    "rowid": 5,
+    "ticker": "NMFC-0.75*ROIC",
     "order_action": "buy",
-    "order_contracts": 20,
-    "order_price": -2.0,
+    "order_contracts": 603,
+    "order_price": 0.98,
     "mar_pos": "long",
-    "mar_pos_size": 20,
+    "mar_pos_size": 603,
     "pre_mar_pos": "flat",
     "pre_mar_pos_size": 0,
     "order_comment": "Enter Long",
-    "order_status": "filled",
+    "order_status": "part.filled",
     "ticker_type": "pair",
-    "stk_ticker1": "MA",
-    "stk_ticker2": "V",
-    "hedge_param": 3.0,
-    "order_id1": 944,
-    "order_id2": 945,
-    "stk_price1": 300.1,
-    "stk_price2": 100.756,
-    "fill_price": -2.168,
-    "slip": 0.168,
-    "error_msg": null
+    "ticker1": "NMFC",
+    "ticker2": "ROIC",
+    "hedge_param": 0.75,
+    "order_id1": 7,
+    "order_id2": 8,
+    "price1": 12.6,
+    "price2": 15.55,
+    "fill_price": 0.9375,
+    "slip": 0.0425,
+    "error_msg": null,
+    "status_msg": "remained(ROIC): 352.0"
 }
 ```
 
 ### POST request to login with a user
 ```python
-'http://api-pairs-v4.herokuapp.com/v4/login'
+'http://api-pairs-v3.herokuapp.com/v3/login'
 ```
 Request Body (Token to expire in 30 min, default is 10 min):
 ```json
@@ -510,7 +533,7 @@ Response:
 
 # Status Codes
 
-Pairs-API v4 returns the following status codes:
+Pairs-API v3 returns the following status codes:
 
 | Status Code | Description             |
 | :--- |:------------------------|
@@ -527,9 +550,9 @@ Download and install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-c
 
 Clone repository, login to Heroku, add git remote and push:
 ````
-$ git clone https://github.com/ozdemirozcelik/pairs-api-v4.git
+$ git clone https://github.com/ozdemirozcelik/pairs-api-v3.git
 $ heroku login
-$ heroku git:remote -a api-pairs-v4
+$ heroku git:remote -a [your-heroku-app-name]
 $ git push heroku main
 ````
 
@@ -557,7 +580,7 @@ Please follow the instructions here:
 
 You can use below template for TradingView to send a POST request as soon as an alert is triggered.
 
-webhook URL should be:  '{URL_OF_YOUR_API}/v4/webhook'
+webhook URL should be:  '{URL_OF_YOUR_API}/v3/webhook'
 
 (local\webhook.json)
 ````json

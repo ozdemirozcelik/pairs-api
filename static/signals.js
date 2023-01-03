@@ -232,22 +232,67 @@ async function getPairs_webhook() {
         }
     }
 
-    if (params['closepair'] != null) {
-        console.log(params['closepair'])
-        ticker_webhook.value = params['closepair'];  
-        if (Number(params['closecontracts'])>0) {
-            order_action.value = "sell";
-            pre_mar_pos.value = "long"; 
-        } else {
+    if (params['tradeaction'] != null) {
+
+        console.log(params['tradepair'])
+        ticker_webhook.value = params['tradepair']; 
+
+        if (params['tradeaction'] == "close") {
+
+            if (Number(params['tradecontracts'])>0) {
+                order_action.value = "sell";
+                pre_mar_pos.value = "long"; 
+            } else {
+                order_action.value = "buy";
+                pre_mar_pos.value = "short"; 
+            }
+
+            order_contracts.value = Math.abs(params['tradecontracts']); 
+            order_price.value = params['tradeprice'];
+            mar_pos.value = "flat";
+            mar_pos_size.value = 0;
+            pre_mar_pos_size.value = Math.abs(params['tradecontracts']); 
+
+        } else if (params['tradeaction'] == "revert") {
+
+            if (Number(params['tradecontracts'])>0) {
+                order_action.value = "sell";
+                pre_mar_pos.value = "long";
+                mar_pos.value = "short"; 
+            } else {
+                order_action.value = "buy";
+                pre_mar_pos.value = "short";
+                mar_pos.value = "long";
+            }
+
+            order_contracts.value = 2*Math.abs(params['tradecontracts']); 
+            order_price.value = params['tradeprice'];
+            mar_pos_size.value = Math.abs(params['tradecontracts']);
+            pre_mar_pos_size.value = Math.abs(params['tradecontracts']); 
+
+        }  else if (params['tradeaction'] == "buy"){
+
             order_action.value = "buy";
-            pre_mar_pos.value = "short"; 
+            pre_mar_pos.value = "flat"; 
+
+            order_contracts.value = Math.abs(params['tradecontracts']); 
+            order_price.value = params['tradeprice'];
+            mar_pos.value = "long";
+            mar_pos_size.value = Math.abs(params['tradecontracts']); 
+            pre_mar_pos_size.value = 0; 
+
+        } else if (params['tradeaction'] == "sell"){
+
+            order_action.value = "sell";
+            pre_mar_pos.value = "flat"; 
+
+            order_contracts.value = Math.abs(params['tradecontracts']); 
+            order_price.value = params['tradeprice'];
+            mar_pos.value = "short";
+            mar_pos_size.value = Math.abs(params['tradecontracts']); 
+            pre_mar_pos_size.value = 0; 
+
         }
-        order_contracts.value = Math.abs(params['closecontracts']); 
-        order_price.value = params['closeprice'];
-        mar_pos.value = "flat";
-        mar_pos_size.value = 0;
-        pre_mar_pos_size.value = Math.abs(params['closecontracts']); 
-    
     }
     
     changeStatusColor(ticker_webhook);
