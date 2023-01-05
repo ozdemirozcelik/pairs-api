@@ -20,10 +20,11 @@ https://api-pairs.herokuapp.com/
   - watchlist page for pairs
   - SMA distance for active positions
   - show average order slip
+  - quick buy/sell/close/revert buttons
   
 ![Summary Backtests](local/positions.png)
 
-# Watch Demo for V3
+# Watch Demo for v3
 
 [![Watch on YouTube](https://ozdemirozcelik.github.io/utubelink.png)](https://www.youtube.com/watch?v=-jfJ6g-fZpI "Watch on YouTube")
 
@@ -36,7 +37,6 @@ https://api-pairs.herokuapp.com/
 - demo improvements:
   - new dashboard
   - list view for signals
-  - quick buy/sell/close/revert buttons
 - functionality to work with Interactive Brokers TWS API (Release V3.1)
   - Check my repository: [PAIRS-IBKR](https://github.com/ozdemirozcelik/pairs-ibkr)
 - keep account position and PNL details
