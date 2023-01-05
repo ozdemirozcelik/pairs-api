@@ -137,14 +137,14 @@ input { display: table-cell; }
 
 .pnl {
     table-layout: auto;
-    width: 80%;
+    width: 100%;
     text-align: center;
     font-size: 90%;
 }
 
 .positions {
     table-layout: auto;
-    width: 80%;
+    width: 100%;
     text-align: left;
     font-size: 90%;
 }

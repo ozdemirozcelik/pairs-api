@@ -14,12 +14,14 @@ https://api-pairs.herokuapp.com/
 
 - configuration file
 - yfinance integration (for ticker price data)
-- simple moving average(SMA) calculation for pairs
-- slippage calculation
+  - simple moving average(SMA) and standard deviation calculation for pairs
 - email notifications for waiting/problematic orders
 - demo improvements:
   - watchlist page for pairs
   - SMA distance for active positions
+  - show average order slip
+  
+![Summary Backtests](local/positions.png)
 
 # Watch Demo for V3
 
@@ -146,7 +148,7 @@ need a passphrase, by default it is set as 'webhook'; check config.ini:
 WEBHOOK_PASSPHRASE : webhook
 ```
 
-### default admin and a user
+### default admin and user
 is created during database creation; check config.ini:
 
 ```python
@@ -179,6 +181,23 @@ needs currently set with Flask- JWT:
 
 
 # Demo Configuration
+
+### config.ini
+SMA calculation and email notifications
+
+```python
+[SMA]
+ENABLE_SMA_CALC = True
+# calculate 20D moving average in every x minutes
+# data is from yahoo finance, check for rate limitations: https://pypi.org/project/yfinance/
+SMA_CALC_PERIOD = 20
+...
+
+# configuraton for the email notifications
+[EMAIL]
+ENABLE_EMAIL_NOTIFICATIONS = True
+...
+```
 
 ### app.py
 ### resources/users.py
@@ -213,7 +232,7 @@ Resources defined with flask_restful are:
 api.add_resource(SignalWebhook, "/v4/webhook")
 api.add_resource(SignalUpdateOrder, "/v4/signal/updateorder")
 api.add_resource(SignalList, "/v4/signals/<string:number_of_items>")
-api.add_resource(SignalListStatus,"/v4/signals/status/<string:order_status>/<string:number_of_items>",)
+api.add_resource(SignalListStatus, "/v4/signals/status/<string:order_status>/<string:number_of_items>")
 api.add_resource(SignalListTicker, "/v4/signals/ticker/<string:ticker_name>/<string:number_of_items>")
 api.add_resource(Signal, "/v4/signal/<string:rowid>")
 
@@ -660,6 +679,7 @@ snippets:
 * [jQuery input filter](https://jsfiddle.net/KarmaProd/hw8j34f2/4/)
 * [JavaScript Countdown Timer](https://www.w3schools.com/howto/howto_js_countdown.asp)
 * [Tooltip](http://css-tricks.com/snippets/css/css-triangle)
+* [Loader](https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_loader5)
 
 
 # Contributing
