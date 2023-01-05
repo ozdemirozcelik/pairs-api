@@ -188,36 +188,36 @@ def my_revoked_token_callback(jwt_header, jwt_payload):
 
 # Resource definitions (Start)
 
-api.add_resource(SignalWebhook, "/v3/webhook")
-api.add_resource(SignalUpdateOrder, "/v3/signal/updateorder")
-api.add_resource(SignalList, "/v3/signals/<string:number_of_items>")
+api.add_resource(SignalWebhook, "/v4/webhook")
+api.add_resource(SignalUpdateOrder, "/v4/signal/updateorder")
+api.add_resource(SignalList, "/v4/signals/<string:number_of_items>")
 api.add_resource(
     SignalListStatus,
-    "/v3/signals/status/<string:order_status>/<string:number_of_items>",
+    "/v4/signals/status/<string:order_status>/<string:number_of_items>",
 )
 api.add_resource(
-    SignalListTicker, "/v3/signals/ticker/<string:ticker_name>/<string:number_of_items>"
+    SignalListTicker, "/v4/signals/ticker/<string:ticker_name>/<string:number_of_items>"
 )
-api.add_resource(Signal, "/v3/signal/<string:rowid>")
+api.add_resource(Signal, "/v4/signal/<string:rowid>")
 
-api.add_resource(PairRegister, "/v3/regpair")
-api.add_resource(PairList, "/v3/pairs/<string:number_of_items>")
-api.add_resource(Pair, "/v3/pair/<string:name>")
+api.add_resource(PairRegister, "/v4/regpair")
+api.add_resource(PairList, "/v4/pairs/<string:number_of_items>")
+api.add_resource(Pair, "/v4/pair/<string:name>")
 
-api.add_resource(TickerRegister, "/v3/regticker")
-api.add_resource(TickerUpdatePNL, "/v3/ticker/updatepnl")
-api.add_resource(TickerList, "/v3/tickers/<string:number_of_items>")
-api.add_resource(Ticker, "/v3/ticker/<string:symbol>")
+api.add_resource(TickerRegister, "/v4/regticker")
+api.add_resource(TickerUpdatePNL, "/v4/ticker/updatepnl")
+api.add_resource(TickerList, "/v4/tickers/<string:number_of_items>")
+api.add_resource(Ticker, "/v4/ticker/<string:symbol>")
 
-api.add_resource(UserRegister, "/v3/reguser")
-api.add_resource(UserList, "/v3/users/<string:number_of_users>")
-api.add_resource(User, "/v3/user/<string:username>")
-api.add_resource(UserLogin, "/v3/login")
-api.add_resource(UserLogout, "/v3/logout")
-api.add_resource(TokenRefresh, "/v3/refresh")
+api.add_resource(UserRegister, "/v4/reguser")
+api.add_resource(UserList, "/v4/users/<string:number_of_users>")
+api.add_resource(User, "/v4/user/<string:username>")
+api.add_resource(UserLogin, "/v4/login")
+api.add_resource(UserLogout, "/v4/logout")
+api.add_resource(TokenRefresh, "/v4/refresh")
 
-api.add_resource(PNLRegister, "/v3/regpnl")
-api.add_resource(PNLList, "/v3/pnl/<string:number_of_items>")
+api.add_resource(PNLRegister, "/v4/regpnl")
+api.add_resource(PNLList, "/v4/pnl/<string:number_of_items>")
 
 
 # Resource definitions (End)

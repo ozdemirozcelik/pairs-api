@@ -2,9 +2,9 @@
 // test get, put, delete requests for the tickers
 
 // define api constants for the tickers:
-const api_url_get= server_url +'v3/ticker/';
-const api_url_get_all= server_url +'v3/tickers/0';// "0" for all tickers
-const api_url_post_put= server_url +'v3/regticker';
+const api_url_get= server_url +'v4/ticker/';
+const api_url_get_all= server_url +'v4/tickers/0';// "0" for all tickers
+const api_url_post_put= server_url +'v4/regticker';
 
 // form data to be collected in these variables:
 var formJSON;

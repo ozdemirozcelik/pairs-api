@@ -1,6 +1,6 @@
 // define API end points for getting list of pairs and tickers
-const api_url_list_all_ticker= server_url + 'v3/tickers/0';
-const api_url_list_all_pair= server_url + 'v3/pairs/0';
+const api_url_list_all_ticker= server_url + 'v4/tickers/0';
+const api_url_list_all_pair= server_url + 'v4/pairs/0';
 
 
 var ticker_webhook = document.getElementById("ticker_webhook")
