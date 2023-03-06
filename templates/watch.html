@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block watchlist %}
+
+<body onload="disableLoader()" style="margin:0;">
+
+<div id="loader"></div>
+
+<script>
+var myVar;
+
+function disableLoader() {
+    myVar = setTimeout(showPage, 500);
+}
+
+function showPage() {
+    document.getElementById("loader").style.display = "none";
+}
+
+function hideTable() {
+    document.getElementById("watchtable").style.display = "none";
+    document.getElementById("loader").style.display = "block";
+}
+</script>
+
+<label for="reload">
+    <div class="loginmsg2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "login_to_update" %}
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <label for="last_update"><b>Last Price Update: ({{last_price_update|timediff("EST") }} min ago)</b></label>
+            <br>
+            <a href="update_watchlist"><button id="reload" onclick="hideTable()">Update Now</button></a>
+        {% endif %}
+        {% endwith %}
+    </div>
+</label>
+
+<h3> Watchlist</h3>
+<table id="watchtable" class="positions">
+    <tr>
+        <th>pair</th>
+        <th>ticker1</th>
+        <th>position</th>
+        <th>cost(US$)</th>
+        <th style="border-right-style: groove;">pnl</th>
+        <th>ticker2</th>
+        <th>position</th>
+        <th>cost(US$)</th>
+        <th style="border-right-style: groove;">pnl</th>
+        <th style="border-right-style: groove;">dist.SMA(US$)</th>
+        <th style="text-align: center;">dist.std.dev</th>
+
+    </tr>
+    {% for pos in pair_pos_all %}
+    <tr>
+        <td>
+        {% if (pos.ticker1.active_pos == 0)  and (pos.ticker2.active_pos == 0) %}&#8883;{% endif %}
+        {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}
+        </td>
+
+        {% if pos.ticker1.active_pos < 0 %}<td style="background-color:lightpink;">
+        {% elif pos.ticker1.active_pos > 0 %}<td style="background-color:palegreen;">
+        {% else %}<td>{% endif %}
+        {{ pos.ticker1.symbol }}
+        </td>
+
+        <td>{{ "{:,.0f}".format(pos.ticker1.active_pos)  }}</td>
+
+        <td>${{ "{:,.0f}".format((pos.ticker1.active_cost * pos.ticker1.active_pos)|abs) }}</td>
+
+        {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
+        ${{ "{:,.0f}".format(pos.ticker1.active_pnl) }}</td>
+
+        {% if pos.ticker2.active_pos < 0 %}<td style="background-color:lightpink;">
+        {% elif pos.ticker2.active_pos > 0 %}<td style="background-color:palegreen;">
+        {% else %}<td>{% endif %}
+        {{ pos.ticker2.symbol }}
+        </td>
+
+        <td>{{ "{:,.0f}".format(pos.ticker2.active_pos)  }}</td>
+
+        <td>${{ "{:,.0f}".format((pos.ticker2.active_cost * pos.ticker2.active_pos)|abs) }}</td>
+
+        {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
+        ${{ "{:,.0f}".format(pos.ticker2.active_pnl) }}</td>
+
+        {% if (pos.pair.contracts*pos.pair.sma_dist|abs) > 100 %}
+            <td style="color:darkblue;font-weight:bold;background-color:lightyellow;border-right-style: groove;">
+                {% if (pos.ticker1.active_pos == 0)  and (pos.ticker2.active_pos == 0) %}&#8883;{% endif %}
+                ${{ "{:,.0f}".format((pos.pair.contracts*pos.pair.sma_dist|abs)) }}
+            </td>
+        {% else %}
+            <td style="color:darkblue;font-weight:bold;border-right-style: groove;">
+                {% if (pos.ticker1.active_pos == 0)  and (pos.ticker2.active_pos == 0) %}&#8883;{% endif %}
+                ${{ "{:,.0f}".format((pos.pair.contracts*pos.pair.sma_dist|abs)) }}
+            </td>
+        {% endif %}
+
+        {% if pos.pair.std!=0 %}
+            {% if (pos.pair.sma_dist/pos.pair.std)|abs>=2 %}
+            <td style="color:darkblue;font-weight:bold;background-color:orangered;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            {% elif (pos.pair.sma_dist/pos.pair.std)|abs>=1.5 %}
+            <td style="color:darkblue;font-weight:bold;background-color:orange;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            {% elif (pos.pair.sma_dist/pos.pair.std)|abs>=1.0 %}
+            <td style="color:darkblue;font-weight:bold;background-color:lightyellow;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            {% else %}
+            <td style="color:darkblue;font-weight:bold;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            {% endif %}
+        {% else %}
+        <td>
+        {% endif %}
+
+        {% if pos.pair.act_price < pos.pair.sma %}
+            <td>
+                <span class='field-tip'>
+                <a href="./setup?tradeaction=buy&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.pair.contracts }}&tradeprice={{ pos.pair.act_price }}" class="buyposbutton">buy</a>
+                <span class='tip-content'>
+                buy {{pos.pair.name}}
+                </span></span>
+            </td>
+        {% else %}
+            <td>
+                <span class='field-tip'>
+                <a href="./setup?tradeaction=sell&tradepair={{ pos.pair.name }}&tradecontracts={{ pos.pair.contracts }}&tradeprice={{ pos.pair.act_price }}" class="sellposbutton">sell</a>
+                <span class='tip-content'>
+                buy {{pos.pair.name}}
+                </span></span>
+            </td>
+        {% endif %}
+
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="loginmsg2">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "login_for_more" %}
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+
+{% endblock %}
+
+{% block legendwatch %}
+<div class="legend">
+    <span style='font-size: 150%;text-align: center;';>&#8883;</span> new positions
+</div>
+{% endblock %}
