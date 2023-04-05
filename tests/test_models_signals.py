@@ -147,7 +147,7 @@ class TestSignal(unittest.TestCase):
         phrase = "wrong"
         self.assertTrue(SignalModel.passphrase_wrong(phrase))
 
-        default_phrase = configs.get("SECRET", "WEBHOOK_PASSPHRASE")
+        default_phrase = os.environ.get("WEBHOOK_PASSPHRASE", configs.get("SECRET", "WEBHOOK_PASSPHRASE"))
         self.assertFalse(SignalModel.passphrase_wrong(default_phrase))
 
     def test_insert_signal(self):

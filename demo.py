@@ -696,4 +696,3 @@ def init_scheduler():
         )
 
     scheduler.start()
-    # sched.shutdown()

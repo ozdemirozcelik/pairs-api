@@ -164,16 +164,15 @@ flask run
 $env:FLASK_APP = "app.py"
 $env:FLASK_ENV = "development"
 $env:FLASK_DEBUG = "1"
-(below is optional)
-$env:DB_ADMIN_PASS = "YOUR_ADMIN_PASSWORD"
 flask run
 ````
 browse to "http://127.0.0.1:5000/" to see the dashboard.
 
-you can also define an admin password during the initial creation of the database:
+you can also define an admin password & passphrase during the initial creation of the database:
 ````
 (below is optional)
 $env:DB_ADMIN_PASS = "YOUR_ADMIN_PASSWORD"
+$env:WEBHOOK_PASSPHRAASE = "YOUR_PASSPHRASE"
 flask run
 ````
 
@@ -214,6 +213,12 @@ need a passphrase, by default it is set as 'webhook'; check config.ini:
 ```python
 # change this after installation
 WEBHOOK_PASSPHRASE : webhook
+```
+
+API looks for a WEBHOOK_PASSPHRASE environment variable first during signal creation/update:
+
+```python
+PASSPHRASE = os.environ.get("WEBHOOK_PASSPHRASE", configs.get("SECRET", "WEBHOOK_PASSPHRASE"))
 ```
 
 ### default admin and user

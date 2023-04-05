@@ -7,9 +7,6 @@ from app import app, configs
 from demo import iftoday, timediff
 from models.signals import SignalModel
 
-# Passphrase is required to register webhooks (& to update account positions & PNL)
-PASSPHRASE = configs.get("SECRET", "WEBHOOK_PASSPHRASE")
-
 # configuration of email
 app.config["MAIL_SERVER"] = configs.get("EMAIL", "MAIL_SERVER")
 app.config["MAIL_PORT"] = int(configs.get("EMAIL", "MAIL_PORT"))

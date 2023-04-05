@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Dict, List, Union  # for type hinting
 from db import db
@@ -14,7 +15,7 @@ from app import configs
 SignalJSON = Dict[str, Union[str, float, int]]  # custom type hint
 
 # Passphrase is required to register webhooks (& to update account positions & PNL)
-PASSPHRASE = configs.get("SECRET", "WEBHOOK_PASSPHRASE")
+PASSPHRASE = os.environ.get("WEBHOOK_PASSPHRASE", configs.get("SECRET", "WEBHOOK_PASSPHRASE"))
 
 
 class SignalModel(db.Model):
