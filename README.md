@@ -164,9 +164,18 @@ flask run
 $env:FLASK_APP = "app.py"
 $env:FLASK_ENV = "development"
 $env:FLASK_DEBUG = "1"
+(below is optional)
+$env:DB_ADMIN_PASS = "YOUR_ADMIN_PASSWORD"
 flask run
 ````
 browse to "http://127.0.0.1:5000/" to see the dashboard.
+
+you can also define an admin password during the initial creation of the database:
+````
+(below is optional)
+$env:DB_ADMIN_PASS = "YOUR_ADMIN_PASSWORD"
+flask run
+````
 
 # PostgreSQL with Docker Setup
 
@@ -217,6 +226,12 @@ ADMIN_USERNAME : admin
 ADMIN_PASSWORD: password
 USER1_USERNAME: user1
 USER1_PASSWORD: password
+```
+
+API also looks for a DB_ADMIN_PASS environment variable during database creation.
+
+```python
+admin_password = os.environ.get("DB_ADMIN_PASS", configs.get("SECRET", "ADMIN_PASSWORD"))
 ```
 
 ### resource authorization
@@ -702,6 +717,12 @@ webhook URL should be:  '{URL_OF_YOUR_API}/v4/webhook'
 # Demo:
 
 https://api-pairs.herokuapp.com/
+
+demo credentials:
+````
+username: user1
+pass : password
+````
 
 # Using with Interactive Brokers
 
