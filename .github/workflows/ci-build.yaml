@@ -1,0 +1,45 @@
+name: CI Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: python:3.9-slim
+    
+    services:
+      postgres:
+        image: postgres:alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: zas4fg4t
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r requirements.txt
+      - name: code format with black
+        run: |
+          black .
+      - name: Lint with flake8
+        run: |
+          flake8 . --ignore=W503,F401,E402,E203,E266,E231 --max-line-length=120 --statistics
+      - name: Run unit tests with nose
+        run: nosetests
+        env:
+          DATABASE_URI: "postgresql://postgres:zas4fg4t@postgres:5432/testdb"
