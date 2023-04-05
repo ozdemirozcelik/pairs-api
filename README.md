@@ -1,7 +1,7 @@
 # Flask-RESTful API for trading tickers (single or pairs), deployed on Heroku & Dreamhost
 
-![Build Status](https://github.com/ozdemirozcelik/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
-![Deploy Status](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+[![Build Status](https://github.com/ozdemirozcelik/pairs-api/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/ozdemirozcelik/pairs-api/actions/workflows/ci-build.yaml)
+[![Deploy Status](https://github.com/ozdemirozcelik/pairs-api/workflows/Deploy/badge.svg)](https://github.com/ozdemirozcelik/pairs-api/actions/workflows/main.yml)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9](https://img.shields.io/badge/Python-3.9-green.svg)](https://shields.io/)
