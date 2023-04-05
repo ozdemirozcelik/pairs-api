@@ -1,10 +1,13 @@
-
 # Flask-RESTful API for trading tickers (single or pairs), deployed on Heroku & Dreamhost
+
+![Build Status](https://github.com/ozdemirozcelik/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9](https://img.shields.io/badge/Python-3.9-green.svg)](https://shields.io/)
 
 (Latest Release: v4.0)
 
 Built from the ground-up with Flask-RESTful & Flask-SQLAlchemy & Flask-JWT-Extended.
-Configured to be used with SQLite3 for local use.
 
 A working demo for the latest release is deployed in Heroku with PostgreSQL:
 
@@ -12,6 +15,7 @@ https://api-pairs.herokuapp.com/
 
 # Additions to v3
 
+- improved security
 - configuration file
 - yfinance integration (for ticker price data)
   - simple moving average(SMA) and standard deviation calculation for pairs
@@ -60,26 +64,48 @@ Considering for the next version:
 
 - automatic selection of pairs by comparing cointegration test results
 - add more statistical analysis and visualization 
-- improve error handling, add unit tests
-- set up CI for the repository
+- improve logging & error handling
 
 
 # Requirements
 
-* flask~=2.0.2
-* Flask-RESTful~=0.3.9
-* Flask-JWT-Extended~=4.4.0
-* flask-sqlalchemy~=2.5.1
-* flask-session~=0.4.0
-* flask-mail~=0.9.1
-* pyjwt~=2.4.0
-* pytz~=2022.1
-* yfinance~=0.1.87
-* apscheduler~=3.9.1.post1
-* pandas~=1.1.5
-* numpy~=1.19.5
+````
+# Build
+* werkzeug==2.0.3
+* flask==2.0.2
+* Flask-RESTful==0.3.9
+* Flask-JWT-Extended==4.4.0
+* sqlalchemy==1.4.13
+* flask-sqlalchemy==2.5.1
+* flask-session==0.4.0
+* flask-mail==0.9.1
+* pyjwt==2.3.0
+* pytz==2021.3
+* yfinance==0.1.87
+* apscheduler==3.9.1.post1
+
+# Runtime
 * uwsgi~=2.0.20 (for Heroku deployment only)
-* psycopg2~=2.9.3 (for Heroku Postgres deployment only)
+* psycopg2-binary~=2.9.5 (for Postgres)
+
+# Code Quality
+* black==23.3.0
+* flake8==5.0.4
+
+# Testing
+* nose~=1.3.7
+* pinocchio~=0.4.3
+* factory-boy~=3.2.1
+
+# Code Coverage
+* coverage~=6.2
+* codecov~=2.1.12
+
+# Security
+* Flask-Talisman~=1.0.0
+* Flask-Cors~=3.0.10
+* flask-seasurf~=1.1.1
+````
 
 # Installation
 (commands in parentheses for anaconda prompt)
@@ -102,7 +128,7 @@ $ python -m venv pairs-env
 (conda create --name pairs-env)
 
 $ source pairs-env/bin/activate
-.\pairs-env\scripts\activate (windows)
+.\pairs-env\scripts\activate (windows, scripts\activate.ps1 for PowerShell)
 (conda activate pairs-env)
 ````
 ### install requirements:
@@ -110,13 +136,11 @@ $ source pairs-env/bin/activate
 IMPORTANT: check the need of using 'uwsgi' and 'psycopg2' from the requirements.txt before installing.
 These are mainly used for Heroku and Heroku Postgres.
 
-(windows: change -if necessary- version declarations from 'flask~=2.0.2'' to 'flask==2.0.2')
-
 ````
-$ pip install -r requirements.txt --user
+$ pip install -r requirements.txt
 (conda install --file requirements_conda.txt)
 ````
-try this if conda fails to install requirements. or try with pip:
+try this if conda fails to install requirements, or try with pip:
 ````
 (conda config --append channels conda-forge)
 ````
@@ -130,13 +154,48 @@ $ export FLASK_ENV=development
 $ set FLASK_DEBUG=1 
 $ flask run
 
-(windows)
+(windows cmd)
 set FLASK_APP=app
 set FLASK_ENV=development
 set FLASK_DEBUG=1 
 flask run
+
+(powershell)
+$env:FLASK_APP = "app.py"
+$env:FLASK_ENV = "development"
+$env:FLASK_DEBUG = "1"
+flask run
 ````
 browse to "http://127.0.0.1:5000/" to see the dashboard.
+
+# PostgreSQL with Docker Setup
+
+API is tested and ready to use with PostgreSQL. Default will be SQLite if you don't setup another database. 
+
+You can use PostgreSQL with the Docker official image by following these steps:
+
+create a persistent data container with a minimal Docker image (alpine):
+````
+docker create -v /var/lib/postgresql/data --name PostgresData alpine
+````
+
+run a postgres container with persistent volume:
+````
+docker run -p 5432:5432 --name yourContainerName -e POSTGRES_PASSWORD=yourPassword -d --volumes-from PostgresData postgres
+(try adding --net=host for Docker Desktop if you are having connection problems)
+````
+
+add environment variable for database URI before running flask:
+
+````
+$ export DATABASE_URL_SQLALCHEMY = "postgresql://postgres:postgres@localhost:5432/test_db
+
+(windows cmd)
+set DATABASE_URL_SQLALCHEMY = "postgresql://postgres:postgres@localhost:5432/test_db
+
+(powershell)
+$env:DATABASE_URL_SQLALCHEMY = "postgresql://postgres:postgres@localhost:5432/test_db"
+````
 
 # Authorization
 
@@ -153,7 +212,7 @@ is created during database creation; check config.ini:
 
 ```python
 # below should be edited via API after the first creation
-# changes do not apply after installation
+# below default values are used during database creation
 ADMIN_USERNAME : admin
 ADMIN_PASSWORD: password
 USER1_USERNAME: user1
@@ -204,25 +263,8 @@ ENABLE_EMAIL_NOTIFICATIONS = True
 
 Demo is using custom created session management for server side sessions.
 If you want to use flask session, search and enable rows marked with "(flask-session-change)".
-Flask sessions may not be persistent in Heroku, works fine in local.
+Flask sessions may not be persistent in Heroku free tier, works fine in local.
 
-### templates/setup.html
-
-If the app is deployed remotely, a proxy can be activated to bypass CORS limitations.
-Proxy is set to "https://api-pairs-cors.herokuapp.com/" by default.
-Check if you need the enable the following lines before deployment:
-
-```javascript
-(base.html)(setup.html)
-// Edit your proxy and enable to overcome CORS limitations
-// if (server_url != "http://127.0.0.1:5000/") {
-//    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
-//    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-//    server_url = proxy_url + updatedURL;
-//};
-```
-
-Check [Heroku deployment](#heroku-deployment) to learn for more about using your own proxy server on Heroku.
 
 # Resources
 
@@ -230,29 +272,29 @@ Resources defined with flask_restful are:
 
 ```python
 api.add_resource(SignalWebhook, "/v4/webhook")
-api.add_resource(SignalUpdateOrder, "/v4/signal/updateorder")
+api.add_resource(SignalUpdateOrder, "/v4/signal/order")
 api.add_resource(SignalList, "/v4/signals/<string:number_of_items>")
 api.add_resource(SignalListStatus, "/v4/signals/status/<string:order_status>/<string:number_of_items>")
 api.add_resource(SignalListTicker, "/v4/signals/ticker/<string:ticker_name>/<string:number_of_items>")
 api.add_resource(Signal, "/v4/signal/<string:rowid>")
 
-api.add_resource(PairRegister, "/v4/regpair")
+api.add_resource(PairRegister, "/v4/pair")
 api.add_resource(PairList, "/v4/pairs/<string:number_of_items>")
 api.add_resource(Pair, "/v4/pair/<string:name>")
 
-api.add_resource(TickerRegister, "/v4/regticker")
-api.add_resource(TickerUpdatePNL, "/v4/ticker/updatepnl")
+api.add_resource(TickerRegister, "/v4/ticker")
+api.add_resource(TickerUpdatePNL, "/v4/ticker/pnl")
 api.add_resource(TickerList, "/v4/tickers/<string:number_of_items>")
 api.add_resource(Ticker, "/v4/ticker/<string:symbol>")
 
-api.add_resource(UserRegister, "/v4/reguser")
+api.add_resource(UserRegister, "/v4/user")
 api.add_resource(UserList, "/v4/users/<string:number_of_users>")
 api.add_resource(User, "/v4/user/<string:username>")
 api.add_resource(UserLogin, "/v4/login")
 api.add_resource(UserLogout, "/v4/logout")
 api.add_resource(TokenRefresh, "/v4/refresh")
 
-api.add_resource(PNLRegister, "/v4/regpnl")
+api.add_resource(PNLRegister, "/v4/pnl")
 api.add_resource(PNLList, "/v4/pnl/<string:number_of_items>")
 ```
 
@@ -262,7 +304,7 @@ Please check the [POSTMAN collection](local/pairs_api%20v4.postman_collection.js
 
 ### POST request to register a single ticker:
 ```python
-'http://api-pairs.herokuapp.com/v4/regticker'
+'http://api-pairs.herokuapp.com/v4/ticker'
 ```
 Request Body:
 ```json
@@ -286,7 +328,7 @@ Response:
 
 ### PUT request to update a single ticker. '-1' to add to the watchlist:
 ```python
-'http://api-pairs.herokuapp.com/v4/regticker'
+'http://api-pairs.herokuapp.com/v4/ticker'
 ```
 Request Body:
 ```json
@@ -398,7 +440,7 @@ Response:
 
 ### PUT request to update PNL records:
 ```python
-'http://api-pairs.herokuapp.com/v4/ticker/updatepnl'
+'http://api-pairs.herokuapp.com/v4/ticker/pnl'
 ```
 Response:
 ```json
@@ -409,7 +451,7 @@ Response:
 
 ### POST request to register a pair:
 ```python
-'http://api-pairs.herokuapp.com/v4/regpair'
+'http://api-pairs.herokuapp.com/v4/pair'
 ```
 Request Body:
 ```json
@@ -431,7 +473,7 @@ Response:
 
 ### PUT request to update a pair:
 ```python
-'http://api-pairs.herokuapp.com/v4/regpair'
+'http://api-pairs.herokuapp.com/v4/pair'
 ```
 Request Body:
 ```json
@@ -528,7 +570,7 @@ Response:
 ```
 ### PUT request to update order price and status by order id
 ```python
-'http://api-pairs.herokuapp.com/v4/signal/updateorder'
+'http://api-pairs.herokuapp.com/v4/signal/order'
 ```
 
 ````
@@ -629,12 +671,6 @@ To enable PostgreSQL in your Heroku account:
 - change 'postgre' to 'postgresql' and save, it should look like: 'postgresql://sdfyebdbfbf..'
 
 
-See the links below to add CORS headers to the proxied request:
-
-https://github.com/Rob--W/cors-anywhere
-
-https://dev.to/imiebogodson/fixing-the-cors-error-by-hosting-your-own-proxy-on-heroku-3lcb
-
 # DreamHost Shared Hosting Deployment:
 
 Please follow the instructions here:
@@ -648,7 +684,7 @@ You can use below template for TradingView to send a POST request as soon as an 
 webhook URL should be:  '{URL_OF_YOUR_API}/v4/webhook'
 
 (local\webhook.json)
-````json
+````
 {
     "passphrase": "webhook",
     "ticker": "{{ticker}}",

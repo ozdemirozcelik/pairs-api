@@ -11,6 +11,26 @@
 			"item": [
 				{
 					"name": "register (a ticker)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -27,15 +47,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"symbol\": \"NOVA\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NASDAQ\",\r\n    \"currency\":\"USD\",\r\n    \"active\": 0\r\n\r\n}"
+							"raw": "{\r\n    \"symbol\": \"AABB\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NASDAQ\",\r\n    \"currency\":\"USD\",\r\n    \"active\": 0,\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regticker",
+							"raw": "{{pairs_api_v4}}/ticker",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regticker"
+								"ticker"
 							]
 						}
 					},
@@ -59,15 +79,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"symbol\": \"NEM\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NYSE\",\r\n    \"currency\": \"USD\",\r\n    \"order_type\": \"RELATIVE\",\r\n    \"active\": 0\r\n}"
+							"raw": "{\r\n    \"symbol\": \"ABB\",\r\n    \"sectype\": \"STK\",\r\n    \"xch\": \"SMART\",\r\n    \"prixch\": \"NASDAQ\",\r\n    \"currency\": \"USD\",\r\n    \"order_type\": \"RELATIVE\",\r\n    \"active\": 0,\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regticker",
+							"raw": "{{pairs_api_v4}}/ticker",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regticker"
+								"ticker"
 							]
 						}
 					},
@@ -86,7 +106,8 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -94,13 +115,13 @@
 							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"symbol\": \"NEM\",\r\n    \"active_pos\": -131.0,\r\n    \"active_pnl\": -117.0,\r\n    \"active_cost\": 46.021\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/ticker/updatepnl",
+							"raw": "{{pairs_api_v4}}/ticker/pnl",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"ticker",
-								"updatepnl"
+								"pnl"
 							]
 						}
 					},
@@ -139,17 +160,18 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v4}}/ticker/NOVA",
+							"raw": "{{pairs_api_v4}}/ticker/AABB",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"ticker",
-								"NOVA"
+								"AABB"
 							]
 						}
 					},
@@ -166,14 +188,23 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/ticker/CCC",
+							"raw": "{{pairs_api_v4}}/ticker/ABBs",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"ticker",
-								"CCC"
+								"ABBs"
 							]
 						}
 					},
@@ -203,15 +234,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"AvailableFunds\": 31000,\r\n    \"BuyingPower\": 103295,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588\r\n\r\n\r\n}"
+							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"AvailableFunds\": 31000,\r\n    \"BuyingPower\": 103295,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588,\r\n     \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regpnl",
+							"raw": "{{pairs_api_v4}}/pnl",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regpnl"
+								"pnl"
 							]
 						}
 					},
@@ -236,15 +267,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"rowid\":10,\r\n    \"timestamp\":\"2022-06-16 23:55:36\",\r\n    \"AvailableFunds\": 32000,\r\n    \"BuyingPower\": 103295,\r\n    \"DailyPnL\": 268.9,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588,\r\n    \"RealizedPnL\": 30,\r\n    \"UnrealizedPnL\": -1000\r\n\r\n}"
+							"raw": "{\r\n    \"passphrase\":\"webhook\",\r\n    \"rowid\":300,\r\n    \"timestamp\":\"2022-06-16 23:55:36\",\r\n    \"AvailableFunds\": 32000,\r\n    \"BuyingPower\": 103295,\r\n    \"DailyPnL\": 268.9,\r\n    \"GrossPositionValue\": 103809,\r\n    \"MaintMarginReq\": 31600,\r\n    \"NetLiquidation\": 62588,\r\n    \"RealizedPnL\": 30,\r\n    \"UnrealizedPnL\": -1000,\r\n     \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regpnl",
+							"raw": "{{pairs_api_v4}}/pnl",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regpnl"
+								"pnl"
 							]
 						}
 					},
@@ -263,13 +294,38 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v4}}/pnl/0",
+							"raw": "{{pairs_api_v4}}/pnls/0",
+							"host": [
+								"{{pairs_api_v4}}"
+							],
+							"path": [
+								"pnls",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pnl (details)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{pairs_api_v4}}/pnl/1",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"pnl",
-								"0"
+								"1"
 							]
 						}
 					},
@@ -322,15 +378,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"MA-V\",\r\n    \"ticker1\": \"MA\",\r\n    \"ticker2\": \"V\",\r\n    \"hedge\": 1.6,\r\n    \"contracts\": 36\r\n}"
+							"raw": "{\r\n    \"name\": \"AAA-Bbb\",\r\n    \"ticker1\": \"AAA\",\r\n    \"ticker2\": \"Bbb\",\r\n    \"hedge\": 0.53,\r\n    \"contracts\": 36,\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regpair",
+							"raw": "{{pairs_api_v4}}/pair",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regpair"
+								"pair"
 							]
 						}
 					},
@@ -354,15 +410,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"MA-V\",\r\n    \"ticker1\": \"MA\",\r\n    \"ticker2\": \"V\",\r\n    \"hedge\": 1.6,\r\n    \"contracts\": 40\r\n}"
+							"raw": "{\r\n    \"name\": \"MA-V\",\r\n    \"ticker1\": \"MA\",\r\n    \"ticker2\": \"V\",\r\n    \"hedge\": 1.6,\r\n    \"contracts\": 40,\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/regpair",
+							"raw": "{{pairs_api_v4}}/pair",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"regpair"
+								"pair"
 							]
 						}
 					},
@@ -392,13 +448,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{pairs_api_v4}}/pair/MA-V",
+							"raw": "{{pairs_api_v4}}/pair/CARR-GE",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"pair",
-								"MA-V"
+								"CARR-GE"
 							]
 						}
 					},
@@ -415,14 +471,23 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/pair/XXX-ZZZ",
+							"raw": "{{pairs_api_v4}}/pair/deletethis",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"pair",
-								"XXX-ZZZ"
+								"deletethis"
 							]
 						}
 					},
@@ -446,7 +511,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"NOVA\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": \"100\",\r\n    \"order_price\": \"400.2\",\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": \"100\",\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": \"0\",\r\n    \"order_comment\": \" Enter Long\",\r\n    \"order_status\": \"waiting\"\r\n}\r\n"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"ticker\": \"CARR-GE\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": \"100\",\r\n    \"order_price\": \"400.2\",\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": \"100\",\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": \"0\",\r\n    \"order_comment\": \" Enter Long\",\r\n    \"order_status\": \"waiting\"\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/webhook",
@@ -478,7 +543,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"rowid\": 87,\r\n    \"timestamp\": \"2023-01-05 00:38:07\",\r\n    \"ticker\": \"NOVA\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 400.2,\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": 100,\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \" Enter Long\",\r\n    \"order_status\": \"canceled\",\r\n    \"ticker_type\": \"single\",\r\n    \"ticker1\": \"NOVA\",\r\n    \"ticker2\": null,\r\n    \"hedge_param\": null,\r\n    \"order_id1\": null,\r\n    \"order_id2\": null,\r\n    \"price1\": null,\r\n    \"price2\": null,\r\n    \"fill_price\": null,\r\n    \"slip\": null,\r\n    \"error_msg\": null,\r\n    \"status_msg\": \"passive ticker\"\r\n}"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"rowid\": 88,\r\n    \"timestamp\": \"2023-03-22 20:00:14\",\r\n    \"ticker\": \"NOVA\",\r\n    \"order_action\": \"buy\",\r\n    \"order_contracts\": 100,\r\n    \"order_price\": 400.2,\r\n    \"mar_pos\": \"long\",\r\n    \"mar_pos_size\": 100,\r\n    \"pre_mar_pos\": \"flat\",\r\n    \"pre_mar_pos_size\": 0,\r\n    \"order_comment\": \" Enter Long\",\r\n    \"order_status\": \"canceled\",\r\n    \"ticker_type\": \"single\",\r\n    \"ticker1\": \"NOVA\",\r\n    \"ticker2\": null,\r\n    \"hedge_param\": null,\r\n    \"order_id1\": null,\r\n    \"order_id2\": null,\r\n    \"price1\": null,\r\n    \"price2\": null,\r\n    \"fill_price\": null,\r\n    \"slip\": null,\r\n    \"error_msg\": null,\r\n    \"status_msg\": \"passive ticker\"\r\n    \r\n}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/webhook",
@@ -511,16 +576,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"symbol\": \"ROIC\",\r\n    \"order_id\": 8,\r\n    \"price\": 15.55,\r\n    \"filled_qty\": 100\r\n}"
+							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"symbol\": \"CARR\",\r\n    \"order_id\": 24343476,\r\n    \"price\": 41.45,\r\n    \"filled_qty\": 129\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/signal/updateorder",
+							"raw": "{{pairs_api_v4}}/signal/order",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"signal",
-								"updateorder"
+								"order"
 							]
 						}
 					},
@@ -547,13 +612,13 @@
 							"raw": "{\r\n    \"passphrase\": \"webhook\",\r\n    \"symbol\": \"ROIC\",\r\n    \"order_id\": 7,\r\n    \"price\": -1,\r\n    \"filled_qty\": -1,\r\n    \"cancel\":true\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/signal/updateorder",
+							"raw": "{{pairs_api_v4}}/signal/order",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"signal",
-								"updateorder"
+								"order"
 							]
 						}
 					},
@@ -567,8 +632,7 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
-								"type": "text",
-								"disabled": true
+								"type": "text"
 							}
 						],
 						"url": {
@@ -597,7 +661,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v4}}/signals/ticker/CARR-GE/2",
+							"raw": "{{pairs_api_v4}}/signals/ticker/CARR-GE/0",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
@@ -605,7 +669,7 @@
 								"signals",
 								"ticker",
 								"CARR-GE",
-								"2"
+								"0"
 							]
 						}
 					},
@@ -665,16 +729,30 @@
 								"key": "Authorization",
 								"value": "Bearer {{access_token}}",
 								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/ecmascript",
+								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/signal/10",
+							"raw": "{{pairs_api_v4}}/signal/89",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"signal",
-								"10"
+								"89"
 							]
 						}
 					},
@@ -692,6 +770,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"var csrf_token = postman.getResponseCookie(\"_csrf_token\");\r",
+									"postman.setEnvironmentVariable(\"csrf_token\", csrf_token.value);\r",
+									"\r",
 									"var jsonData = pm.response.json();\r",
 									"pm.test(\"access_token not empty\", function () {\r",
 									"    pm.expect(jsonData.access_token).not.eql(undefined);\r",
@@ -715,6 +796,15 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.get(\"csrf_token\");"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -734,7 +824,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"password\",\r\n    \"expire\":20\r\n\r\n}"
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"123\",\r\n    \"expire\":20,\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
 						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/login",
@@ -791,7 +881,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/logout",
@@ -848,7 +943,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/refresh",
@@ -880,15 +980,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"user2\",\r\n    \"password\": \"123\"\r\n\r\n}"
+							"raw": "{\r\n    \"username\": \"user3\",\r\n    \"password\": \"123\",\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/reguser",
+							"raw": "{{pairs_api_v4}}/user",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"reguser"
+								"user"
 							]
 						}
 					},
@@ -912,15 +1012,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"user2\",\r\n    \"password\": \"123\"\r\n\r\n}"
+							"raw": "{\r\n    \"username\": \"user3\",\r\n    \"password\": \"123\",\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
 						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/reguser",
+							"raw": "{{pairs_api_v4}}/user",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
-								"reguser"
+								"user"
 							]
 						}
 					},
@@ -928,6 +1028,20 @@
 				},
 				{
 					"name": "users (# of users)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [
@@ -937,6 +1051,10 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}"
+						},
 						"url": {
 							"raw": "{{pairs_api_v4}}/users/0",
 							"host": [
@@ -962,13 +1080,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{pairs_api_v4}}/user/user2",
+							"raw": "{{pairs_api_v4}}/user/admin",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"user",
-								"user2"
+								"admin"
 							]
 						}
 					},
@@ -985,14 +1103,23 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_csrf_token\": \"{{csrf_token}}\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{pairs_api_v4}}/user/user",
+							"raw": "{{pairs_api_v4}}/user/user3",
 							"host": [
 								"{{pairs_api_v4}}"
 							],
 							"path": [
 								"user",
-								"user"
+								"user3"
 							]
 						}
 					},
