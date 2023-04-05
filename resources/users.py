@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from flask import request
 from flask_restful import Resource, reqparse
@@ -48,8 +49,10 @@ class UserRegister(Resource):
     def default_users():
         from app import configs
 
+        os.environ.get("DATABASE_URL_SQLALCHEMY", "sqlite:///data.db")
+
         admin_username = configs.get("SECRET", "ADMIN_USERNAME")
-        admin_password = configs.get("SECRET", "ADMIN_PASSWORD")
+        admin_password = os.environ.get("DB_ADMIN_PASS", configs.get("SECRET", "ADMIN_PASSWORD"))
         user1_username = configs.get("SECRET", "USER1_USERNAME")
         user1_password = configs.get("SECRET", "USER1_PASSWORD")
 
