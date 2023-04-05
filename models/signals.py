@@ -25,7 +25,6 @@ class SignalModel(db.Model):
     )  # using 'rowid' as the default key
     timestamp = db.Column(
         db.DateTime(timezone=False),
-        # server_default=func.timezone("UTC", func.current_timestamp()) # this can be problematic for sqlite3
         server_default=func.current_timestamp()  # TODO: check for sqlite3 and postgres
         # db.DateTime(timezone=False), server_default = func.now()
     )  # DATETIME DEFAULT (CURRENT_TIMESTAMP) for sqlite3
@@ -508,12 +507,12 @@ class SignalModel(db.Model):
                 self.status_msg = "unknown ticker"
                 return False
 
-    def splitticker(
-        self,
-    ) -> bool:
+    def splitticker(self,) -> bool:
 
         success_flag = True
         currency_match = True
+        ticker_pair1 = ""
+        ticker_pair2 = ""
 
         eq12 = self.ticker.split("-")  # check if pair or single
         # print(eq12)  # ['LNT', '1.25*NYSE:FTS']
@@ -543,15 +542,15 @@ class SignalModel(db.Model):
             item = TickerModel.find_by_symbol(eq1_ticker_almost)
 
             if item:
+                # print("item found")
+
+                # refer to test cases
                 if item.sectype == "CASH":
+
                     fx1 = eq1_ticker_almost[0:3]  # get the first 3 char # USD
                     fx2 = eq1_ticker_almost[-3:]  # get the last 3 char # CAD
                     ticker_pair1 = fx1 + "." + fx2
 
-                    # TODO: improve validity check
-                    # check if valid fx pair
-                    if len(ticker_pair1) != 7:  # check if it is in USD.CAD format
-                        success_flag = False
                     # check for currency mismatch
                     if fx2 != item.currency:
                         currency_match = False
@@ -567,7 +566,7 @@ class SignalModel(db.Model):
 
                     # TODO: improve validity check
                     # check if valid crypto pair, accepts only USD pairs
-                    if cry2 != item.currency or cry2 != "USD":
+                    if cry2 != item.currency:
                         currency_match = False
                         success_flag = False
 
@@ -584,8 +583,9 @@ class SignalModel(db.Model):
                             char for char in eq1_ticker_almost if char.isalnum()
                         )
 
-                        if eq1_ticker_almost != ticker_pair1:
-                            success_flag = False
+            else:
+                success_flag = False
+                self.status_msg = "unknown ticker!"
 
             # print("ticker_pair1: ", ticker_pair1)  # LNT
 
@@ -621,18 +621,16 @@ class SignalModel(db.Model):
             # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
 
             # check if the ticker security type is CASH or CRYPTO
-            item = TickerModel.find_by_symbol(eq1_ticker_almost)
+            item = TickerModel.find_by_symbol(eq2_ticker_almost)
 
             if item:
+                # print("item found")
+
                 if item.sectype == "CASH":
                     fx1 = eq2_ticker_almost[0:3]  # get the first 3 char # USD
                     fx2 = eq2_ticker_almost[-3:]  # get the last 3 char # CAD
                     ticker_pair2 = fx1 + "." + fx2
 
-                    # TODO: improve validity check
-                    # check if valid fx pair
-                    if len(ticker_pair2) != 7:  # check if it is in USD.CAD format
-                        success_flag = False
                     # check for currency mismatch
                     if fx2 != item.currency:
                         currency_match = False
@@ -648,10 +646,9 @@ class SignalModel(db.Model):
 
                     # TODO: improve validity check
                     # check if valid cryptopair, accepts only USD pairs
-                    if cry2 != item.currency or cry2 != "USD":
+                    if cry2 != item.currency:
                         currency_match = False
                         success_flag = False
-
                 else:
 
                     if (
@@ -665,8 +662,9 @@ class SignalModel(db.Model):
                             char for char in eq2_ticker_almost if char.isalnum()
                         )
 
-                        if eq2_ticker_almost != ticker_pair2:
-                            success_flag = False
+            else:
+                success_flag = False
+                self.status_msg = "unknown ticker!"
 
             # print("ticker_pair2: ", ticker_pair2)  # FTS
 
@@ -691,134 +689,6 @@ class SignalModel(db.Model):
             self.status_msg = "problematic ticker!"
             if not currency_match:
                 self.status_msg = "currency mismatch!"
-
-        return success_flag
-
-    # to split stocks only
-    def splitticker_stocks(
-        self,
-    ) -> bool:
-
-        # Split the received webhook equation into tickers and hedge parameters
-        # Tested with Tradingview webhooks and Interactive Brokers ticker format
-        # TESTED FOR THESE EQUATIONS:
-        # pair_equation = "TEST 123"
-        # pair_equation = "NYSE:LNT"
-        # pair_equation = "0.7*NYSE:BF.A"
-        # pair_equation = "NYSE:BF.A"
-        # pair_equation = "NYSE:LNT-NYSE:FTS*2.2"
-        # pair_equation = "NYSE:LNT*2-NYSE:FTS"
-        # pair_equation = "NYSE:LNT-NYSE:FTS/3"
-        # pair_equation = "1.3*NYSE:LNT-NYSE:FTS*2.2"
-        # pair_equation = "NYSE:LNT-1.25*NYSE:FTS"
-        # pair_equation = "LNT-1.25*NYSE:FTS"
-        # pair_equation = "NYSE:LNT-NYSE:FTS"
-        # pair_equation = "BF.A-0.7*NYSE:BF.B"
-
-        success_flag = True
-
-        eq12 = self.ticker.split("-")  # check if pair or single
-        # print(eq12)  # ['LNT', '1.25*NYSE:FTS']
-
-        if len(eq12) <= 2:
-
-            eq1_hedge = re.findall(
-                r"[-+]?\d*\.\d+|\d+", eq12[0]
-            )  # hedge constant fot the 1st ticker
-            # print("eq1_hedge: ", eq1_hedge)  # []
-
-            if len(eq1_hedge) > 0:
-                eq1 = eq12[0].replace(eq1_hedge[0], "")
-            else:
-                eq1 = eq12[0]  # LNT
-
-            eq1 = eq1.replace("*", "")
-            # print("eq1: ", eq1)  # LNT
-
-            eq1_split = eq1.rsplit(":", maxsplit=1)
-            eq1_ticker_almost = eq1_split[len(eq1_split) - 1]
-
-            # print("eq1_split: ", eq1_split)  # ['LNT']
-            # print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
-
-            if "." in eq1_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
-                ticker_pair1 = eq1_ticker_almost.replace(
-                    ".", " "
-                )  # convert Tradingview -> IB format
-            else:
-                ticker_pair1 = "".join(
-                    char for char in eq1_ticker_almost if char.isalnum()
-                )
-
-                if eq1_ticker_almost != ticker_pair1:
-                    success_flag = False
-
-            # print("ticker_pair1: ", ticker_pair1)  # LNT
-
-            if len(eq1_hedge) != 0:
-                if eq1_hedge[0] != 1:
-                    success_flag = False
-
-            # print("problem_flag_first: ", success_flag)
-
-            self.ticker_type = "single"
-            self.ticker1 = ticker_pair1
-
-        if len(eq12) == 2:
-
-            eq2_hedge = re.findall(
-                r"[-+]?\d*\.\d+|\d+", eq12[1]
-            )  # hedge constant fot the 2nd ticker
-            # print("eq2_hedge: ", eq2_hedge)  # ['1.25']
-
-            if len(eq2_hedge) > 0:
-                eq2 = eq12[1].replace(eq2_hedge[0], "")
-            else:
-                eq2 = eq12[1]  # *NYSE:FTS
-
-            eq2 = eq2.replace("*", "")
-
-            # print("eq2: ", eq2)  # NYSE:FTS
-
-            eq2_split = eq2.rsplit(":", maxsplit=1)
-            eq2_ticker_almost = eq2_split[len(eq2_split) - 1]
-
-            # print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
-            # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
-
-            if "." in eq2_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
-                ticker_pair2 = eq2_ticker_almost.replace(
-                    ".", " "
-                )  # convert Tradingview -> IB format
-            else:
-                ticker_pair2 = "".join(
-                    char for char in eq2_ticker_almost if char.isalnum()
-                )
-
-                if eq2_ticker_almost != ticker_pair2:
-                    success_flag = False
-
-            # print("ticker_pair2: ", ticker_pair2)  # FTS
-
-            if len(eq2_hedge) == 0:
-                hedge_const = 1
-            else:
-                hedge_const = eq2_hedge[0]
-
-            # print("hedge_const: ", hedge_const)  # False
-            # print("problem_flag_final: ", success_flag)
-            # print("ticker_type: ", self.ticker_type)
-
-            self.ticker_type = "pair"
-            self.ticker2 = ticker_pair2
-            self.hedge_param = hedge_const
-
-        if len(eq12) > 2:
-            success_flag = False
-
-        if not success_flag:
-            self.order_status = "error"
-            self.status_msg = "problematic ticker!"
 
         return success_flag
 
@@ -877,7 +747,6 @@ class SignalModel(db.Model):
                 db.session.query(db.func.avg(cls.slip))
                 .filter(
                     (cls.ticker1 == ticker1)
-                    & (cls.ticker2 == ticker2)
                     & (cls.timestamp <= end_date)
                     & (cls.timestamp >= start_date)
                     & (cls.order_action == "buy")
@@ -890,7 +759,6 @@ class SignalModel(db.Model):
                 db.session.query(db.func.avg(cls.slip))
                 .filter(
                     (cls.ticker1 == ticker1)
-                    & (cls.ticker2 == ticker2)
                     & (cls.timestamp <= end_date)
                     & (cls.timestamp >= start_date)
                     & (cls.order_action == "sell")
@@ -903,7 +771,6 @@ class SignalModel(db.Model):
                 db.session.query(db.func.avg(cls.slip))
                 .filter(
                     (cls.ticker1 == ticker1)
-                    & (cls.ticker2 == ticker2)
                     & (cls.timestamp <= end_date)
                     & (cls.timestamp >= start_date)
                 )
@@ -923,7 +790,7 @@ class SignalModel(db.Model):
         )  # get the most recent order in case of a multiple order id situation
 
     @classmethod
-    # multiple order id situation happens a lot, better to double check the ticker
+    # multiple order id situation happens a lot, better to double-check the ticker
     def find_by_orderid_ticker(cls, orderid, ticker) -> "SignalModel":
         return (
             cls.query.filter(
@@ -935,7 +802,7 @@ class SignalModel(db.Model):
         )  # get the most recent order in case of a multiple order id situation
 
     @classmethod
-    def check_timestamp(cls) -> "SignalModel":
+    def check_latest(cls) -> "SignalModel":
         return (
             cls.query.filter(
                 (
@@ -948,3 +815,131 @@ class SignalModel(db.Model):
             .order_by(cls.rowid.desc())
             .first()
         )
+
+    # to split stocks only
+    # def splitticker_stocks(
+    #     self,
+    # ) -> bool:
+    #
+    #     # Split the received webhook equation into tickers and hedge parameters
+    #     # Tested with Tradingview webhooks and Interactive Brokers ticker format
+    #     # TESTED FOR THESE EQUATIONS:
+    #     # pair_equation = "TEST 123"
+    #     # pair_equation = "NYSE:LNT"
+    #     # pair_equation = "0.7*NYSE:BF.A"
+    #     # pair_equation = "NYSE:BF.A"
+    #     # pair_equation = "NYSE:LNT-NYSE:FTS*2.2"
+    #     # pair_equation = "NYSE:LNT*2-NYSE:FTS"
+    #     # pair_equation = "NYSE:LNT-NYSE:FTS/3"
+    #     # pair_equation = "1.3*NYSE:LNT-NYSE:FTS*2.2"
+    #     # pair_equation = "NYSE:LNT-1.25*NYSE:FTS"
+    #     # pair_equation = "LNT-1.25*NYSE:FTS"
+    #     # pair_equation = "NYSE:LNT-NYSE:FTS"
+    #     # pair_equation = "BF.A-0.7*NYSE:BF.B"
+    #
+    #     success_flag = True
+    #
+    #     eq12 = self.ticker.split("-")  # check if pair or single
+    #     # print(eq12)  # ['LNT', '1.25*NYSE:FTS']
+    #
+    #     if len(eq12) <= 2:
+    #
+    #         eq1_hedge = re.findall(
+    #             r"[-+]?\d*\.\d+|\d+", eq12[0]
+    #         )  # hedge constant fot the 1st ticker
+    #         # print("eq1_hedge: ", eq1_hedge)  # []
+    #
+    #         if len(eq1_hedge) > 0:
+    #             eq1 = eq12[0].replace(eq1_hedge[0], "")
+    #         else:
+    #             eq1 = eq12[0]  # LNT
+    #
+    #         eq1 = eq1.replace("*", "")
+    #         # print("eq1: ", eq1)  # LNT
+    #
+    #         eq1_split = eq1.rsplit(":", maxsplit=1)
+    #         eq1_ticker_almost = eq1_split[len(eq1_split) - 1]
+    #
+    #         # print("eq1_split: ", eq1_split)  # ['LNT']
+    #         # print("eq1_ticker_almost: ", eq1_ticker_almost)  # LNT
+    #
+    #         if "." in eq1_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+    #             ticker_pair1 = eq1_ticker_almost.replace(
+    #                 ".", " "
+    #             )  # convert Tradingview -> IB format
+    #         else:
+    #             ticker_pair1 = "".join(
+    #                 char for char in eq1_ticker_almost if char.isalnum()
+    #             )
+    #
+    #             if eq1_ticker_almost != ticker_pair1:
+    #                 success_flag = False
+    #
+    #         # print("ticker_pair1: ", ticker_pair1)  # LNT
+    #
+    #         if len(eq1_hedge) != 0:
+    #             if eq1_hedge[0] != 1:
+    #                 success_flag = False
+    #
+    #         # print("problem_flag_first: ", success_flag)
+    #
+    #         self.ticker_type = "single"
+    #         self.ticker1 = ticker_pair1
+    #
+    #     if len(eq12) == 2:
+    #
+    #         eq2_hedge = re.findall(
+    #             r"[-+]?\d*\.\d+|\d+", eq12[1]
+    #         )  # hedge constant fot the 2nd ticker
+    #         # print("eq2_hedge: ", eq2_hedge)  # ['1.25']
+    #
+    #         if len(eq2_hedge) > 0:
+    #             eq2 = eq12[1].replace(eq2_hedge[0], "")
+    #         else:
+    #             eq2 = eq12[1]  # *NYSE:FTS
+    #
+    #         eq2 = eq2.replace("*", "")
+    #
+    #         # print("eq2: ", eq2)  # NYSE:FTS
+    #
+    #         eq2_split = eq2.rsplit(":", maxsplit=1)
+    #         eq2_ticker_almost = eq2_split[len(eq2_split) - 1]
+    #
+    #         # print("eq2_split: ", eq2_split)  # ['NYSE', 'FTS']
+    #         # print("eq2_ticker_almost: ", eq2_ticker_almost)  # FTS
+    #
+    #         if "." in eq2_ticker_almost:  # For Class A,B type tickers EXP: BF.A BF.B
+    #             ticker_pair2 = eq2_ticker_almost.replace(
+    #                 ".", " "
+    #             )  # convert Tradingview -> IB format
+    #         else:
+    #             ticker_pair2 = "".join(
+    #                 char for char in eq2_ticker_almost if char.isalnum()
+    #             )
+    #
+    #             if eq2_ticker_almost != ticker_pair2:
+    #                 success_flag = False
+    #
+    #         # print("ticker_pair2: ", ticker_pair2)  # FTS
+    #
+    #         if len(eq2_hedge) == 0:
+    #             hedge_const = 1
+    #         else:
+    #             hedge_const = eq2_hedge[0]
+    #
+    #         # print("hedge_const: ", hedge_const)  # False
+    #         # print("problem_flag_final: ", success_flag)
+    #         # print("ticker_type: ", self.ticker_type)
+    #
+    #         self.ticker_type = "pair"
+    #         self.ticker2 = ticker_pair2
+    #         self.hedge_param = hedge_const
+    #
+    #     if len(eq12) > 2:
+    #         success_flag = False
+    #
+    #     if not success_flag:
+    #         self.order_status = "error"
+    #         self.status_msg = "problematic ticker!"
+    #
+    #     return success_flag

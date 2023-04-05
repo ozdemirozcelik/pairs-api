@@ -28,6 +28,15 @@ for(const radioButton of radioButtons){
     radioButton.addEventListener('change', checkTradeType);
 }  
 
+// create  event listener for dynamic list content
+function dynamiclistener_signal(id) {
+    document.getElementById(id).addEventListener('click', dynamicHandler_signal);
+}
+
+function dynamicHandler_signal(event) {
+    Update_signal(this)
+}
+
 
 // define dynamic objects
 // TO-DO: define all
@@ -642,25 +651,25 @@ async function listSignals() {
             str = str.toUpperCase()
 
             if (signals_data.signals[key].order_status.includes("waiting") || signals_data.signals[key].order_status.includes("rerouted")) {
-                li.innerHTML = "<span title='waiting' class='numberCircle' style='background-color: whitesmoke';>"+ signals_data.signals[key].rowid +"</span>";
+                li.innerHTML = "<span title='waiting' class='numberCircleWhite'>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("err")) {
                 // show error messages in a tip box
-                li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircle' style='background-color: orange';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
+                li.innerHTML = "<span class='field-tip'><span title='error' class='numberCircleOrange'>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status.includes("cancel")) {
-                li.innerHTML = "<span class='field-tip'><span title='canceled' class='numberCircle' style='background-color: lightgoldenrodyellow';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
+                li.innerHTML = "<span class='field-tip'><span title='canceled' class='numberCircleYellow'>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             } else if (signals_data.signals[key].order_status.includes("filled")) {
-                li.innerHTML = "<span title='filled' class='numberCircle' style='background-color: lightgreen';>"+ signals_data.signals[key].rowid +"</span>";
+                li.innerHTML = "<span title='filled' class='numberCircleGreen'>"+ signals_data.signals[key].rowid +"</span>";
             } else if (signals_data.signals[key].order_status.includes("created")) {
-                li.innerHTML = "<span class='field-tip'><span title='created' class='numberCircle' style='background-color: lightblue';>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
+                li.innerHTML = "<span class='field-tip'><span title='created' class='numberCircleBlue'>"+ signals_data.signals[key].rowid +"</span><span class='tip-content'>" + signals_data.signals[key].error_msg + "</span></span>";
             }else {
                 li.innerHTML = "<span class='numberCircle';>"+ signals_data.signals[key].rowid +"</span>";
             }
-            
-            
-            li.setAttribute('id', signals_data.signals[key].rowid);          
+            //create list elements
+            li.setAttribute('id', signals_data.signals[key].rowid);
             li.appendChild(document.createTextNode(str));
-            li.setAttribute("onclick", "Update_signal(this)");
             signallist.appendChild(li);     
+            // add onclick event listener for each list element
+            dynamiclistener_signal(signals_data.signals[key].rowid)
         }
     }
 
@@ -679,6 +688,7 @@ async function listSignals() {
     createPages_signals();
 
 }
+
 
 function Update_signal(currentEl){
     
@@ -743,16 +753,16 @@ async function getSignal(rowid) {
 
 }
 
-function alertBefore_signals() {
+function alertBefore_signals(csrf_token) {
 
     if (confirm("Do you want to delete selected signal?") == true) {
-        deleteSignal()
+        deleteSignal(csrf_token)
     } else {
         return
     }
 }
 
-function deleteSignal() {
+function deleteSignal(csrf_token) {
 
     // check token status
     if (!localStorage.access_token) {
@@ -771,11 +781,17 @@ function deleteSignal() {
 
         var api_url_delete_signal = api_url_get_signal + rowid_update.value
 
+        body_msg = {_csrf_token: csrf_token }
+
+        alert(JSON.stringify(body_msg))
         fetch(api_url_delete_signal, {
                 method: "DELETE",
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token,
                 },
+                body: JSON.stringify(body_msg)
+
             }).then(response => {
                 if (response.status >= 200 && response.status <= 401) {
                     return_code = response.status;

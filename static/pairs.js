@@ -4,7 +4,7 @@
 // define api constants for the pairs:
 const api_url_get_pair= server_url +'v4/pair/';
 const api_url_get_all_pairs= server_url +'v4/pairs/0';// "0" for all pairs.
-const api_url_post_put_pair= server_url +'v4/regpair';
+const api_url_post_put_pair= server_url +'v4/pair';
 // define other api constants (defining as a separate constant to be used as a standalone script):
 const api_url_get_all_tickers= server_url +'v4/tickers/0';
 
@@ -19,6 +19,16 @@ const form_pairs = document.querySelector('.pairs-form');
 form_pairs.addEventListener('submit', handleFormSubmit_pairs);
 const form_update_pairs = document.querySelector('.pairs-update');
 form_update_pairs.addEventListener('submit', handleFormSubmit_pairs_update);
+
+// create  event listener for dynamic list content
+function dynamiclistener_pair(id) {
+    document.getElementById(id).addEventListener('click', dynamicHandler_pair);
+}
+
+function dynamicHandler_pair(event) {
+    Update_pair(this)
+}
+
 
 // dynamic objects
 // TO-DO: define all
@@ -140,14 +150,11 @@ function handleFormSubmit_pairs(event) {
         const results = document.querySelector('.results-pairs pre');
 
         document.getElementById("jsontext-pairs").style.display = 'block';
-        
-        // Uppercase JSON string - no need
-        // uppercase_json = JSON.parse(JSON.stringify(formJSON_pairs, function(a, b) {
-        //     return typeof b === "string" ? b.toUpperCase() : b
-        // }));
 
         // show JSON string before sending
-        results.innerText = JSON.stringify(formJSON_pairs, null, 2);
+        var formJSON_pairs_show = JSON.parse(JSON.stringify(formJSON_pairs)); //new json object here
+        delete formJSON_pairs_show['_csrf_token'];
+        results.innerText = JSON.stringify(formJSON_pairs_show, null, 2);
 
         // create post & save button
         createButton_pairs();
@@ -179,14 +186,11 @@ function handleFormSubmit_pairs_update(event) {
         formJSON_update_pairs = Object.fromEntries(data.entries());
 
         document.getElementById("jsontext-pairs-update").style.display = 'block';
-        
-        // Uppercase JSON string - no need
-        // uppercase_json = JSON.parse(JSON.stringify(formJSON_update_pairs, function(a, b) {
-        //     return typeof b === "string" ? b.toUpperCase() : b
-        // }));
 
-         // show JSON string before sending
-        results.innerText = JSON.stringify(formJSON_update_pairs, null, 2);
+        // show JSON string before sending
+        var formJSON_update_pairs_show = JSON.parse(JSON.stringify(formJSON_update_pairs)); //new json object here
+        delete formJSON_update_pairs_show['_csrf_token'];
+        results.innerText = JSON.stringify(formJSON_update_pairs_show, null, 2);
 
         // create put & update button
         createUpdateButton_pairs();
@@ -285,17 +289,19 @@ function postSave_pairs() {
 
                     // create span element according to pair status
                     if (jsonResponse.status) {
-                        li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
+                        li.innerHTML = "<span title='active' class='roundgreen'></span>";
                     } else if (pairs_data.pairs[key].status==0) {
-                        li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                        li.innerHTML = "<span title='passive' class='roundred'></span>";
                     } else {
-                        li.innerHTML = "<span title='watch' class='round' style='background-color: yellow';></span>";
+                        li.innerHTML = "<span title='watch' class='roundyellow'></span>";
                     }
 
                     li.setAttribute('id', pair_text);
                     li.appendChild(document.createTextNode(pair_text));
-                    li.setAttribute("onclick", "Update_pair(this)");
                     pairlist.insertBefore(li, pairlist.firstChild);
+
+                    // add onclick event listener for each list element
+                    dynamiclistener_signal(pair_text)
 
                     createPages_pairs();
         
@@ -434,17 +440,18 @@ async function listPairs() {
 
             // create span element according to pair status
             if (pairs_data.pairs[key].status==1) {
-                li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
+                li.innerHTML = "<span title='active' class='roundgreen'></span>";
             } else if (pairs_data.pairs[key].status==0) {
-                li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                li.innerHTML = "<span title='passive' class='roundred'></span>";
             } else {
-                li.innerHTML = "<span title='watch' class='round' style='background-color: yellow';></span>";
+                li.innerHTML = "<span title='watch' class='roundyellow'></span>";
             }
-
+            //create list elements
             li.setAttribute('id', str);             
             li.appendChild(document.createTextNode(str));
-            li.setAttribute("onclick", "Update_pair(this)");
             pairlist.appendChild(li);
+            // add onclick event listener for each list element
+            dynamiclistener_pair(str)
       
         }
     }
@@ -534,16 +541,16 @@ function Update_pair(currentEl){
     getPair(pairname);
 }
 
-function alertBefore_pairs() {
+function alertBefore_pairs(csrf_token) {
 
     if (confirm("Do you want to delete selected pair?") == true) {
-        deletePair()
+        deletePair(csrf_token)
     } else {
         return
     }
 }
 
-function deletePair() {
+function deletePair(csrf_token) {
 
     // check token status
     if (!localStorage.access_token) {
@@ -557,16 +564,21 @@ function deletePair() {
             return
 
         }
-        
+
         alert("Sending DELETE request for: " + pair_update.value);
 
         var api_url_delete_pair = api_url_get_pair + pair_update.value
 
+        body_msg = {_csrf_token: csrf_token }
+
         fetch(api_url_delete_pair, {
                 method: "DELETE",
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token,
                 },
+                body: JSON.stringify(body_msg)
+
             }).then(response => {
                 if (response.status >= 200 && response.status <= 401) {
                     return_code = response.status;

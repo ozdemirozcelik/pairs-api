@@ -3,6 +3,7 @@ from models.account import AccountModel
 from models.signals import SignalModel
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 from datetime import datetime
+from . import status_codes as status
 
 EMPTY_ERR = "'{}' cannot be empty!"
 PASS_ERR = "incorrect passphrase."
@@ -47,9 +48,8 @@ class PNLRegister(Resource):
 
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return_msg = {"message": {"passphrase": PASS_ERR}}
-            #  return {"message": PASS_ERR}, 400  # return Bad Request
-            return return_msg, 400  # return Bad Request
+            return_msg = {"message": PASS_ERR}
+            return return_msg, status.HTTP_401_UNAUTHORIZED  # return Unauthorized
 
         item = AccountModel(
             data["timestamp"],
@@ -70,12 +70,12 @@ class PNLRegister(Resource):
             print("Error occurred - ", e)  # better log the errors
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("record")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
     @staticmethod
@@ -85,8 +85,7 @@ class PNLRegister(Resource):
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
             return_msg = {"message": {"passphrase": PASS_ERR}}
-            #  return {"message": PASS_ERR}, 400  # return Bad Request
-            return return_msg, 400  # return Bad Request
+            return return_msg, status.HTTP_401_UNAUTHORIZED  # return Unauthotized
 
         if AccountModel.find_by_rowid(data["rowid"]):
 
@@ -109,7 +108,7 @@ class PNLRegister(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": UPDATE_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             item.rowid = data["rowid"]
@@ -117,7 +116,7 @@ class PNLRegister(Resource):
 
             return return_json
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
 
 class PNLList(Resource):
@@ -144,12 +143,12 @@ class PNLList(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         # return {'signals': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
         return {
-            "signals": [item.json() for item in items],
+            "pnls": [item.json() for item in items],
             "notoken_limit": notoken_limit,
         }  # this is more readable
 
@@ -165,13 +164,13 @@ class PNL(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         if item:
             return item.json()
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -179,9 +178,11 @@ class PNL(Resource):
 
         claims = get_jwt()
 
-        # TODO: consider user to delete own data
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
             item_to_delete = AccountModel.find_by_rowid(rowid)
@@ -189,15 +190,13 @@ class PNL(Resource):
             if item_to_delete:
                 item_to_delete.delete()
             else:
-                return {"message": NOT_FOUND}
+                return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND
 
         except Exception as e:
             print("Error occurred - ", e)
             return (
                 {"message": DELETE_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
-        return {"message": DELETE_OK.format("signal")}
-
-    # TODO: add a get(date) function
+        return {"message": DELETE_OK.format("pnl")}

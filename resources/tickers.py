@@ -3,6 +3,7 @@ from models.tickers import TickerModel
 from flask_jwt_extended import jwt_required, get_jwt
 from models.pairs import PairModel
 from models.signals import SignalModel
+from . import status_codes as status
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
@@ -36,9 +37,8 @@ class TickerUpdatePNL(Resource):
 
         # format return message inline with flask_restful parser errors
         if SignalModel.passphrase_wrong(data["passphrase"]):
-            return_msg = {"message": {"passphrase": PASS_ERR}}
-            #  return {"message": PASS_ERR}, 400  # return Bad Request
-            return return_msg, 400  # return Bad Request
+            return_msg = {"message": PASS_ERR}
+            return return_msg, status.HTTP_400_BAD_REQUEST  # return Bad Request
 
         # get ticker with symbol
         item = TickerModel.find_by_symbol(data["symbol"])
@@ -56,12 +56,12 @@ class TickerUpdatePNL(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": UPDATE_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             return item.json()
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
 
 class TickerRegister(Resource):
@@ -89,7 +89,7 @@ class TickerRegister(Resource):
         if TickerModel.find_by_symbol(data["symbol"]):
             return (
                 {"message": NAME_ERR.format("ticker")},
-                400,
+                status.HTTP_400_BAD_REQUEST,
             )  # Return Bad Request
 
         item = TickerModel(
@@ -110,7 +110,7 @@ class TickerRegister(Resource):
             if PairModel.find_active_ticker(item.symbol):
                 return (
                     {"message": TICKR_ERR},
-                    400,
+                    status.HTTP_400_BAD_REQUEST,
                 )  # Return Bad Request
 
         try:
@@ -120,12 +120,12 @@ class TickerRegister(Resource):
             print("Error occurred - ", e)  # better log the errors
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("ticker")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
     @staticmethod
@@ -151,7 +151,7 @@ class TickerRegister(Resource):
             if PairModel.find_active_ticker(item.symbol):
                 return (
                     {"message": TICKR_ERR},
-                    400,
+                    status.HTTP_400_BAD_REQUEST,
                 )  # Return Bad Request
 
         item_to_update = TickerModel.find_by_symbol(data["symbol"])
@@ -165,7 +165,7 @@ class TickerRegister(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": UPDATE_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             return item_to_update.json()
@@ -177,12 +177,12 @@ class TickerRegister(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("ticker")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
 
@@ -196,7 +196,7 @@ class TickerList(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         # return {'tickers': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
@@ -216,13 +216,13 @@ class Ticker(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         if item:
             return item.json()
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -232,7 +232,10 @@ class Ticker(Resource):
 
         # TODO: consider user to delete own data
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
             item_to_delete = TickerModel.find_by_symbol(symbol)
@@ -240,13 +243,16 @@ class Ticker(Resource):
             if item_to_delete:
                 item_to_delete.delete()
             else:
-                return {"message": NOT_FOUND}
+                return (
+                    {"message": NOT_FOUND},
+                    status.HTTP_404_NOT_FOUND,
+                )  # Return Not Found
 
         except Exception as e:
             print("Error occurred - ", e)
             return (
                 {"message": DELETE_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("ticker")}

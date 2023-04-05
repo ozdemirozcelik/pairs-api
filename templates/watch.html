@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block watchlist %}
 
-<body onload="disableLoader()" style="margin:0;">
+<body>
 
-<div id="loader"></div>
+<script nonce="{{ csp_nonce() }}">
+document.addEventListener("DOMContentLoaded", disableLoader());
 
-<script>
 var myVar;
 
 function disableLoader() {
@@ -20,7 +20,10 @@ function hideTable() {
     document.getElementById("watchtable").style.display = "none";
     document.getElementById("loader").style.display = "block";
 }
+
 </script>
+
+<div id="loader"></div>
 
 <label for="reload">
     <div class="loginmsg2">
@@ -34,7 +37,7 @@ function hideTable() {
         {% else %}
             <label for="last_update"><b>Last Price Update: ({{last_price_update|timediff("EST") }} min ago)</b></label>
             <br>
-            <a href="update_watchlist"><button id="reload" onclick="hideTable()">Update Now</button></a>
+                <a href="update_watchlist"><button id="reload">Update Now</button></a>
         {% endif %}
         {% endwith %}
     </div>
@@ -47,13 +50,13 @@ function hideTable() {
         <th>ticker1</th>
         <th>position</th>
         <th>cost(US$)</th>
-        <th style="border-right-style: groove;">pnl</th>
+        <th class="tdgroove">pnl</th>
         <th>ticker2</th>
         <th>position</th>
         <th>cost(US$)</th>
-        <th style="border-right-style: groove;">pnl</th>
-        <th style="border-right-style: groove;">dist.SMA(US$)</th>
-        <th style="text-align: center;">dist.std.dev</th>
+        <th class="tdgroove">pnl</th>
+        <th class="tdgroove">dist.SMA(US$)</th>
+        <th class="tdcenter">dist.std.dev</th>
 
     </tr>
     {% for pos in pair_pos_all %}
@@ -63,8 +66,8 @@ function hideTable() {
         {{ pos.ticker1.symbol }}-{{ pos.pair.hedge }}*{{ pos.ticker2.symbol }}
         </td>
 
-        {% if pos.ticker1.active_pos < 0 %}<td style="background-color:lightpink;">
-        {% elif pos.ticker1.active_pos > 0 %}<td style="background-color:palegreen;">
+        {% if pos.ticker1.active_pos < 0 %}<td class="tdpink">
+        {% elif pos.ticker1.active_pos > 0 %}<td class="tdgreen3">
         {% else %}<td>{% endif %}
         {{ pos.ticker1.symbol }}
         </td>
@@ -73,11 +76,11 @@ function hideTable() {
 
         <td>${{ "{:,.0f}".format((pos.ticker1.active_cost * pos.ticker1.active_pos)|abs) }}</td>
 
-        {% if pos.ticker1.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker1.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
+        {% if pos.ticker1.active_pnl < 0 %}<td class="tdredboldgroove">{% elif pos.ticker1.active_pnl > 0 %}<td class="tdgreenboldgroove">{% else %}<td class="tdgroove">{% endif %}
         ${{ "{:,.0f}".format(pos.ticker1.active_pnl) }}</td>
 
-        {% if pos.ticker2.active_pos < 0 %}<td style="background-color:lightpink;">
-        {% elif pos.ticker2.active_pos > 0 %}<td style="background-color:palegreen;">
+        {% if pos.ticker2.active_pos < 0 %}<td class="tdpink">
+        {% elif pos.ticker2.active_pos > 0 %}<td class="tdgreen3">
         {% else %}<td>{% endif %}
         {{ pos.ticker2.symbol }}
         </td>
@@ -86,16 +89,16 @@ function hideTable() {
 
         <td>${{ "{:,.0f}".format((pos.ticker2.active_cost * pos.ticker2.active_pos)|abs) }}</td>
 
-        {% if pos.ticker2.active_pnl < 0 %}<td style="color:darkred;font-weight:bold;border-right-style: groove;">{% elif pos.ticker2.active_pnl > 0 %}<td style="color:green;font-weight:bold;border-right-style: groove;">{% else %}<td style="border-right-style: groove;">{% endif %}
+        {% if pos.ticker2.active_pnl < 0 %}<td class="tdredboldgroove">{% elif pos.ticker2.active_pnl > 0 %}<td class="tdgreenboldgroove">{% else %}<td class="tdgroove">{% endif %}
         ${{ "{:,.0f}".format(pos.ticker2.active_pnl) }}</td>
 
         {% if (pos.pair.contracts*pos.pair.sma_dist|abs) > 100 %}
-            <td style="color:darkblue;font-weight:bold;background-color:lightyellow;border-right-style: groove;">
+            <td class="tdblueyellowgroove">
                 {% if (pos.ticker1.active_pos == 0)  and (pos.ticker2.active_pos == 0) %}&#8883;{% endif %}
                 ${{ "{:,.0f}".format((pos.pair.contracts*pos.pair.sma_dist|abs)) }}
             </td>
         {% else %}
-            <td style="color:darkblue;font-weight:bold;border-right-style: groove;">
+            <td class="tdbluegroove2">
                 {% if (pos.ticker1.active_pos == 0)  and (pos.ticker2.active_pos == 0) %}&#8883;{% endif %}
                 ${{ "{:,.0f}".format((pos.pair.contracts*pos.pair.sma_dist|abs)) }}
             </td>
@@ -103,13 +106,13 @@ function hideTable() {
 
         {% if pos.pair.std!=0 %}
             {% if (pos.pair.sma_dist/pos.pair.std)|abs>=2 %}
-            <td style="color:darkblue;font-weight:bold;background-color:orangered;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            <td class="tdblueredgroove">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
             {% elif (pos.pair.sma_dist/pos.pair.std)|abs>=1.5 %}
-            <td style="color:darkblue;font-weight:bold;background-color:orange;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            <td class="tdblueorangegroove">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
             {% elif (pos.pair.sma_dist/pos.pair.std)|abs>=1.0 %}
-            <td style="color:darkblue;font-weight:bold;background-color:lightyellow;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            <td class="tdblueyellowgroove">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
             {% else %}
-            <td style="color:darkblue;font-weight:bold;border-right-style: groove;">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
+            <td class="tdbluegroove2">{{ "{:,.2f}".format((pos.pair.sma_dist/pos.pair.std)|abs) }}</td>
             {% endif %}
         {% else %}
         <td>
@@ -154,6 +157,6 @@ function hideTable() {
 
 {% block legendwatch %}
 <div class="legend">
-    <span style='font-size: 150%;text-align: center;';>&#8883;</span> new positions
+    <span class="poslegend">&#8883;</span> new positions
 </div>
 {% endblock %}

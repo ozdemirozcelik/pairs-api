@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block submitlist %}
 
-<div style="width: 100%;font-size: medium;">
-    <div style="width: 50%; height: 100px; float: left;">
+<div class="divlist1">
+    <div class="divlist2">
         <form action="list" method="get">
             <div id="tradetype">
                 <input type="radio" id="checkpair" name="tradetype" value="pair" {% if selected_trade_type == "pair" %} checked {% endif %}><span>pair</span>
@@ -15,7 +15,7 @@
                 <select onchange="changeStatusColor(this); "name="ticker_webhook" id="ticker_webhook">
                 <option disabled selected value></option>
                 </select>&nbsp
-                <span title= "ticker status" id="show_status" class="round" style="vertical-align:middle";></span>
+                <span title= "ticker status" id="show_status" class="round"></span>
                 <br><br>
 
                 <input type="date" id="start_date" name="start_date" value={{start_date}}>
@@ -24,7 +24,7 @@
             </div>
         </form>
     </div>
-    <div style="margin-left: 90%; height: 100px; border-style: groove; text-align: left; font-size: medium;">
+    <div class="divlist3">
         <b>slippage:</b><br><br>
         buy:  {{slip_buy}} <br>
         sell: {{slip_sell}}<br>
@@ -53,7 +53,7 @@
     <tr>
         <td>{{ signal.rowid }}</td>
         {% if signal.timestamp|iftoday %}
-        <td style="background-color:#dcf5f4">{{ signal.timestamp|pct_time("UTC")}}</td>                 
+        <td class='tdtoday'>{{ signal.timestamp|pct_time("UTC")}}</td>
         {% else %}
         <td>{{ signal.timestamp|pct_time("UTC")}}</td>
         {% endif %} 
@@ -63,15 +63,15 @@
         <td>{{ "{:,}".format(signal.order_contracts) }}</td>
         <td>{{ "{:,.2f}".format(signal.order_price) }}</td>
         {% if "err" in signal.order_status%}
-        <td style="background-color:orange"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
+        <td class='tdorange'><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "created" in signal.order_status %}
-        <td style="background-color:lightblue"><span class='field-tip'>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
+        <td class='tdblue'><span class='field-tip'>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "cancel" in signal.order_status %}
-        <td style="background-color:lightgoldenrodyellow"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
+        <td class='tdyellow'><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "waiting" in signal.order_status or "rerouted" in signal.order_status %}
-        <td style="background-color:whitesmoke"><span class='field-tip'>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
+        <td class='tdwhite'><span class='field-tip'>{{ signal.order_status }}({{ (signal.timestamp|timediff) }} min)<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% elif "filled" in signal.order_status %}
-        <td style="background-color:lightgreen"><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>  
+        <td class='tdgreen2'><span class='field-tip'>{{ signal.order_status }}<span class='tip-content'>{{ signal.status_msg }}</span></span></td>
         {% else %}
         <td>{{ signal.order_status }}</td>                                                   
         {% endif %}                
@@ -99,24 +99,24 @@
 {% endblock %}
 
 {% block listscript %}
-<script type="text/javascript">
+<script nonce="{{ csp_nonce() }}" type="text/javascript">
     var selected_ticker = '{{selected_ticker}}';
 </script>
-<script type="text/javascript" src={{ url_for("static",filename="list.js") }} ></script>
+<script nonce="{{ csp_nonce() }}" type="text/javascript" src={{ url_for("static",filename="list.js") }} ></script>
 
 {% endblock %}
 
 {% block legendlist %}
 <div class="legendleft">
-    <span class='round' style='background-color: yellowgreen';>&nbsp;</span> active
-    <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
-    <span class='round' style='background-color: yellow';>&nbsp;</span> watch
+    <span class='roundgreen'>&nbsp;</span> active
+    <span class='roundred'>&nbsp;</span> passive
+    <span class='roundyellow'>&nbsp;</span> watch
 </div>
 <div class="legend">
-    <span class='numberCircle' style='background-color: whitesmoke';>&nbsp;</span> waiting
-    <span class='numberCircle' style='background-color: lightgoldenrodyellow';>&nbsp;</span> canceled
-    <span class='numberCircle' style='background-color: orange';>&nbsp;</span> error
-    <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created
-    <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
+    <span class='numberCircleWhite'>&nbsp;</span> waiting
+    <span class='numberCircleYellow'>&nbsp;</span> canceled
+    <span class='numberCircleOrange'>&nbsp;</span> error
+    <span class='numberCircleBlue'>&nbsp;</span> created
+    <span class='numberCircleGreen'>&nbsp;</span> filled
 </div>
 {% endblock %}

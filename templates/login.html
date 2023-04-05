@@ -1,13 +1,21 @@
      
      <div id="loginbox" class="modal-login">
-        <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
-        <section class="login-form">
+        <span id="loginspan" class="close" title="Close Modal">&times;</span>
+            <script nonce="{{ csp_nonce() }}" >
+            document.getElementById("loginspan").addEventListener('click', clickHandler);
+
+            function clickHandler(event) {
+                document.getElementById('loginbox').style.display='none'
+            }
+            </script>
+         <section class="login-form">
             <form class="modal-login-content animate">   
             <div class="modal-login-container">
                 <label for="username"><b>username:</b></label>
                 <input type="text" autocomplete='username' name="username" required>       
                 <label for="password"><b>password:</b></label>
                 <input type="password"  autocomplete='password' name="password" required>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label for="expire"><b>validity:</b></label>
                 <select name="expire" id="expire">
                     <option value="1">1m</option>
@@ -31,8 +39,18 @@
             </form>
         </section>
     </div>
-    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
-    <a href="setup"><div class="settingsbutton" id="settingsbutton" ><i class="fa fa-gear fa-lg"></i></div></a>
+    <div id="loginbutton" class="loginbutton" >LOGIN</div>
+    <script nonce="{{ csp_nonce() }}" >
+    document.getElementById("loginbutton").addEventListener('click', clickHandler);
+
+    function clickHandler(event) {
+        document.getElementById('loginbox').style.display='block'
+    }
+    </script>
+
+    <!-- <a href="setup"><div class="settingsbutton" id="settingsbutton" ><i class="fa fa-gear fa-lg"></i></div></a> -->
+    <!-- <a href="setup"><div class="settingsbutton" id="settingsbutton" >&#9881;</div></a> -->
+    <a href="setup"><div class="settingsbutton" id="settingsbutton" ><p class="settingicon">&#9881;</p></div></a>
     <div class="loginmsg">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from models.pairs import PairModel
 from flask_jwt_extended import jwt_required, get_jwt
 from models.tickers import TickerModel
+from . import status_codes as status
 
 EMPTY_ERR = "'{}' cannot be empty!"
 NAME_ERR = "'{}' with that name already exists."
@@ -30,33 +31,23 @@ class PairRegister(Resource):
         "hedge", type=float, required=True, help=EMPTY_ERR.format("hedge")
     )
     parser.add_argument(
-        "status",
-        type=int,
-        default=0,
+        "status", type=int, default=0,
     )
     parser.add_argument("notes", type=str)
     parser.add_argument(
         "contracts", type=int, required=True, help=EMPTY_ERR.format("contracts")
     )
     parser.add_argument(
-        "act_price",
-        type=float,
-        default=0,
+        "act_price", type=float, default=0,
     )
     parser.add_argument(
-        "sma",
-        type=float,
-        default=0,
+        "sma", type=float, default=0,
     )
     parser.add_argument(
-        "sma_dist",
-        type=float,
-        default=0,
+        "sma_dist", type=float, default=0,
     )
     parser.add_argument(
-        "std",
-        type=float,
-        default=0,
+        "std", type=float, default=0,
     )
 
     @staticmethod
@@ -83,7 +74,7 @@ class PairRegister(Resource):
             if TickerModel.find_active_ticker(item.ticker1, item.ticker2):
                 return (
                     {"message": STK_ERR},
-                    400,
+                    status.HTTP_400_BAD_REQUEST,
                 )  # Return Bad Request
 
         try:
@@ -94,26 +85,26 @@ class PairRegister(Resource):
                 if PairModel.find_by_name(item.name):
                     return (
                         {"message": NAME_ERR.format("pair")},
-                        400,
+                        status.HTTP_400_BAD_REQUEST,
                     )  # Return Bad Request
 
                 item.insert()
             else:
                 return (
                     {"message": TICKER_ERR},
-                    400,
+                    status.HTTP_400_BAD_REQUEST,
                 )  # Return Bad Request
 
         except Exception as e:
             print("Error occurred - ", e)  # better log the errors
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("pair")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
     @staticmethod
@@ -140,7 +131,7 @@ class PairRegister(Resource):
             if TickerModel.find_active_ticker(item.ticker1, item.ticker2):
                 return (
                     {"message": STK_ERR},
-                    400,
+                    status.HTTP_400_BAD_REQUEST,
                 )  # Return Bad Request
 
         item_to_return = PairModel.find_by_name(data["name"])
@@ -153,12 +144,12 @@ class PairRegister(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": UPDATE_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             return item_to_return.json()
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
 
 class PairList(Resource):
@@ -171,7 +162,7 @@ class PairList(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         # return {'pairs': list(map(lambda x: x.json(), items))}  # we can map the list of objects,
@@ -191,13 +182,16 @@ class Pair(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         if item:
             return item.json()
 
-        return {"message": "Item not found"}, 404  # Return Not Found
+        return (
+            {"message": "Item not found"},
+            status.HTTP_404_NOT_FOUND,
+        )  # Return Not Found
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -207,7 +201,10 @@ class Pair(Resource):
 
         # TODO: consider user to delete own data
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
             item_to_delete = PairModel.find_by_name(name)
@@ -215,13 +212,13 @@ class Pair(Resource):
             if item_to_delete:
                 item_to_delete.delete()
             else:
-                return {"message": NOT_FOUND}
+                return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Not Found
 
         except Exception as e:
             print("Error occurred - ", e)
             return (
                 {"message": DELETE_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("pair")}

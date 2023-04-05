@@ -3,6 +3,7 @@ from flask import request
 from flask_restful import Resource, reqparse
 from datetime import datetime
 import pytz
+from . import status_codes as status
 
 # enable if using sessions:
 # from flask import session
@@ -67,14 +68,17 @@ class UserRegister(Resource):
         claims = get_jwt()
 
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         data = _parser.parse_args()
 
         if UserModel.find_by_username(data["username"]):
             return (
                 {"message": USERNAME_ERR.format("username")},
-                400,
+                status.HTTP_400_BAD_REQUEST,
             )  # Return Bad Request
 
         item = UserModel(data["username"], data["password"])
@@ -86,12 +90,12 @@ class UserRegister(Resource):
             print("Error occurred - ", e)  # better log the errors
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("user")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
     @staticmethod
@@ -101,7 +105,10 @@ class UserRegister(Resource):
         claims = get_jwt()
 
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         data = _parser.parse_args()
 
@@ -115,7 +122,7 @@ class UserRegister(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": UPDATE_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             return item.json()
@@ -127,12 +134,12 @@ class UserRegister(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": INSERT_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return (
             {"message": CREATE_OK.format("user")},
-            201,
+            status.HTTP_201_CREATED,
         )  # Return Successful Creation of Resource
 
 
@@ -144,7 +151,10 @@ class UserList(Resource):
         claims = get_jwt()
 
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
             users = UserModel.get_rows(number_of_users)
@@ -153,7 +163,7 @@ class UserList(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         # return {'users': list(map(lambda x: x.json(), users))}  # we can map the list of objects,
@@ -170,7 +180,10 @@ class User(Resource):
         claims = get_jwt()
 
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
             item = UserModel.find_by_username(username)
@@ -179,13 +192,13 @@ class User(Resource):
             print("Error occurred - ", e)
             return (
                 {"message": GET_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         if item:
             return item.json()
 
-        return {"message": NOT_FOUND}, 404  # Return Not Found
+        return {"message": NOT_FOUND}, status.HTTP_404_NOT_FOUND  # Return Not Found
 
     @staticmethod
     @jwt_required(fresh=True)  # need fresh token
@@ -194,16 +207,27 @@ class User(Resource):
         claims = get_jwt()
 
         if not claims["is_admin"]:
-            return {"message": PRIV_ERR.format("admin")}, 401  # Return Unauthorized
+            return (
+                {"message": PRIV_ERR.format("admin")},
+                status.HTTP_401_UNAUTHORIZED,
+            )  # Return Unauthorized
 
         try:
-            UserModel.delete(username)
+            item_to_delete = UserModel.find_by_username(username)
+
+            if item_to_delete:
+                UserModel.delete(item_to_delete)
+            else:
+                return (
+                    {"message": NOT_FOUND},
+                    status.HTTP_404_NOT_FOUND,
+                )  # Return Not Found
 
         except Exception as e:
             print("Error occurred - ", e)
             return (
                 {"message": DELETE_ERR},
-                500,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )  # Return Interval Server Error
 
         return {"message": DELETE_OK.format("user")}
@@ -236,24 +260,21 @@ class UserLogin(Resource):
                 print("Error occurred - ", e)
                 return (
                     {"message": SESSION_ERR},
-                    500,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )  # Return Interval Server Error
 
             # (flask-session-change)enable if using flask sessions:
             # session["token"] = "yes_token"  # store token, use it as a dict
 
-            return (
-                {
-                    # 'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
-                    # 'refresh_token': refresh_token.decode('utf-8'), # for earlier versions of pyjwt
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "expire": data["expire"],
-                },
-                200,
-            )
+            return {
+                # 'access_token': access_token.decode('utf-8'),  # token needs to be JSON serializable
+                # 'refresh_token': refresh_token.decode('utf-8'), # for earlier versions of pyjwt
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "expire": data["expire"],
+            }
 
-        return {"message": INVAL_ERR}, 401
+        return {"message": INVAL_ERR}, status.HTTP_401_UNAUTHORIZED
 
 
 class UserLogout(Resource):
@@ -271,7 +292,7 @@ class UserLogout(Resource):
 
         # (flask-session-change) enable if using flask sessions to end session:
         # session["token"] = None
-        return {"message": LOGOUT_OK}, 200
+        return {"message": LOGOUT_OK}
 
 
 class TokenRefresh(Resource):
@@ -284,4 +305,4 @@ class TokenRefresh(Resource):
         )  # Create not fresh Token if fresh=False
         refresh_token = create_refresh_token(current_user)
 
-        return {"access_token": new_token, "refresh_token": refresh_token}, 200
+        return {"access_token": new_token, "refresh_token": refresh_token}

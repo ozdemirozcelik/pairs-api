@@ -156,12 +156,11 @@ input { display: table-cell; }
     font-size: 90%;
 }
 
-
-
 .ticker {
     border-radius: 5%;
     box-sizing: border-box;
     width: 90px;
+    text-transform: uppercase;
 }
 
 .sectype {
@@ -502,21 +501,30 @@ button:hover {
 
 .settingsbutton {
 
+    height: 30px;
     float: right;
     right: 80px;
-    font-size: 80%;
     margin-right: 0.5%;
-    padding: 4px;
+    padding: 0px;
     color:black;
-    border:2px solid black;
+    border:0px solid black;
     border-radius:5px;
-    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
     cursor:default;
-    vertical-align:middle;
+    vertical-align:middletop;
     text-align: center;
     letter-spacing:0.5px;
-
 }
+
+.settingicon {
+    font-size: 180%;
+    font-weight: bold;
+    color:black;
+    left: 0px;
+    top: -8px;
+    position: relative;
+}
+
+
 .loginmsg {
 
     float: right;
@@ -567,6 +575,7 @@ ul.no-bullets {
     list-style-type: none; /* Remove bullets */
     padding: 0; /* Remove padding */
     margin: 0; /* Remove margins */
+    cursor: pointer;
 }
 
 .column li:hover{
@@ -579,6 +588,11 @@ ul.no-bullets {
     display: none;
 }
 
+.poslegend {
+    font-size: 150%;
+    text-align: center;
+}
+
 .round {
     height: 10px;
     width: 10px;
@@ -587,8 +601,163 @@ ul.no-bullets {
     display: inline-block;
     border:1px solid grey;
     margin: 2px;
+    vertical-align:middle
+
+}
+
+.roundgreen {
+    height: 10px;
+    width: 10px;
+    background-color: yellowgreen;
+    border-radius: 50%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 2px;
     vertical-align:text-top;
 
+}
+
+.roundred {
+    height: 10px;
+    width: 10px;
+    background-color: lightcoral;
+    border-radius: 50%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 2px;
+    vertical-align:text-top;
+
+}
+
+.roundyellow {
+    height: 10px;
+    width: 10px;
+    background-color: yellow;
+    border-radius: 50%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 2px;
+    vertical-align:text-top;
+
+}
+
+.tdorange {
+    background-color:orange;
+    text-align: center;
+}
+
+.tdblue {
+    background-color:lightblue;
+}
+
+.tdbluegroove {
+    background-color:lightblue;
+    border-right-style: groove;
+}
+
+.tdbluegroove2 {
+    color:darkblue;
+    font-weight:bold;
+    border-right-style: groove;
+}
+
+.tdpeachgroove {
+    background-color:peachpuff;
+    border-right-style: groove;
+}
+
+
+.tdyellow {
+    background-color:lightgoldenrodyellow;
+}
+
+.tdlightyellow {
+    background-color:lightyellow;
+    text-align: center;
+}
+
+.tdwhite{
+    background-color:whitesmoke;
+}
+
+.tdgreen1 {
+    background-color:greenyellow;
+}
+
+.tdgreen2 {
+    background-color:lightgreen;
+}
+
+.tdgreen3 {
+    background-color:palegreen;
+}
+
+.tdpink {
+    background-color:lightpink;
+}
+
+.tdtoday {
+    background-color:#dcf5f4;
+}
+.tdredbold {
+    color:darkred;
+    font-weight:bold;
+
+}
+.tdredboldgroove {
+    color:darkred;
+    font-weight:bold;
+    border-right-style: groove;
+}
+
+.tdgreenbold {
+    color:darkred;
+    font-weight:bold;
+}
+
+.tdgreenboldgroove {
+    color:darkred;
+    font-weight:bold;
+    border-right-style: groove;
+}
+.tdblueyellowgroove {
+    color:darkblue;
+    font-weight:bold;
+    background-color:lightyellow;
+    border-right-style: groove;
+}
+
+.tdblueredgroove {
+    color:darkblue;
+    font-weight:bold;
+    background-color:orangered;
+    border-right-style: groove;
+}
+
+.tdblueorangegroove {
+    color:darkblue;
+    font-weight:bold;
+    background-color:orange;
+    border-right-style: groove;
+}
+
+.tdblueyellowgroove {
+    color:darkblue;
+    font-weight:bold;
+    background-color:lightyellow;
+    border-right-style: groove;
+}
+
+.tdgroove {
+    border-right-style: groove;
+}
+
+.tdcenter {
+   text-align: center;
+}
+
+.tdleft {
+   text-align: left;
 }
 
 .numberCircle {
@@ -604,6 +773,142 @@ ul.no-bullets {
     font-size: 75%;
 }
 
+.numberCircleWhite {
+    height: 14px;
+    width: 18px;
+    background-color: whitesmoke;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleOrange {
+    height: 14px;
+    width: 18px;
+    background-color: orange;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleYellow {
+    height: 14px;
+    width: 18px;
+    background-color: lightgoldenrodyellow;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleYellow2 {
+    height: 14px;
+    width: 18px;
+    background-color: lightyellow;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleBlue{
+    height: 14px;
+    width: 18px;
+    background-color: lightblue;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleGreen {
+    height: 14px;
+    width: 18px;
+    background-color: lightgreen;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCircleGreen2 {
+    height: 14px;
+    width: 18px;
+    background-color: palegreen;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.numberCirclePink {
+    height: 14px;
+    width: 18px;
+    background-color: lightpink;
+    border-radius: 20%;
+    display: inline-block;
+    border:1px solid grey;
+    margin: 1.5px;
+    vertical-align:text-top;
+    text-align: center;
+    font-size: 75%;
+}
+
+.divlist1 {
+    width: 100%;
+    font-size: medium;
+}
+
+.divlist2 {
+    width: 50%;
+    height: 100px;
+    float: left;
+}
+
+.divlist3 {
+    margin-left: 90%;
+    height: 100px;
+    border-style: groove;
+    text-align: left;
+    font-size: medium;
+}
+
+.setupdiv1 {
+    border-bottom:1px solid darkgrey;
+}
+
+.floatleftnodisplay {
+    float: left; display: none;
+}
+
+.floatleft {
+    float: left;
+}
+
+
 .pages {
     display: none;
     font-size: 90%;
@@ -617,8 +922,40 @@ ul.no-bullets {
     cursor:default;
     text-align: center;
     letter-spacing:0.5px;
-
 }
+
+.pagesleft {
+    display: none;
+    font-size: 90%;
+    margin: 3px;
+    padding: 1px;
+    color:black;
+    border:1px solid black;
+    border-radius:1px;
+    background: whitesmoke;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:default;
+    text-align: center;
+    letter-spacing:0.5px;
+    float: left;
+}
+
+.pagesright {
+    display: none;
+    font-size: 90%;
+    margin: 3px;
+    padding: 1px;
+    color:black;
+    border:1px solid black;
+    border-radius:1px;
+    background: whitesmoke;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:default;
+    text-align: center;
+    letter-spacing:0.5px;
+    float: right;
+}
+
 .legend {
     float: center;
     font-size: 80%;

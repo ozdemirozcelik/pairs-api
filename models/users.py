@@ -143,10 +143,9 @@ class UserModel(db.Model):
         #
         # return items
 
-    @staticmethod
-    def delete(username) -> None:
+    def delete(self) -> None:
 
-        db.session.delete(username)
+        db.session.delete(self)
         db.session.commit()
 
         # KEEPING THE SQL CODE THAT FUNCTIONS THE SAME FOR COMPARISON PURPOSES:

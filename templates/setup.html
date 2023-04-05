@@ -4,11 +4,10 @@
     <title>RESTful API TEST PAGE</title>
     <meta charset="UTF-8">
     <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">   
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   
-    <script type="text/javascript" >
+    <script nonce="{{ csp_nonce() }}"  type="text/javascript" >
         $(document).ready(function(){
 
             // for the tabs:
@@ -99,7 +98,14 @@
 
 <body>
     <div id="loginbox" class="modal-login">
-        <span onclick="document.getElementById('loginbox').style.display='none'" class="close" title="Close Modal">&times;</span> 
+        <span id="loginspan" class="close" title="Close Modal">&times;</span>
+        <script nonce="{{ csp_nonce() }}" >
+            document.getElementById("loginspan").addEventListener('click', clickHandler);
+
+            function clickHandler(event) {
+                document.getElementById('loginbox').style.display='none'
+            }
+        </script>
         <section class="login-form">
             <form class="modal-login-content animate">   
             <div class="modal-login-container">
@@ -107,6 +113,7 @@
                 <input type="text" autocomplete='username' name="username" required>       
                 <label for="password"><b>password:</b></label>
                 <input type="password" autocomplete='password' name="password" required>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label for="expire"><b>validity:</b></label>
                 <select name="expire" id="expire">
                     <option value="1">1m</option>
@@ -130,11 +137,27 @@
             </form>
         </section>
     </div>
-    <div class="loginbutton" onclick="document.getElementById('loginbox').style.display='block'">LOGIN</div>
+    <div id="loginbutton" class="loginbutton" >LOGIN</div>
+    <script nonce="{{ csp_nonce() }}" >
+    document.getElementById("loginbutton").addEventListener('click', clickHandler);
+
+    function clickHandler(event) {
+        document.getElementById('loginbox').style.display='block'
+    }
+    </script>
+
     <div class="countdown" id="countdown"></div>
     <a href="../"><div class="dashbutton" id="dashbutton" ><i class="fa fa-arrow-left"></i> DASHBOARD</div></a>
     <br><br>
-    <div class="logoutbutton" onclick="logout()">LOGOUT</div>
+    
+    <div id="logoutbutton" class="logoutbutton" >LOGOUT</div>
+    <script nonce="{{ csp_nonce() }}">
+        document.getElementById("logoutbutton").addEventListener('click', clickHandler);
+    
+        function clickHandler(event) {
+            logout()
+        }
+    </script>
 
     <div class="tabs">
         
@@ -156,13 +179,20 @@
                         </div>
                         <br>
                         <div>
-                            <div style="border-bottom:1px solid darkgrey;">
+                            <div class="setupdiv1">
                                 <p>
                                     <label for="ticker_webhook" id="ticker_webhook_label">Select Pair(*):</label>
-                                    <select onchange="changeStatusColor(this); "name="ticker_webhook" id="ticker_webhook">                    
+                                    <select name="ticker_webhook" id="ticker_webhook">
+                                    <script nonce="{{ csp_nonce() }}" >
+                                        document.getElementById("ticker_webhook").addEventListener('onchange', clickHandler);
+                            
+                                        function clickHandler(event) {
+                                            changeStatusColor(this);
+                                        }
+                                    </script>                   
                                     <option disabled selected value></option>
                                     </select>
-                                    <span title= "ticker status" id="show_status" class="round" style="vertical-align:middle";></span>                               
+                                    <span title= "ticker status" id="show_status" class="round"></span>                               
                                 </p>                          
                             </div>
                             <br>
@@ -249,16 +279,23 @@
                 <div class="column">
                     <h3> List of Order Signals </h3>
                     <p>
-                    <ul id="signallist" class="no-bullets" style="cursor: pointer;" > </ul>
-                    <div id="login-txt" style=" float: left; display: none"><br>Login to see all signals...</div>
-                    <div id="prev-signals" class="pages" style=" float: left;">Prev</div>
-                    <div id="next-signals" class="pages" style=" float: right;">Next</div>
+                    <ul id="signallist" class="no-bullets"> </ul>
+                    <div id="login-txt" class="floatleftnodisplay"><br>Login to see all signals...</div>
+                    <div id="prev-signals" class="pagesleft" >Prev</div>
+                    <div id="next-signals" class="pagesright">Next</div>
                 </div>
                 
                 <div class="column">
                     <h3> Update Signal </h3>
                     <section class="signals-update">
-                        <div class="deletebutton" onclick="alertBefore_signals()">&nbsp;DELETE!&nbsp;</div>
+                        <div id="deletebutton_signal" class="deletebutton">&nbsp;DELETE!&nbsp;</div>
+                        <script nonce="{{ csp_nonce() }}" >
+                            document.getElementById("deletebutton_signal").addEventListener('click', clickHandler);
+                
+                            function clickHandler(event) {
+                                alertBefore_signals('{{ csrf_token() }}')
+                            }
+                        </script>
                         <form>  
                             <p>
                                 <label for="rowid_update">RowId:</label>
@@ -412,11 +449,11 @@
                 </div>
             </div>
             <div class="legend">
-                <span class='numberCircle' style='background-color: whitesmoke';>&nbsp;</span> waiting
-                <span class='numberCircle' style='background-color: lightgoldenrodyellow';>&nbsp;</span> canceled
-                <span class='numberCircle' style='background-color: orange';>&nbsp;</span> error
-                <span class='numberCircle' style='background-color: lightblue';>&nbsp;</span> created 
-                <span class='numberCircle' style='background-color: lightgreen';>&nbsp;</span> filled
+                <span class='numberCircleWhite'>&nbsp;</span> waiting
+                <span class='numberCircleYellow'>&nbsp;</span> canceled
+                <span class='numberCircleOrange'>&nbsp;</span> error
+                <span class='numberCircleBlue'>&nbsp;</span> created
+                <span class='numberCircleGreen'>&nbsp;</span> filled
             </div>
         </div>
         <div id="tab2" class="tab">
@@ -457,6 +494,7 @@
                             <p>
                                 <label for="contracts">Contracts:&nbsp;</label>
                                 <input type="text" name="contracts" id="contracts" class="integer"> 
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             </p>
                             <br><br>
                             <button type="submit">Create JSON</button>
@@ -476,20 +514,41 @@
             
                 <div class="column">
                     <h3> List of Pairs </h3>
-                    <button id="getpairs_button" type="submit" onclick="listPairs()">GET Pairs</button>
-                    <button id="sort_button_pairs" onclick="sortList_pairs()" class="hidden">Sort</button>
+                    <button id="getpairs_button" type="submit">GET Pairs</button>
+                    <script nonce="{{ csp_nonce() }}" >
+                        document.getElementById("getpairs_button").addEventListener('click', clickHandler);
+            
+                        function clickHandler(event) {
+                            listPairs()
+                        }
+                    </script>
+                    <button id="sort_button_pairs" class="hidden">Sort</button>
+                    <script nonce="{{ csp_nonce() }}" >
+                        document.getElementById("sort_button_pairs").addEventListener('click', clickHandler);
+            
+                        function clickHandler(event) {
+                            sortList_pairs()
+                        }
+                    </script>
                     <br>
-                    <ul id="pairlist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <ul id="pairlist" class="no-bullets"> </ul>
                     <div id="pages-pairs" class="hidden">
-                        <div id="prev-pairs" class="pages" style=" float: left;">Prev</div>
-                        <div id="next-pairs" class="pages" style=" float: right;">Next</div>
+                        <div id="prev-pairs" class="pagesleft">Prev</div>
+                        <div id="next-pairs" class="pagesright">Next</div>
                     </div>
                 </div>
             
                 <div class="column">
                     <h3> Update Pair </h3>
                     <section class="pairs-update">
-                        <div class="deletebutton" onclick="alertBefore_pairs()">&nbsp;DELETE&nbsp;</div>
+                        <div id="deletebutton_pair" class="deletebutton" >&nbsp;DELETE&nbsp;</div>
+                        <script nonce="{{ csp_nonce() }}" >
+                            document.getElementById("deletebutton_pair").addEventListener('click', clickHandler);
+                
+                            function clickHandler(event) {
+                                alertBefore_pairs('{{ csrf_token() }}')
+                            }
+                        </script>
                         <form>
                             <div>
                                 <p>
@@ -531,6 +590,7 @@
                                 <p>
                                     <label>&nbsp;</label>  
                                     <input type="radio" id="watch-pair-update" name="status" value="-1"><span>watch</span>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                     
                                 </p>
                                 
@@ -554,8 +614,8 @@
             
             </div>
             <div class="legend">
-                <span class='round' style='background-color: yellowgreen';>&nbsp;</span> active
-                <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+                <span class='roundgreen'>&nbsp;</span> active
+                <span class='roundred'>&nbsp;</span> passive
             </div>
         </div>
         <div id="tab3" class="tab">
@@ -567,7 +627,7 @@
                         <div>
                             <p>
                                 <label for="ticker">Ticker Symbol:&nbsp;</label>
-                                <input type="text" id="ticker" class="ticker" name="symbol" style="text-transform: uppercase;" pattern="^\S{1,9}$" required placeholder="Add Here"
+                                <input type="text" id="ticker" class="ticker" name="symbol" pattern="^\S{1,9}$" required placeholder="Add Here"
                                 oninvalid="this.setCustomValidity('Less than 10 charachers with no spaces!')" oninput="this.setCustomValidity('')"/>
                             </p>
                             <p>
@@ -630,6 +690,7 @@
                                 </select>
                             </p>
                             <input name="active" type="hidden" value="0"/>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             <br><br>
                             <button type="submit">Create JSON</button>
                         </div>
@@ -647,20 +708,41 @@
             
                 <div class="column">
                     <h3> List of Tickers </h3>
-                    <button id="getticker_button" type="submit" onclick="getTickers()">GET Tickers</button>
-                    <button id="sort_button" onclick="sortList()" class="hidden">Sort</button>
+                    <button id="getticker_button" type="submit">GET Tickers</button>
+                    <script nonce="{{ csp_nonce() }}" >
+                        document.getElementById("getticker_button").addEventListener('click', clickHandler);
+            
+                        function clickHandler(event) {
+                            getTickers()
+                        }
+                    </script>
+                    <button id="sort_button" class="hidden">Sort</button>
+                    <script nonce="{{ csp_nonce() }}" >
+                        document.getElementById("sort_button").addEventListener('click', clickHandler);
+            
+                        function clickHandler(event) {
+                            sortList()
+                        }
+                    </script>
                     <br>
-                    <ul id="stklist" class="no-bullets" style="cursor: pointer;" > </ul>
+                    <ul id="stklist" class="no-bullets"> </ul>
                     <div id="pages-tickers" class="hidden">
-                        <div id="prev-stk" class="pages" style=" float: left;">Prev</div>
-                        <div id="next-stk" class="pages" style=" float: right;">Next</div>
+                        <div id="prev-stk" class="pagesleft">Prev</div>
+                        <div id="next-stk" class="pagesright">Next</div>
                     </div>
                 </div>
             
                 <div class="column">
                     <h3> Update Ticker </h3>
                     <section class="tickers-update">
-                        <div class="deletebutton" onclick="alertBefore()">&nbsp;DELETE&nbsp;</div>
+                        <div id="deletebutton_ticker" class="deletebutton">&nbsp;DELETE&nbsp;</div>
+                        <script nonce="{{ csp_nonce() }}" >
+                            document.getElementById("deletebutton_ticker").addEventListener('click', clickHandler);
+                
+                            function clickHandler(event) {
+                                alertBefore('{{ csrf_token() }}')
+                            }
+                        </script>
                         <form>
                             <div>
                                 <p>
@@ -735,6 +817,7 @@
                                 <p>
                                     <label>&nbsp;</label>            
                                     <input type="radio" id="passive-update" name="active" value="0"><span>passive</span>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                     
                                 </p>
                                 <br><br>
@@ -754,31 +837,24 @@
             
             </div>
             <div class="legend">
-                <span class='round' style='background-color: yellowgreen';>&nbsp;</span> active
-                <span class='round' style='background-color: lightcoral';>&nbsp;</span> passive
+                <span class='roundgreen'>&nbsp;</span> active
+                <span class='roundred'>&nbsp;</span> passive
             </div>
         </div>
     </div>
 
 
-<script>
+<script nonce="{{ csp_nonce() }}" >
 
 var server_url = window.location.origin + "/";
 console.log("base_url: " + server_url);
 
-// Edit your proxy and enable to overcome CORS limitations
-// if (server_url != "http://127.0.0.1:5000/") {
-//    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
-//    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-//    server_url = proxy_url + updatedURL;
-//};
-
 </script>
 
-<script type="text/javascript" src={{ url_for("static",filename="tickers.js") }} > </script>
-<script type="text/javascript" src={{ url_for("static",filename="pairs.js") }} > </script>
-<script type="text/javascript" src={{ url_for("static",filename="signals.js") }} > </script>
-<script type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>
+<script nonce="{{ csp_nonce() }}" type="text/javascript" src={{ url_for("static",filename="tickers.js") }} > </script>
+<script nonce="{{ csp_nonce() }}" type="text/javascript" src={{ url_for("static",filename="pairs.js") }} > </script>
+<script nonce="{{ csp_nonce() }}" type="text/javascript" src={{ url_for("static",filename="signals.js") }} > </script>
+<script nonce="{{ csp_nonce() }}" type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>
 
 
 </body>

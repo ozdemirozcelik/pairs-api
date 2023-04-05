@@ -1,4 +1,4 @@
-from typing import Dict, Union  # for type hinting
+from typing import Dict, List  # for type hinting
 from db import db
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -32,6 +32,11 @@ class SessionModel(db.Model):
 
         return cls.query.filter_by(value=value).first()
 
+    @classmethod
+    def get_all(cls) -> List:
+
+        return cls.query.order_by(cls.rowid.desc())
+
     def insert(self) -> None:
 
         db.session.add(self)
@@ -44,21 +49,14 @@ class SessionModel(db.Model):
 
     @staticmethod
     def delete_all() -> None:
-        try:
-            db.session.query(SessionModel).delete()
-            db.session.commit()
-        except:
-            db.session.rollback()
+
+        db.session.query(SessionModel).delete()
+        db.session.commit()
 
     @classmethod
     def delete_expired(cls) -> None:
 
         date_now = datetime.now(tz=pytz.utc)
 
-        print(date_now)
-
-        try:
-            cls.query.filter(cls.expiry < date_now).delete()
-            db.session.commit()
-        except:
-            db.session.rollback()
+        cls.query.filter(cls.expiry < date_now).delete()
+        db.session.commit()

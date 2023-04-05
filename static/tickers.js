@@ -4,7 +4,7 @@
 // define api constants for the tickers:
 const api_url_get= server_url +'v4/ticker/';
 const api_url_get_all= server_url +'v4/tickers/0';// "0" for all tickers
-const api_url_post_put= server_url +'v4/regticker';
+const api_url_post_put= server_url +'v4/ticker';
 
 // form data to be collected in these variables:
 var formJSON;
@@ -16,6 +16,16 @@ const form = document.querySelector('.tickers-form');
 form.addEventListener('submit', handleFormSubmit);
 const form_update = document.querySelector('.tickers-update');
 form_update.addEventListener('submit', handleFormSubmit_update);
+
+// create  event listener for dynamic list content
+function dynamiclistener_ticker(id) {
+    document.getElementById(id).addEventListener('click', dynamicHandler_ticker);
+}
+
+function dynamicHandler_ticker(event) {
+    Update(this)
+}
+
 
 // dynamic objects
 // TO-DO: define all
@@ -112,13 +122,23 @@ function handleFormSubmit(event) {
 
         document.getElementById("jsontext").style.display = 'block';
         
+        // copy token to add later
+        csrf_token_copy = formJSON['_csrf_token'];
+
         // Uppercase JSON string
-        uppercase_json = JSON.parse(JSON.stringify(formJSON, function(a, b) {
+        var uppercase_json = JSON.parse(JSON.stringify(formJSON, function(a, b) {
             return typeof b === "string" ? b.toUpperCase() : b
         }));
 
+        // show text without token
+        delete uppercase_json['_csrf_token'];
         results.innerText = JSON.stringify(uppercase_json, null, 2);
 
+        // add token
+        uppercase_json['_csrf_token'] = csrf_token_copy;
+
+        formJSON = uppercase_json
+        
         // create post & save button
         createButton();
     }
@@ -137,6 +157,9 @@ function handleFormSubmit_update(event) {
     const results = document.querySelector('.results-update pre');
 
     document.getElementById("jsontext-update").style.display = 'block';
+
+    // copy token to add later
+    csrf_token_copy = formJSON_update['_csrf_token'];
     
     // Uppercase JSON string
     uppercase_json = JSON.parse(JSON.stringify(formJSON_update, function(a, b) {
@@ -144,7 +167,14 @@ function handleFormSubmit_update(event) {
     }));
 
     // show JSON string before sending
+    delete uppercase_json['_csrf_token'];
     results.innerText = JSON.stringify(uppercase_json, null, 2);
+
+    // add token
+    uppercase_json['_csrf_token'] = csrf_token_copy;
+
+    formJSON_update = uppercase_json
+    alert(JSON.stringify(formJSON_update))
 
     // create put & update button
     createUpdateButton();
@@ -209,17 +239,13 @@ function postSave() {
         ticker_text = (formJSON.symbol + "-" + formJSON.xch + "-" + formJSON.prixch).toUpperCase();
         alert("Sending POST request for: " + ticker_text);
 
-        var body_msg = JSON.stringify(formJSON, function(a, b) {
-                return typeof b === "string" ? b.toUpperCase() : b
-        });
-
         fetch(api_url_post_put, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token,          
                 }, 
-                body: body_msg
+                body: JSON.stringify(formJSON)
             }).then(response => {
                 if (response.status >= 200 && response.status <= 401) {
                     return_code = response.status;
@@ -244,9 +270,9 @@ function postSave() {
 
                         // create span element according to ticker status
                         if (jsonResponse.active) {
-                            li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
+                            li.innerHTML = "<span title='active' class='roundgreen'></span>";
                         } else {
-                            li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                            li.innerHTML = "<span title='passive' class='roundred'></span>";
                         }
 
                         li.setAttribute('id', ticker.value.toUpperCase());
@@ -295,17 +321,13 @@ function putUpdate() {
         alert("Sending PUT request for: " + ticker_text);
 
 
-        var body_msg = JSON.stringify(formJSON_update, function(a, b) {
-                return typeof b === "string" ? b.toUpperCase() : b
-        });
-
         fetch(api_url_post_put, {
                 method: "PUT",
                 headers: {
                     'Content-Type': 'application/json', 
                     'Authorization': 'Bearer ' + localStorage.access_token,
                 },
-                body: body_msg
+                body: JSON.stringify(formJSON_update)
             }).then(response => {
                 if (response.status >= 200 && response.status <= 401) {
                     return_code = response.status;
@@ -359,17 +381,19 @@ async function getTickers() {
 
             // create span element according to ticker status
             if (tickers_data.tickers[key].active) {
-                li.innerHTML = "<span title='active' class='round' style='background-color: yellowgreen';></span>";
+                li.innerHTML = "<span title='active' class='roundgreen'></span>";
             } else {
-                li.innerHTML = "<span title='passive' class='round' style='background-color: lightcoral';></span>";
+                li.innerHTML = "<span title='passive' class='roundred'></span>";
             }
 
 
             str = tickers_data.tickers[key].symbol
             li.setAttribute('id', str);             
             li.appendChild(document.createTextNode(str));
-            li.setAttribute("onclick", "Update(this)");
             stklist.appendChild(li);
+            // add onclick event listener for each list element
+            dynamiclistener_ticker(str)
+
             
         }
     }
@@ -456,16 +480,16 @@ function Update(currentEl){
     getTicker(symbol);
 }
 
-function alertBefore() {
+function alertBefore(csrf_token) {
 
     if (confirm("Do you want to delete selected ticker?") == true) {
-        deleteTicker()
+        deleteTicker(csrf_token)
     } else {
         return
     }
 }
 
-function deleteTicker() {
+function deleteTicker(csrf_token) {
 
     // check token status
     if (!localStorage.access_token) {
@@ -484,11 +508,16 @@ function deleteTicker() {
 
         var api_url_delete_ticker = api_url_get + ticker_update.value
 
+        body_msg = {_csrf_token: csrf_token }
+
         fetch(api_url_delete_ticker, {
                 method: "DELETE",
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.access_token,
                 },
+                body: JSON.stringify(body_msg)
+
             }).then(response => {
                 if (response.status >= 200 && response.status <= 401) {
                     return_code = response.status;

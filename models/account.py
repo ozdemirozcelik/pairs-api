@@ -1,3 +1,4 @@
+"""Account Model"""
 import re
 from typing import Dict, List  # for type hinting
 from db import db
@@ -18,8 +19,7 @@ class AccountModel(db.Model):
     )  # using 'rowid' as the default key
     timestamp = db.Column(
         db.DateTime(timezone=False),
-        # server_default=func.timezone("UTC", func.current_timestamp()) # this can be problematic for sqlite3
-        server_default=func.current_timestamp()  # TODO: check for sqlite3 and postgres
+        server_default=func.current_timestamp()
         # db.DateTime(timezone=False), server_default = func.now()
     )  # DATETIME DEFAULT (CURRENT_TIMESTAMP) for sqlite3
     AvailableFunds = db.Column(db.Float)
@@ -106,8 +106,3 @@ class AccountModel(db.Model):
 
         db.session.delete(self)
         db.session.commit()
-
-    # TODO: add a find_by_date function
-    # def find_by_date(cls, date) -> "AccountModel":
-    #
-    #     return cls.query.filter_by(cls.timestamp == date).first()

@@ -4,8 +4,7 @@
     <title>{{ title }}</title>
     <meta charset="UTF-8">
     <link href={{ url_for("static",filename="style.css") }} rel="stylesheet" type="text/css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script nonce="{{ csp_nonce() }}"  src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
@@ -57,22 +56,14 @@
             {% endblock %}  
         </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}" >
 
 var server_url = window.location.origin + "/";
 console.log("base_url: " + server_url);
 
-// Edit your proxy and enable to overcome CORS limitations
-// if (server_url != "http://127.0.0.1:5000/") {
-//    const updatedURL = server_url.replace(/^https:\/\//i, 'http://');
-//    var proxy_url = "https://api-pairs-cors.herokuapp.com/";
-//    server_url = proxy_url + updatedURL;
-//};
-
-
 </script>
 
-<script type="text/javascript" src={{ url_for("static",filename="users.js") }} > </script>
+<script nonce="{{ csp_nonce() }}"  src={{ url_for("static",filename="users.js") }} > </script>
 {% block listscript %}
 {% endblock %}
 
