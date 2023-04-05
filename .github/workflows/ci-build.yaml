@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          grep "uwsgi" requirements.txt | xargs pip install
+          grep -v 'uwsgi\|#' requirements.txt | xargs pip install
       - name: code format with black
         run: |
           black .
