@@ -28,12 +28,12 @@ GET_URL = "/v4/pairs/"
 LOGIN_URL = "/v4/login"
 
 ######################################################################
-#  PAIR MODEL TEST CASES
+#  PAIR RESOURCE TEST CASES
 ######################################################################
 
 
 class TestPair(unittest.TestCase):
-    """Test Cases for Pair Model"""
+    """Test Cases for Pair Resource"""
 
     @classmethod
     def setUpClass(cls):

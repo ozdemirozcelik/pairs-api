@@ -28,12 +28,12 @@ GET_URL = "/v4/tickers/"
 LOGIN_URL = "/v4/login"
 
 ######################################################################
-#  TICKER MODEL TEST CASES
+#  TICKER RESOURCETEST CASES
 ######################################################################
 
 
 class TestTicker(unittest.TestCase):
-    """Test Cases for Ticker Model"""
+    """Test Cases for Ticker Resource"""
 
     @classmethod
     def setUpClass(cls):

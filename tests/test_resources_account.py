@@ -26,12 +26,12 @@ BASE_URL = "/v4/pnl"
 LOGIN_URL = "/v4/login"
 
 ######################################################################
-#  ACCOUNT MODEL TEST CASES
+#  ACCOUNT RESOURCE TEST CASES
 ######################################################################
 
 
 class TestAccount(unittest.TestCase):
-    """Test Cases for Account Model"""
+    """Test Cases for Account Resource"""
 
     @classmethod
     def setUpClass(cls):

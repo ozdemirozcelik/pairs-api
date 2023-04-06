@@ -31,12 +31,12 @@ LOGOUT_URL = "/v4/logout"
 REFRESH_URL = "/v4/refresh"
 
 ######################################################################
-#  USER MODEL TEST CASES
+#  USER RESOURCE TEST CASES
 ######################################################################
 
 
 class TestUser(unittest.TestCase):
-    """Test Cases for User Model"""
+    """Test Cases for User Resource"""
 
     @classmethod
     def setUpClass(cls):

@@ -32,12 +32,12 @@ GET_URL = "/v4/signals/"
 LOGIN_URL = "/v4/login"
 
 ######################################################################
-#  PAIR MODEL TEST CASES
+#  PAIR RESOURCE TEST CASES
 ######################################################################
 
 
 class TestSignal(unittest.TestCase):
-    """Test Cases for Signal Model"""
+    """Test Cases for Signal Resource"""
 
     @classmethod
     def setUpClass(cls):
