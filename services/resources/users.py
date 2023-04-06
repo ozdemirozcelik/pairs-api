@@ -8,8 +8,8 @@ from . import status_codes as status
 
 # enable if using sessions:
 # from flask import session
-from models.users import UserModel
-from models.session import SessionModel
+from services.models.users import UserModel
+from services.models.session import SessionModel
 from blacklist import BLACKLIST
 from hmac import compare_digest
 from flask_jwt_extended import (

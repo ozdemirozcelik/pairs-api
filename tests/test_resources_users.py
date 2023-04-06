@@ -10,12 +10,12 @@ from app import app
 from db import db
 from security import talisman, csrf
 from flask_jwt_extended import create_access_token
-from resources import status_codes as status
-from models.users import UserModel
-from models.session import SessionModel
+from services.resources import status_codes as status
+from services.models.users import UserModel
+from services.models.session import SessionModel
 from tests.factories import UserFactory
 from tests.factories import SessionFactory
-from resources.users import UserRegister
+from services.resources.users import UserRegister
 
 # rather than referring to an app directly, use a proxy,
 # which points to the application handling the current activity
@@ -159,7 +159,7 @@ class TestUser(unittest.TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("resources.users.UserModel.insert")
+    @patch("services.resources.users.UserModel.insert")
     def test_post_user_server_error(self, mock_insert):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -189,7 +189,7 @@ class TestUser(unittest.TestCase):
         test_user["expire"] = 10
 
         # test for exception handler for creating new user
-        with mock.patch("models.session.SessionModel.insert", side_effect=Exception):
+        with mock.patch("services.models.session.SessionModel.insert", side_effect=Exception):
             # try to login
             response = self.client.post(
                 LOGIN_URL, json=test_user, content_type="application/json"
@@ -226,8 +226,8 @@ class TestUser(unittest.TestCase):
         self.assertEqual(data["message"], "Invalid Credentials!")
 
     ## TODO: works in conda virtual env., not working in python virtual env.
-    # @patch("resources.users.request")
-    # @patch("models.session.SessionModel.find_by_value")
+    # @patch("services.resources.users.request")
+    # @patch("services.models.session.SessionModel.find_by_value")
     # def test_post_logout(self, mock_cookie, mock_session):
     #     """It should logout"""
     # 
@@ -277,7 +277,7 @@ class TestUser(unittest.TestCase):
         test_user["password"] = "test"
 
         # test for exception handler for creating new user
-        with mock.patch("resources.users.UserModel.insert", side_effect=Exception):
+        with mock.patch("services.resources.users.UserModel.insert", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -299,7 +299,7 @@ class TestUser(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # test for exception handler for updating user
-        with mock.patch("resources.users.UserModel.update", side_effect=Exception):
+        with mock.patch("services.resources.users.UserModel.update", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -365,7 +365,7 @@ class TestUser(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.users.UserModel.find_by_username", side_effect=Exception
+            "services.resources.users.UserModel.find_by_username", side_effect=Exception
         ):
             # get unique user and assert
             response = self.client.get(
@@ -410,7 +410,7 @@ class TestUser(unittest.TestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(data["message"], "item not found.")
 
-    @patch("resources.users.UserModel.get_rows")
+    @patch("services.resources.users.UserModel.get_rows")
     def test_put_user_server_error(self, mock_get_rows):
         """It should try to get user from the endpoint but an error occurs on the server side"""
 
@@ -435,7 +435,7 @@ class TestUser(unittest.TestCase):
         self.assertEqual(len(data["users"]), 3)
 
         # test for exception handler
-        with mock.patch("resources.users.UserModel.get_rows", side_effect=Exception):
+        with mock.patch("services.resources.users.UserModel.get_rows", side_effect=Exception):
             # get unique user and assert
             response = self.client.get(GET_URL + "0", headers=self._get_headers())
             self.assertEqual(
@@ -477,7 +477,7 @@ class TestUser(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.users.UserModel.find_by_username", side_effect=Exception
+            "services.resources.users.UserModel.find_by_username", side_effect=Exception
         ):
             # delete unique user and assert
             response = self.client.delete(

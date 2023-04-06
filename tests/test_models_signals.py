@@ -5,9 +5,9 @@ import unittest
 import os
 from app import app
 from db import db
-from models.signals import SignalModel
-from models.pairs import PairModel
-from models.tickers import TickerModel
+from services.models.signals import SignalModel
+from services.models.pairs import PairModel
+from services.models.tickers import TickerModel
 from tests.factories import SignalFactory
 from tests.factories import PairFactory
 from tests.factories import TickerFactory

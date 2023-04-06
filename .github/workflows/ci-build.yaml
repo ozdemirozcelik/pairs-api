@@ -62,7 +62,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-badge
-          path: tests/coverage.svg
+          path: tests
       - name: Push the badge to repo
         run: |
           git config user.name github-actions

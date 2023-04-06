@@ -10,12 +10,12 @@ from app import app
 from db import db
 from security import talisman, csrf
 from flask_jwt_extended import create_access_token
-from resources import status_codes as status
-from models.pairs import PairModel
-from models.tickers import TickerModel
+from services.resources import status_codes as status
+from services.models.pairs import PairModel
+from services.models.tickers import TickerModel
 from tests.factories import TickerFactory
 from tests.factories import PairFactory
-from resources.users import UserRegister
+from services.resources.users import UserRegister
 
 # rather than referring to an app directly, use a proxy,
 # which points to the application handling the current activity
@@ -203,7 +203,7 @@ class TestPair(unittest.TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("resources.pairs.PairModel.insert")
+    @patch("services.resources.pairs.PairModel.insert")
     def test_post_pair_server_error(self, mock_insert):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -250,7 +250,7 @@ class TestPair(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # test for exception handler for updating pair
-        with mock.patch("resources.pairs.PairModel.update", side_effect=Exception):
+        with mock.patch("services.resources.pairs.PairModel.update", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -325,7 +325,7 @@ class TestPair(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.pairs.PairModel.find_by_name", side_effect=Exception
+            "services.resources.pairs.PairModel.find_by_name", side_effect=Exception
         ):
             # get unique pair and assert
             response = self.client.get(BASE_URL + "/" + test_pair.name)
@@ -396,7 +396,7 @@ class TestPair(unittest.TestCase):
         self.assertEqual(len(data["pairs"]), 2)
 
         # test for exception handler
-        with mock.patch("resources.pairs.PairModel.get_rows", side_effect=Exception):
+        with mock.patch("services.resources.pairs.PairModel.get_rows", side_effect=Exception):
             # get unique pair and assert
             response = self.client.get(GET_URL + "0")
             self.assertEqual(
@@ -450,7 +450,7 @@ class TestPair(unittest.TestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(data["message"], "'admin' privilege required.")
 
-    @patch("resources.pairs.PairModel.find_by_name")
+    @patch("services.resources.pairs.PairModel.find_by_name")
     def test_put_pair_server_error(self, mock_delete):
         """It should try to delete pair from the endpoint but an error occurs on the server side"""
 

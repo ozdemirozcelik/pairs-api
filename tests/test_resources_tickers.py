@@ -10,12 +10,12 @@ from app import app
 from db import db
 from security import talisman, csrf
 from flask_jwt_extended import create_access_token
-from resources import status_codes as status
-from models.tickers import TickerModel
-from models.pairs import PairModel
+from services.resources import status_codes as status
+from services.models.tickers import TickerModel
+from services.models.pairs import PairModel
 from tests.factories import TickerFactory
 from tests.factories import PairFactory
-from resources.users import UserRegister
+from services.resources.users import UserRegister
 
 # rather than referring to an app directly, use a proxy,
 # which points to the application handling the current activity
@@ -185,7 +185,7 @@ class TestTicker(unittest.TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("resources.tickers.TickerModel.insert")
+    @patch("services.resources.tickers.TickerModel.insert")
     def test_post_ticker_server_error(self, mock_insert):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -211,7 +211,7 @@ class TestTicker(unittest.TestCase):
         test_ticker = TickerFactory()
 
         # test for exception handler for creating new ticker
-        with mock.patch("resources.tickers.TickerModel.insert", side_effect=Exception):
+        with mock.patch("services.resources.tickers.TickerModel.insert", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -235,7 +235,7 @@ class TestTicker(unittest.TestCase):
         test_ticker.order_type = "NEW_ORDER_TYPE"
 
         # test for exception handler for updating ticker
-        with mock.patch("resources.tickers.TickerModel.update", side_effect=Exception):
+        with mock.patch("services.resources.tickers.TickerModel.update", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -309,7 +309,7 @@ class TestTicker(unittest.TestCase):
         new_body["active_pos"] = -100.1
 
         # test for exception handler
-        with mock.patch("resources.tickers.TickerModel.update", side_effect=Exception):
+        with mock.patch("services.resources.tickers.TickerModel.update", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL + "/pnl", json=new_body, content_type="application/json"
@@ -390,7 +390,7 @@ class TestTicker(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.tickers.TickerModel.find_by_symbol", side_effect=Exception
+            "services.resources.tickers.TickerModel.find_by_symbol", side_effect=Exception
         ):
             # get unique ticker and assert
             response = self.client.get(BASE_URL + "/" + symbol)
@@ -444,7 +444,7 @@ class TestTicker(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.tickers.TickerModel.get_rows", side_effect=Exception
+            "services.resources.tickers.TickerModel.get_rows", side_effect=Exception
         ):
             # get unique ticker and assert
             response = self.client.get(GET_URL + "0")
@@ -452,7 +452,7 @@ class TestTicker(unittest.TestCase):
                 response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @patch("resources.tickers.TickerModel.get_rows")
+    @patch("services.resources.tickers.TickerModel.get_rows")
     def test_put_ticker_server_error(self, mock_get_rows):
         """It should try to get ticker from the endpoint but an error occurs on the server side"""
 
@@ -509,7 +509,7 @@ class TestTicker(unittest.TestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(data["message"], "'admin' privilege required.")
 
-    @patch("resources.tickers.TickerModel.find_by_symbol")
+    @patch("services.resources.tickers.TickerModel.find_by_symbol")
     def test_delete_ticker_server_error(self, mock_delete):
         """It should try to delete ticker from the endpoint but an error occurs on the server side"""
 

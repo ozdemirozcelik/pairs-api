@@ -5,7 +5,7 @@ import unittest
 import os
 from app import app
 from db import db
-from models.users import UserModel
+from services.models.users import UserModel
 from tests.factories import UserFactory
 
 # rather than referring to an app directly, use a proxy,

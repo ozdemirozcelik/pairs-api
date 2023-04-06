@@ -5,7 +5,7 @@ Email Notifications
 from flask_mail import Mail, Message
 from app import app, configs
 from demo import iftoday, timediff
-from models.signals import SignalModel
+from services.models.signals import SignalModel
 
 # configuration of email
 app.config["MAIL_SERVER"] = configs.get("EMAIL", "MAIL_SERVER")

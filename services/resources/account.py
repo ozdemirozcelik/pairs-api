@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
-from models.account import AccountModel
-from models.signals import SignalModel
+from services.models.account import AccountModel
+from services.models.signals import SignalModel
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 from datetime import datetime
 from . import status_codes as status

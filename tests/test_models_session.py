@@ -7,7 +7,7 @@ import pytz
 import os
 from app import app
 from db import db
-from models.session import SessionModel
+from services.models.session import SessionModel
 from tests.factories import SessionFactory
 
 # rather than referring to an app directly, use a proxy,

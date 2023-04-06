@@ -3,8 +3,8 @@ Resource Definitions for API
 """
 from app import app
 from flask_restful import Api
-from resources.pairs import PairRegister, PairList, Pair
-from resources.signals import (
+from services.resources.pairs import PairRegister, PairList, Pair
+from services.resources.signals import (
     SignalWebhook,
     SignalUpdateOrder,
     SignalList,
@@ -12,8 +12,8 @@ from resources.signals import (
     SignalListStatus,
     Signal,
 )
-from resources.tickers import TickerRegister, TickerUpdatePNL, TickerList, Ticker
-from resources.users import (
+from services.resources.tickers import TickerRegister, TickerUpdatePNL, TickerList, Ticker
+from services.resources.users import (
     UserRegister,
     UserList,
     User,
@@ -21,7 +21,7 @@ from resources.users import (
     UserLogout,
     TokenRefresh,
 )
-from resources.account import PNLRegister, PNLList, PNL
+from services.resources.account import PNLRegister, PNLList, PNL
 
 
 api = Api(app)

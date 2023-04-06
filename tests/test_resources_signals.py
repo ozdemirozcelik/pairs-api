@@ -10,14 +10,14 @@ from app import app
 from db import db
 from security import talisman, csrf
 from flask_jwt_extended import create_access_token
-from resources import status_codes as status
-from models.signals import SignalModel
-from models.pairs import PairModel
-from models.tickers import TickerModel
+from services.resources import status_codes as status
+from services.models.signals import SignalModel
+from services.models.pairs import PairModel
+from services.models.tickers import TickerModel
 from tests.factories import TickerFactory
 from tests.factories import PairFactory
 from tests.factories import SignalFactory
-from resources.users import UserRegister
+from services.resources.users import UserRegister
 
 # rather than referring to an app directly, use a proxy,
 # which points to the application handling the current activity
@@ -214,7 +214,7 @@ class TestSignal(unittest.TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    @patch("resources.signals.SignalModel.splitticker")
+    @patch("services.resources.signals.SignalModel.splitticker")
     def test_post_pair_server_error(self, mock_split):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -253,7 +253,7 @@ class TestSignal(unittest.TestCase):
 
         # test for exception handler for updating pair
         with mock.patch(
-            "resources.signals.SignalModel.splitticker", side_effect=Exception
+            "services.resources.signals.SignalModel.splitticker", side_effect=Exception
         ):
             # assert update with fresh token
             response = self.client.put(
@@ -422,7 +422,7 @@ class TestSignal(unittest.TestCase):
         self.assertEqual(data["order_status"], "filled")
 
         # test for exception handler for updating pair
-        with mock.patch("resources.signals.SignalModel.update", side_effect=Exception):
+        with mock.patch("services.resources.signals.SignalModel.update", side_effect=Exception):
             # assert update with fresh token
             response = self.client.put(
                 BASE_URL + "/order",
@@ -735,7 +735,7 @@ class TestSignal(unittest.TestCase):
 
         # test for exception handler to get pair
         with mock.patch(
-            "resources.signals.SignalModel.find_by_rowid", side_effect=Exception
+            "services.resources.signals.SignalModel.find_by_rowid", side_effect=Exception
         ):
             # assert get with fresh token
             response = self.client.get(BASE_URL + "/" + "2")
@@ -773,7 +773,7 @@ class TestSignal(unittest.TestCase):
 
         # test for exception handler to get pair
         with mock.patch(
-            "resources.signals.SignalModel.get_rows", side_effect=Exception
+            "services.resources.signals.SignalModel.get_rows", side_effect=Exception
         ):
             # assert get with fresh token
             response = self.client.get(GET_URL + "0")
@@ -830,7 +830,7 @@ class TestSignal(unittest.TestCase):
 
         # test for exception handler to get pair
         with mock.patch(
-            "resources.signals.SignalModel.get_list_ticker", side_effect=Exception
+            "services.resources.signals.SignalModel.get_list_ticker", side_effect=Exception
         ):
             # assert get with fresh token
             response = self.client.get(GET_URL + "ticker/C-D/1")
@@ -866,7 +866,7 @@ class TestSignal(unittest.TestCase):
 
         # test for exception handler to get pair
         with mock.patch(
-            "resources.signals.SignalModel.get_list_status", side_effect=Exception
+            "services.resources.signals.SignalModel.get_list_status", side_effect=Exception
         ):
             # assert get with fresh token
             response = self.client.get(GET_URL + "status/waiting/1")
@@ -908,7 +908,7 @@ class TestSignal(unittest.TestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(data["message"], "'admin' privilege required.")
 
-    @patch("resources.signals.SignalModel.find_by_rowid")
+    @patch("services.resources.signals.SignalModel.find_by_rowid")
     def test_put_pair_server_error(self, mock_delete):
         """It should try to delete signal from the endpoint but an error occurs on the server side"""
 

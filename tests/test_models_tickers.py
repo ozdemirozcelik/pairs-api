@@ -5,7 +5,7 @@ import unittest
 import os
 from app import app
 from db import db
-from models.tickers import TickerModel
+from services.models.tickers import TickerModel
 from tests.factories import TickerFactory
 
 # rather than referring to an app directly, use a proxy,

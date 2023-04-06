@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
-from models.pairs import PairModel
+from services.models.pairs import PairModel
 from flask_jwt_extended import jwt_required, get_jwt
-from models.tickers import TickerModel
+from services.models.tickers import TickerModel
 from . import status_codes as status
 
 EMPTY_ERR = "'{}' cannot be empty!"

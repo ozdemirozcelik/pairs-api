@@ -7,12 +7,12 @@ import factory
 from factory.fuzzy import BaseFuzzyAttribute
 import string
 import random
-from models.tickers import TickerModel
-from models.pairs import PairModel
-from models.signals import SignalModel
-from models.users import UserModel
-from models.account import AccountModel
-from models.session import SessionModel
+from services.models.tickers import TickerModel
+from services.models.pairs import PairModel
+from services.models.signals import SignalModel
+from services.models.users import UserModel
+from services.models.account import AccountModel
+from services.models.session import SessionModel
 
 sec_types = ["STK", "CASH", "CRYPTO"]
 xch_types = ["SMART", "NASDAQ", "NYSE", "ISLAND", "BYX"]

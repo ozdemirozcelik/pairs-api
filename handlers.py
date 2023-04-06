@@ -11,7 +11,7 @@ from jwt import ExpiredSignatureError
 @app.before_first_request
 def create_tables():
     from app import db
-    from resources.users import UserRegister
+    from services.resources.users import UserRegister
 
     db.create_all()
     UserRegister.default_users()

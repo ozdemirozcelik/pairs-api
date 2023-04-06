@@ -4,11 +4,11 @@ Routes and functions used for the frontend demo
 import os
 from app import app, configs
 from flask import render_template, request, flash, redirect, url_for
-from models.signals import SignalModel
-from models.tickers import TickerModel
-from models.account import AccountModel
-from models.pairs import PairModel
-from models.session import SessionModel
+from services.models.signals import SignalModel
+from services.models.tickers import TickerModel
+from services.models.account import AccountModel
+from services.models.pairs import PairModel
+from services.models.session import SessionModel
 from datetime import datetime
 from datetime import timedelta
 import pytz

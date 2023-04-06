@@ -10,10 +10,10 @@ from app import app
 from db import db
 from security import talisman, csrf
 from flask_jwt_extended import create_access_token
-from resources import status_codes as status
-from models.account import AccountModel
+from services.resources import status_codes as status
+from services.models.account import AccountModel
 from tests.factories import AccountFactory
-from resources.users import UserRegister
+from services.resources.users import UserRegister
 
 
 # rather than referring to an app directly, use a proxy,
@@ -111,7 +111,7 @@ class TestAccount(unittest.TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @patch("resources.account.AccountModel.insert")
+    @patch("services.resources.account.AccountModel.insert")
     def test_post_PNL_server_error(self, mock_insert):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -169,7 +169,7 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(data["RealizedPnL"], 333)
 
         # test for exception handler for updating account
-        with mock.patch("resources.account.AccountModel.update", side_effect=Exception):
+        with mock.patch("services.resources.account.AccountModel.update", side_effect=Exception):
             # assert create with fresh token
             response = self.client.put(
                 BASE_URL,
@@ -289,7 +289,7 @@ class TestAccount(unittest.TestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(len(data["pnls"]), 5)
 
-    @patch("resources.account.AccountModel.get_rows")
+    @patch("services.resources.account.AccountModel.get_rows")
     def test_get_PNLs_server_error(self, mock_rows):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -300,7 +300,7 @@ class TestAccount(unittest.TestCase):
         response = self.client.get(BASE_URL + "s/0")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @patch("resources.account.AccountModel.find_by_rowid")
+    @patch("services.resources.account.AccountModel.find_by_rowid")
     def test_get_PNL_server_error(self, mock_find):
         """It should try to insert to the endpoint but an error occurs on the server side"""
 
@@ -337,7 +337,7 @@ class TestAccount(unittest.TestCase):
 
         # test for exception handler
         with mock.patch(
-            "resources.account.AccountModel.find_by_rowid", side_effect=Exception
+            "services.resources.account.AccountModel.find_by_rowid", side_effect=Exception
         ):
             # delete and assert
             response = self.client.delete(BASE_URL + "/" + str(rowid), headers=self._get_headers())

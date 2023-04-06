@@ -7,8 +7,8 @@ from sqlalchemy.sql import (
     func,
 )  # 'sqlalchemy' is being installed together with 'flask-sqlalchemy'
 
-from models.pairs import PairModel
-from models.tickers import TickerModel
+from services.models.pairs import PairModel
+from services.models.tickers import TickerModel
 
 from app import configs
 

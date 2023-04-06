@@ -324,7 +324,7 @@ api.add_resource(PNLList, "/v4/pnl/<string:number_of_items>")
 
 # Request & Response Examples
 
-Please check the [POSTMAN collection](local/pairs_api%20v4.postman_collection.json) for all resources.
+Please check the [POSTMAN collection](local/pairs_api%20v4.postman_collection.json) for all services.resources.
 
 ### POST request to register a single ticker:
 ```python

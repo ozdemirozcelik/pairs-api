@@ -5,7 +5,7 @@ import unittest
 import os
 from app import app
 from db import db
-from models.pairs import PairModel
+from services.models.pairs import PairModel
 from tests.factories import PairFactory
 
 # rather than referring to an app directly, use a proxy,
