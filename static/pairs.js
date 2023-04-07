@@ -290,7 +290,7 @@ function postSave_pairs() {
                     // create span element according to pair status
                     if (jsonResponse.status) {
                         li.innerHTML = "<span title='active' class='roundgreen'></span>";
-                    } else if (pairs_data.pairs[key].status==0) {
+                    } else if (jsonResponse.status==0) {
                         li.innerHTML = "<span title='passive' class='roundred'></span>";
                     } else {
                         li.innerHTML = "<span title='watch' class='roundyellow'></span>";
@@ -299,9 +299,8 @@ function postSave_pairs() {
                     li.setAttribute('id', pair_text);
                     li.appendChild(document.createTextNode(pair_text));
                     pairlist.insertBefore(li, pairlist.firstChild);
-
                     // add onclick event listener for each list element
-                    dynamiclistener_signal(pair_text)
+                    dynamiclistener_pair(pair_text)
 
                     createPages_pairs();
         
