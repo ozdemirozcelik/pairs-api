@@ -57,13 +57,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download coverage badge
+      - name: Checkout
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           name: coverage-badge
           path: tests
-      - name: Push the badge to repo
+      - name: Push new badge to repo
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com

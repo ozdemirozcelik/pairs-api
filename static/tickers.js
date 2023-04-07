@@ -277,8 +277,10 @@ function postSave() {
 
                         li.setAttribute('id', ticker.value.toUpperCase());
                         li.appendChild(document.createTextNode(ticker.value.toUpperCase()));
-                        li.setAttribute("onclick", "Update(this)");
+                        // li.setAttribute("onclick", "Update(this)");
                         stklist.insertBefore(li, stklist.firstChild);
+                        // add onclick event listener for each list element
+                        dynamiclistener_ticker(ticker.value.toUpperCase())
 
                         createPages();
             

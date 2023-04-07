@@ -207,11 +207,11 @@
                             </p>
                             <p>
                                 <label for="order_contracts"># of Contracts(*):&nbsp;</label>
-                                <input type="text" name="order_contracts" id="order_contracts" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###">
+                                <input type="text" name="order_contracts" id="order_contracts" class="integer" title="Integers only" pattern="^$|[0-9]+" required placeholder="###">
                             </p>
                             <p>
                                 <label for="order_price">Order Price:&nbsp;</label>
-                                <input type="text" name="order_price" id="order_price" class="float" title="Decimals only" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="##.##">
+                                <input type="text" name="order_price" id="order_price" class="float" title="Decimals only" pattern="^$|^[1-9]\d*(\.\d+)?$" placeholder="##.##">
                             </p>
                             <p>
                                 <label for="mar_pos">Market Position:&nbsp;</label>
@@ -224,7 +224,7 @@
                             </p>
                             <p>
                                 <label for="mar_pos_size">Mar. Pos. Size:&nbsp;</label>
-                                <input type="text" name="mar_pos_size" id="mar_pos_size" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
+                                <input type="text" name="mar_pos_size" id="mar_pos_size" class="integer" class="integer" title="Integers only" pattern="^$|[0-9]+" placeholder="###"> 
                             </p>
                             <p>
                                 <label for="pre_mar_pos">Previous Mar. Pos.:&nbsp;</label>
@@ -237,11 +237,11 @@
                             </p>
                             <p>
                                 <label for="pre_mar_pos_size">Pre. Mar. Pos. Size:&nbsp</label>
-                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer" class="integer" title="Integers only" pattern="^$|[0-9]+" placeholder="###"> 
                             </p>
                             <p>
                                 <label for="passphrase">Passphrase(*):&nbsp</label>
-                                <input type="text" name="passphrase" id="passphrase" autocomplete='passphrase'>
+                                <input type="text" name="passphrase" id="passphrase" autocomplete='passphrase' required>
                             </p>
                             <br>
                             <p>
@@ -341,12 +341,12 @@
                             </p>
                             <p>
                                 <label for="order_contracts_update"># Contracts(*):&nbsp;</label>
-                                <input type="text" name="order_contracts" id="order_contracts-update" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###">
+                                <input type="text" name="order_contracts" id="order_contracts_update" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###">
 
                             </p>
                             <p>
                                 <label for="order_price_update">Order Price:&nbsp;</label>
-                                <input type="text" name="order_price" id="order_price_update" class="float" title="Decimals only" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="##.##"> 
+                                <input type="text" name="order_price" id="order_price_update" class="float" title="Decimals only" pattern="^[1-9]\d*(\.\d+)?$" placeholder="##.##"> 
                             </p>
                             <p>
                                 <label for="mar_pos_update">Mar. Position:&nbsp;</label>
@@ -359,7 +359,7 @@
                             </p>
                             <p>
                                 <label for="mar_pos_size_update">Mar. Pos. Size:&nbsp;</label>
-                                <input type="text" name="mar_pos_size" id="mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
+                                <input type="text" name="mar_pos_size" id="mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" placeholder="###"> 
                             </p>
                             <p>
                                 <label for="pre_mar_pos_update">Pre. Mar. Pos.:&nbsp;</label>
@@ -372,7 +372,7 @@
                             </p>
                             <p>
                                 <label for="pre_mar_pos_size_update">Pre.Mar.Pos.Size:&nbsp;</label>
-                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" placeholder="###"> 
                             </p>
                             
                             <p>
@@ -430,7 +430,7 @@
                             </p>
                             <p>
                                 <label for="passphrase">Passphrase(*):&nbsp</label>
-                                <input type="text" name="passphrase" id="passphrase_update" autocomplete='passphrase'>
+                                <input type="text" name="passphrase" id="passphrase_update" autocomplete='passphrase' required >
                             </p>
              
              
@@ -489,12 +489,12 @@
                                 </select>
                             </p>          
                             <p>
-                                <label for="hedge">Hedge:&nbsp;</label>
+                                <label for="hedge">Hedge(*):&nbsp;</label>
                                 <input type="text" title="Decimals only" name="hedge" id="hedge" class="float" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="#.##">
                                 <input name="status" type="hidden" value="0"/>
                             </p>
                             <p>
-                                <label for="contracts">Contracts:&nbsp;</label>
+                                <label for="contracts">Contracts(*):&nbsp;</label>
                                 <input type="text" title="Integers only" name="contracts" id="contracts" class="integer" pattern="[0-9]+" required placeholder="###"> 
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             </p>
@@ -568,11 +568,11 @@
                                 </p>    
                                 <br>    
                                 <p>
-                                    <label for="hedge-update">Hedge Value:&nbsp;</label>
+                                    <label for="hedge-update">Hedge(*):&nbsp;</label>
                                     <input type="text" title="Decimals only" name="hedge" id="hedge-update" class="float" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="#.##">
                                 </p>
                                 <p>
-                                    <label for="contracts-update">Contracts:&nbsp;</label>
+                                    <label for="contracts-update">Contracts(*):&nbsp;</label>
                                     <input type="text" title="Integers only" name="contracts" id="contracts-update" class="integer" pattern="[0-9]+" required placeholder="###"> 
                                 </p>
                                 <p>
