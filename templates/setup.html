@@ -26,61 +26,62 @@
 
             // end
 
+            //Below needs a CSP fix
             // thanks to: https://jsfiddle.net/KarmaProd/hw8j34f2/4/
             // Restricts input for each element in the set of matched elements to the given inputFilter.
-            (function($) {
-            $.fn.inputFilter = function(callback, errMsg) {
-                return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function(e) {
-                if (callback(this.value)) {
-                    // Accepted value
-                    if (["keydown","mousedown","focusout"].indexOf(e.type) >= 0){
-                    $(this).removeClass("input-error");
-                    this.setCustomValidity("");
-                    }
-                    this.oldValue = this.value;
-                    this.oldSelectionStart = this.selectionStart;
-                    this.oldSelectionEnd = this.selectionEnd;
-                } else if (this.hasOwnProperty("oldValue")) {
-                    // Rejected value - restore the previous one
-                    $(this).addClass("input-error");
-                    this.setCustomValidity(errMsg);
-                    this.reportValidity();
-                    this.value = this.oldValue;
-                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-                } else {
-                    // Rejected value - nothing to restore
-                    this.value = "";
-                }
-                });
-            };
-            }(jQuery));
+            // (function($) {
+            // $.fn.inputFilter = function(callback, errMsg) {
+            //     return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function(e) {
+            //     if (callback(this.value)) {
+            //         // Accepted value
+            //         if (["keydown","mousedown","focusout"].indexOf(e.type) >= 0){
+            //         $(this).removeClass("input-error");
+            //         this.setCustomValidity("");
+            //         }
+            //         this.oldValue = this.value;
+            //         this.oldSelectionStart = this.selectionStart;
+            //         this.oldSelectionEnd = this.selectionEnd;
+            //     } else if (this.hasOwnProperty("oldValue")) {
+            //         // Rejected value - restore the previous one
+            //         $(this).addClass("input-error");
+            //         this.setCustomValidity(errMsg);
+            //         this.reportValidity();
+            //         this.value = this.oldValue;
+            //         this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+            //     } else {
+            //         // Rejected value - nothing to restore
+            //         this.value = "";
+            //     }
+            //     });
+            // };
+            // }(jQuery));
 
             // Install input filters.
             // not used:
-            $("#intTextBox").inputFilter(function(value) {
-            return /^-?\d*$/.test(value); }, "Must be an integer");
+            // $("#intTextBox").inputFilter(function(value) {
+            // return /^-?\d*$/.test(value); }, "Must be an integer");
             
-            // used:
-            $('input.integer').inputFilter(function(value) {
-            return /^\d*$/.test(value); }, "Must be an unsigned integer");
+            // // used:
+            // $('input.integer').inputFilter(function(value) {
+            // return /^\d*$/.test(value); }, "Must be an unsigned integer");
             
-            // not used:
-            $("#intLimitTextBox").inputFilter(function(value) {
-            return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1000); }, "Must be between 0 and 1000");
-            $('input.float').inputFilter(function(value) {
-            return /^-?\d*[.]?\d*$/.test(value); }, "Must be a floating (real) number");
+            // // not used:
+            // $("#intLimitTextBox").inputFilter(function(value) {
+            // return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1000); }, "Must be between 0 and 1000");
+            // $('input.float').inputFilter(function(value) {
+            // return /^-?\d*[.]?\d*$/.test(value); }, "Must be a floating (real) number");
             
-            // used. if you need ',' as a separator use below:
-            //return /^-?\d*[.,]?\d*$/.test(value); }, "Must be a floating (real) number");
-            $("#currencyTextBox").inputFilter(function(value) {
-            return /^-?\d*[.,]?\d{0,2}$/.test(value); }, "Must be a currency value");
+            // // used. if you need ',' as a separator use below:
+            // //return /^-?\d*[.,]?\d*$/.test(value); }, "Must be a floating (real) number");
+            // $("#currencyTextBox").inputFilter(function(value) {
+            // return /^-?\d*[.,]?\d{0,2}$/.test(value); }, "Must be a currency value");
             
-            // not used. currently using html input pattern:
-            $("#latinTextBox").inputFilter(function(value) {
-            return /^[a-z]*$/i.test(value); }, "Must use alphabetic latin characters");
-            // not used
-            $("#hexTextBox").inputFilter(function(value) {
-            return /^[0-9a-f]*$/i.test(value); }, "Must use hexadecimal characters");
+            // // not used. currently using html input pattern:
+            // $("#latinTextBox").inputFilter(function(value) {
+            // return /^[a-z]*$/i.test(value); }, "Must use alphabetic latin characters");
+            // // not used
+            // $("#hexTextBox").inputFilter(function(value) {
+            // return /^[0-9a-f]*$/i.test(value); }, "Must use hexadecimal characters");
 
             // // not used: this can also be used for float only text inputs as "class=float"
             // $('input.float').on('input', function() {
@@ -206,11 +207,11 @@
                             </p>
                             <p>
                                 <label for="order_contracts"># of Contracts(*):&nbsp;</label>
-                                <input type="text" name="order_contracts" id="order_contracts" class="integer"> 
+                                <input type="text" name="order_contracts" id="order_contracts" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###">
                             </p>
                             <p>
                                 <label for="order_price">Order Price:&nbsp;</label>
-                                <input type="text" name="order_price" id="order_price" class="float"> 
+                                <input type="text" name="order_price" id="order_price" class="float" title="Decimals only" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="##.##">
                             </p>
                             <p>
                                 <label for="mar_pos">Market Position:&nbsp;</label>
@@ -223,7 +224,7 @@
                             </p>
                             <p>
                                 <label for="mar_pos_size">Mar. Pos. Size:&nbsp;</label>
-                                <input type="text" name="mar_pos_size" id="mar_pos_size" class="integer"> 
+                                <input type="text" name="mar_pos_size" id="mar_pos_size" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
                             </p>
                             <p>
                                 <label for="pre_mar_pos">Previous Mar. Pos.:&nbsp;</label>
@@ -236,7 +237,7 @@
                             </p>
                             <p>
                                 <label for="pre_mar_pos_size">Pre. Mar. Pos. Size:&nbsp</label>
-                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer"> 
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
                             </p>
                             <p>
                                 <label for="passphrase">Passphrase(*):&nbsp</label>
@@ -339,15 +340,16 @@
                                 </select>          
                             </p>
                             <p>
-                                <label for="order_contracts_update"># of Contracts(*):&nbsp;</label>
-                                <input type="text" name="order_contracts" id="order_contracts_update" class="integer"> 
+                                <label for="order_contracts_update"># Contracts(*):&nbsp;</label>
+                                <input type="text" name="order_contracts" id="order_contracts-update" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###">
+
                             </p>
                             <p>
                                 <label for="order_price_update">Order Price:&nbsp;</label>
-                                <input type="text" name="order_price" id="order_price_update" class="float"> 
+                                <input type="text" name="order_price" id="order_price_update" class="float" title="Decimals only" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="##.##"> 
                             </p>
                             <p>
-                                <label for="mar_pos_update">Market Position:&nbsp;</label>
+                                <label for="mar_pos_update">Mar. Position:&nbsp;</label>
                                 <select name="mar_pos" id="mar_pos_update">
                                     <option></option>
                                     <option value="flat">flat</option>
@@ -357,10 +359,10 @@
                             </p>
                             <p>
                                 <label for="mar_pos_size_update">Mar. Pos. Size:&nbsp;</label>
-                                <input type="text" name="mar_pos_size" id="mar_pos_size_update" class="integer"> 
+                                <input type="text" name="mar_pos_size" id="mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
                             </p>
                             <p>
-                                <label for="pre_mar_pos_update">Previous Mar. Pos.:&nbsp;</label>
+                                <label for="pre_mar_pos_update">Pre. Mar. Pos.:&nbsp;</label>
                                 <select name="pre_mar_pos" id="pre_mar_pos_update">
                                     <option></option>
                                     <option value="flat">flat</option>
@@ -369,8 +371,8 @@
                                 </select>        
                             </p>
                             <p>
-                                <label for="pre_mar_pos_size_update">Pre. Mar. Pos. Size:&nbsp;</label>
-                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size_update" class="integer"> 
+                                <label for="pre_mar_pos_size_update">Pre.Mar.Pos.Size:&nbsp;</label>
+                                <input type="text" name="pre_mar_pos_size" id="pre_mar_pos_size_update" class="integer" class="integer" title="Integers only" pattern="[0-9]+" required placeholder="###"> 
                             </p>
                             
                             <p>
@@ -488,12 +490,12 @@
                             </p>          
                             <p>
                                 <label for="hedge">Hedge:&nbsp;</label>
-                                <input type="text" name="hedge" id="hedge" class="float"> 
+                                <input type="text" title="Decimals only" name="hedge" id="hedge" class="float" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="#.##">
                                 <input name="status" type="hidden" value="0"/>
                             </p>
                             <p>
                                 <label for="contracts">Contracts:&nbsp;</label>
-                                <input type="text" name="contracts" id="contracts" class="integer"> 
+                                <input type="text" title="Integers only" name="contracts" id="contracts" class="integer" pattern="[0-9]+" required placeholder="###"> 
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             </p>
                             <br><br>
@@ -567,11 +569,11 @@
                                 <br>    
                                 <p>
                                     <label for="hedge-update">Hedge Value:&nbsp;</label>
-                                    <input type="text" name="hedge" id="hedge-update" class="float">
+                                    <input type="text" title="Decimals only" name="hedge" id="hedge-update" class="float" pattern="^[1-9]\d*(\.\d+)?$" required placeholder="#.##">
                                 </p>
                                 <p>
                                     <label for="contracts-update">Contracts:&nbsp;</label>
-                                    <input type="text" name="contracts" id="contracts-update" class="integer">
+                                    <input type="text" title="Integers only" name="contracts" id="contracts-update" class="integer" pattern="[0-9]+" required placeholder="###"> 
                                 </p>
                                 <p>
                                     <label for="notes-update">Notes:&nbsp;</label>
@@ -627,8 +629,10 @@
                         <div>
                             <p>
                                 <label for="ticker">Ticker Symbol:&nbsp;</label>
-                                <input type="text" id="ticker" class="ticker" name="symbol" pattern="^\S{1,9}$" required placeholder="Add Here"
-                                oninvalid="this.setCustomValidity('Less than 10 charachers with no spaces!')" oninput="this.setCustomValidity('')"/>
+                                <input type="text" title="Max 10 chars with no spaces" id="ticker" class="ticker" name="symbol" pattern="^\S{1,9}$" required placeholder="Add Here"/>
+                                <!--Below needs a CSP fix-->
+                                <!-- <input type="text" id="ticker" class="ticker" name="symbol" pattern="^\S{1,9}$" required placeholder="Add Here"
+                                oninvalid="this.setCustomValidity('Less than 10 charachers with no spaces!')" oninput="this.setCustomValidity('')"/> -->
                             </p>
                             <p>
                                 <label for="sectype">Sec. Type:&nbsp; </label>
