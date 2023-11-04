@@ -1,5 +1,5 @@
 # Build & Runtime dependencies
-werkzeug==2.0.3
+werkzeug==3.0.1
 flask==2.0.2
 Flask-RESTful==0.3.9
 Flask-JWT-Extended==4.4.0
