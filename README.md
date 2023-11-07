@@ -66,9 +66,11 @@ With Pairs-API you can:
 
 Considering for the next version:
 
-- automatic selection of pairs by comparing cointegration test results
-- add more statistical analysis and visualization 
 - improve logging & error handling
+
+- ~~automatic selection of pairs by comparing cointegration test results~~
+
+- ~~add more statistical analysis and visualization~~ 
 
 
 # Requirements
